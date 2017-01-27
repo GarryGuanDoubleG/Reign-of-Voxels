@@ -1,13 +1,11 @@
 #pragma once
-#ifndef _CLIENT_H_
-#define _CLIENT_H_
-
+#ifndef _SERVER_H
+#define _SERVER_H
 #include "SFML/Network.hpp"
 
-#define SERVER_IP_ADDR "192.138.179.239"
-#define SERVER_PORT 5000
+#define MAX_CLIENTS 100;
 
-class Client
+class Server
 {
 private:
 	std::string username;
@@ -15,22 +13,18 @@ private:
 	sf::Int16 port;
 	std::string data;
 public:
-	Client(const std::string & name)
+	Server(const std::string & name)
 	{
 		username = name;
-		port = rand() % 5000;
 		if (socket.bind(port) != sf::Socket::Done)
 		{
 			printf("Error binding \n");
 		}
 	}
-	~Client();
+	~Server();
 
 	void SendData();
 	void onReceiveData();
-
+	void ServerLoop();
 };
-
-
-
 #endif

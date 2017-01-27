@@ -145,14 +145,19 @@
     <ClCompile Include="source\game.cpp" />
     <ClCompile Include="source\graphics.cpp" />
     <ClCompile Include="source\main.cpp" />
+    <ClCompile Include="source\server.cpp" />
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="include\Actor.h" />
     <ClInclude Include="include\client.h" />
+    <ClInclude Include="include\command.h" />
     <ClInclude Include="include\game.h" />
     <ClInclude Include="include\graphics.h" />
+    <ClInclude Include="include\Menu.h" />
+    <ClInclude Include="include\server.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

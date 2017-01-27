@@ -22,6 +22,8 @@ int APIENTRY WinMain(
 )
 #endif
 {
+	srand(0);
+
 	Initialize();
 	GameLoop();
 	return 0;
