@@ -5,12 +5,10 @@ Font *fonts;
 
 void LoadFonts()
 {
-	std::string filepath;
-	fonts = (Font *) malloc(sizeof(Font));
-
-	filepath = "Resources\fonts\Quicksand-Regular.otf";
-	if (!fonts->quicksand_reg.loadFromFile(filepath))
-		printf("Could not load font %s\n", filepath);
+	sf::Font font;
+	
+	if (!font.loadFromFile("Resources/fonts/Quicksand-Regular.otf"))
+		printf("Could not load font %s\n", "Resources/fonts/Quicksand-Regular.otf");
 }
 
 void Initialize()
@@ -18,7 +16,6 @@ void Initialize()
 	//initialize funcitons
 	GraphicsInit();
 	LoadFonts();
-
 }
 
 void MenuLoop()
