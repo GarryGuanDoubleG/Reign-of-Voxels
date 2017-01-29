@@ -6,7 +6,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 
-extern sf::Window *g_window;
+extern sf::RenderWindow *g_window;
 
 void GraphicsInit();
 void draw(); // temporary
