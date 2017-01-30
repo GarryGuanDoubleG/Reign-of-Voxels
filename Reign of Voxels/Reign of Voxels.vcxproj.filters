@@ -12,6 +12,12 @@
     <Filter Include="Shader">
       <UniqueIdentifier>{875eadf3-b4b2-439c-ba6d-8809cb12975f}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Header Files\Gui">
+      <UniqueIdentifier>{d60b0497-7486-44c4-b9f2-28897b18079d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Gui">
+      <UniqueIdentifier>{11f21522-ca88-4e8e-933f-0ca211d9b179}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -45,10 +51,10 @@
       <Filter>Header Files</Filter>
     </ClInclude>
     <ClInclude Include="src\Gui\Menu.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Gui</Filter>
     </ClInclude>
     <ClInclude Include="src\Gui\Textbox.h">
-      <Filter>Header Files</Filter>
+      <Filter>Header Files\Gui</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -69,6 +75,12 @@
     </ClCompile>
     <ClCompile Include="src\client.cpp">
       <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gui\Menu.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gui\TextBox.cpp">
+      <Filter>Source Files\Gui</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

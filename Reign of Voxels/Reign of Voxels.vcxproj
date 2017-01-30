@@ -164,6 +164,8 @@
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\graphics.cpp" />
+    <ClCompile Include="src\Gui\Menu.cpp" />
+    <ClCompile Include="src\Gui\TextBox.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\server.cpp" />
     <ClCompile Include="src\shader.cpp" />

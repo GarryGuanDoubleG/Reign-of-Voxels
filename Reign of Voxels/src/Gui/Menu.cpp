@@ -21,7 +21,7 @@ Menu::Menu()
 //doing login first to set up for network
 void Menu::MenuLoop()
 {
-	while (g_window->isOpen && state_ == STATE_LOGIN)
+	while (g_window->isOpen())
 	{
 		sf::Event event;
 		while (g_window->pollEvent(event))
@@ -59,16 +59,16 @@ void Menu::HandleInput(sf::Event event)
 	case STATE_TEXTBOX:
 		break;
 	}
-	if (event.type == sf::Event::TextEntered)
-	{
-		if (event.text.unicode >= 32 && event.text.unicode < 126)
-		{
-			printf("Text event\n");
-			input += (char)event.text.unicode;
-		}
-		else if (event.text.unicode == 8 && input.length() > 0)
-		{
-			input.erase(input.length() - 1, input.size());
-		}
-	}
+	//if (event.type == sf::Event::TextEntered)
+	//{
+	//	if (event.text.unicode >= 32 && event.text.unicode < 126)
+	//	{
+	//		printf("Text event\n");
+	//		input += (char)event.text.unicode;
+	//	}
+	//	else if (event.text.unicode == 8 && input.length() > 0)
+	//	{
+	//		input.erase(input.length() - 1, input.size());
+	//	}
+	//}
 }
