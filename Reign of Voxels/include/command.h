@@ -7,6 +7,10 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 
+/*
+*	Virtual class to run specific commands on input
+* Architected to run commands with polymorphism
+*/
 class Command
 {
 public:
@@ -16,6 +20,7 @@ public:
 	virtual void execute(Actor* actor) = 0;
 	virtual void execute() = 0;
 };
+
 class InputHandler
 {
 public:
