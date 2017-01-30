@@ -1,6 +1,7 @@
 #pragma once
-#include "command.h"
 #include "SFML\Graphics.hpp"
+#include "command.h"
+#include "Gui\Textbox.h"
 
 //list of states to know which to render to
 //do states even make sense idk
@@ -41,4 +42,6 @@ private:
 
 	sf::Font font_;
 	sf::Text text_;
+
+	TextBox box;
 };
