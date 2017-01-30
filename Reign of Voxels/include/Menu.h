@@ -6,9 +6,8 @@
 //do states even make sense idk
 enum MenuState
 {
-	STATE_LOGIN,
-	STATE_LOBBY,
-	STATE_GAME
+	STATE_TEXTBOX,
+	STATE_IDLE
 };
 
 class MenuCommand : public Command
@@ -20,17 +19,21 @@ public:
 
 	}
 };
-
+/*
+	setting up this menu for login only right now
+	will later make a scene class that menu will extend from
+	and a scene manager, this way I can push and pop scenes for easy
+	management
+*/
 class Menu
 {
 public:
 	Menu();
 	~Menu();
 
-	//use input handler based on current state
-	static InputHandler GameHandler;
-	static InputHandler LoginHandler;
-	static InputHandler LobbyHandler;
+	virtual void Render();
+	virtual void MenuLoop();
+	virtual void HandleInput(sf::Event event);
 
 private:
 	std::string login_name_;
@@ -38,8 +41,4 @@ private:
 
 	sf::Font font_;
 	sf::Text text_;
-
-	void RenderLoginMenu();
-	void LoginMenuLoop();
-	void Lobby();
 };

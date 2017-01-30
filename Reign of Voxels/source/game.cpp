@@ -40,49 +40,17 @@ void MenuLoop()
 		sf::Event event;
 		while (g_window->pollEvent(event))
 		{
-			if ((event.type == sf::Event::Closed) ||
-				(event.key.code == sf::Keyboard::Escape))
-			{
-				g_window->close();
-			}
-			if (event.type == sf::Event::TextEntered)
-			{
-				if (event.text.unicode >= 32 && event.text.unicode < 126)
-				{
-					printf("Text event\n");
-					input += (char)event.text.unicode;
-				}
-				else if (event.text.unicode == 8 && input.length() > 0)
-				{
-					input.erase(input.length() - 1, input.size());
-				}
-			}
+			
 		}
 		text.setString(input);
-		g_window->clear(sf::Color::Blue);
-		g_window->pushGLStates();
-		g_window->draw(text);
-		g_window->popGLStates();
-		draw();		
-		g_window->display();
 	}
 }
 
 void GameLoop()
 {
 	//go to menu then start game
+	//later implement a scene manager that runs the scene's loop
+	//instead of calling it explicitly
 	MenuLoop();
 
-	//while (g_window->isOpen())
-	//{
-	//	sf::Event event;
-	//	while (g_window->pollEvent(event))
-	//	{
-	//		if ((event.type == sf::Event::Closed) ||
-	//			(event.key.code == sf::Keyboard::Escape))
-	//		{
-	//			g_window->close();
-	//		}
-	//	}
-	//}
 }
