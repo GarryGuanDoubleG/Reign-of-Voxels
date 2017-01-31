@@ -69,19 +69,19 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;$(IncludePath)</IncludePath>
     <LibraryPath>$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;$(IncludePath)</IncludePath>
     <LibraryPath>$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;$(IncludePath)</IncludePath>
     <LibraryPath>$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(IncludePath)</IncludePath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;$(IncludePath)</IncludePath>
     <LibraryPath>$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
@@ -89,7 +89,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SFML_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -102,7 +102,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SFML_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -117,7 +117,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SFML_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -134,7 +134,7 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SFML_STATIC;_CRT_SECURE_NO_WARNINGS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
@@ -153,21 +153,22 @@
     <ClInclude Include="src\Actor.h" />
     <ClInclude Include="src\client.h" />
     <ClInclude Include="src\command.h" />
+    <ClInclude Include="src\error_logger.h" />
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\graphics.h" />
     <ClInclude Include="src\Gui\Menu.h" />
     <ClInclude Include="src\Gui\Textbox.h" />
-    <ClInclude Include="src\Gui\widget.h" />
+    <ClInclude Include="src\model.h" />
     <ClInclude Include="src\server.h" />
     <ClInclude Include="src\shader.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\client.cpp" />
+    <ClCompile Include="src\error_logger.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\graphics.cpp" />
     <ClCompile Include="src\Gui\Menu.cpp" />
     <ClCompile Include="src\Gui\TextBox.cpp" />
-    <ClCompile Include="src\Gui\widget.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\server.cpp" />
     <ClCompile Include="src\shader.cpp" />
