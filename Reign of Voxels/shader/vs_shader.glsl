@@ -1,4 +1,4 @@
-#version 450 core
+#version 400 core
 layout (location = 0) in vec4 verts;
 layout (location = 1) in vec2 verts_UV;
 

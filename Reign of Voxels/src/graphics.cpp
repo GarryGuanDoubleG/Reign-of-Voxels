@@ -127,7 +127,7 @@ void GraphicsInit()
 	settings.stencilBits = 8;
 	settings.antialiasingLevel = 4;
 	settings.majorVersion = 4;
-	settings.minorVersion = 5;
+	settings.minorVersion = .0;
 	//Create context
 	g_window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "Reign of Voxels", sf::Style::Default, settings);
 	g_window->setFramerateLimit(60);

@@ -16,7 +16,9 @@ Camera::Camera()
 	sf::Vector2u win_size = g_window->getSize();
 	m_proj_mat = Perspective(glm::radians(45.0f), (float)win_size.x / win_size.y, 0.1f, 100.0f);
 
-	yaw = pitch = roll = 0.0f;
+	m_pitch = 0.0f;
+	m_yaw = -90.0f;
+	m_roll = 0.0f;
 }
 
 Mat4 Camera::GetProj()
@@ -29,10 +31,6 @@ Mat4 Camera::GetCamView()
 	return m_view_mat;
 }
 
-void Camera::UpdateView()
-{
-	m_view_mat = LookAt(m_pos, m_pos + m_forward, m_up);
-}
 
 void Camera::HandleInput(sf::Event event)
 {
@@ -40,8 +38,8 @@ void Camera::HandleInput(sf::Event event)
 	GLfloat cam_speed = 5.0f * time.asSeconds();
 
 	if (event.type == sf::Event::KeyPressed)
-		slog("Key Press");
 	{
+		slog("key press ");
 		switch (event.key.code)
 		{
 		case sf::Keyboard::W:
@@ -60,16 +58,15 @@ void Camera::HandleInput(sf::Event event)
 			break;
 		}
 	}
-	
-	if (event.type == sf::Event::MouseMoved)
-	{
-		
+
+	else if (event.type == sf::Event::MouseMoved)
+	{	
 		GLfloat sensitivity = 0.05f; // mouse sensitivity
 
 		sf::Vector2u win_size = g_window->getSize();
 		sf::Vector2i mouse_pos = sf::Mouse::getPosition();
-		float xcenter = win_size.x / 2.0f;
-		float ycenter = win_size.y / 2.0f;
+		int xcenter = win_size.x / 2;
+		int ycenter = win_size.y / 2;
 
 		float xoffset = (float)mouse_pos.x - xcenter;
 		float yoffset = (float)mouse_pos.y - ycenter;
@@ -77,22 +74,20 @@ void Camera::HandleInput(sf::Event event)
 		xoffset *= sensitivity;
 		yoffset *= sensitivity;
 
-		yaw += xoffset;
-		pitch += yoffset;
+		m_yaw += xoffset;
+		m_pitch -= yoffset;
 
-		if (pitch > 89.0f)
-			pitch = 89.0f;
-		else if (pitch < -89.0f)
-			pitch = -89.0f;
+		if (m_pitch > 89.0f)
+			m_pitch = 89.0f;
+		else if (m_pitch < -89.0f)
+			m_pitch = -89.0f;
 
-		m_forward.x = cos(glm::radians(yaw)) * cos(glm::radians(pitch));
-		m_forward.y = sin(glm::radians(pitch));
-		m_forward.z = sin(glm::radians(yaw)) * cos(glm::radians(pitch));
-
-		m_forward = Normalize(m_forward);
-		sf::Mouse::setPosition(sf::Vector2f(xcenter, ycenter));
+		Vec3 front;
+		front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+		front.y = sin(glm::radians(m_pitch));
+		front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+		m_forward = Normalize(front);
 	}
 
-
-	UpdateView();
+	m_view_mat = LookAt(m_pos, m_pos + m_forward, m_up);
 }

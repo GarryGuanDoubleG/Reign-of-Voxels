@@ -3,6 +3,8 @@
 #include "graphics.h"
 #include "glm.h"
 
+
+extern sf::Clock g_delta_clock;
 class Camera
 {
 public:
@@ -14,6 +16,7 @@ public:
 	Mat4 GetProj();
 	void HandleInput(sf::Event event);
 	void Rotate();
+	void Update();
 
 private:
 	Vec3 m_pos;
@@ -23,12 +26,13 @@ private:
 	Vec3 m_right;
 	Vec3 m_up;
 
-	GLfloat yaw;
-	GLfloat pitch;
-	GLfloat roll;
+	GLfloat m_yaw;
+	GLfloat m_pitch;
+	GLfloat m_roll;
 
 	Mat4 m_view_mat;
 	Mat4 m_proj_mat;
 	//update the view matrix with new camera values
 	void UpdateView();
+	void MouseInput();
 };

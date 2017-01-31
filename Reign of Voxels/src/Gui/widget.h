@@ -33,5 +33,6 @@ public:
 	virtual void onTextEnter(char text);
  
 	virtual void onTriggerCallback();
-
+protected:
+	int m_id;
 };
