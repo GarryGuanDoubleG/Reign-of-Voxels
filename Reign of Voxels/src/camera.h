@@ -16,13 +16,16 @@ public:
 	void Rotate();
 
 private:
-
 	Vec3 m_pos;
 	Vec4 m_vel;
 	Vec3 m_target;
 	Vec3 m_forward;
 	Vec3 m_right;
 	Vec3 m_up;
+
+	GLfloat yaw;
+	GLfloat pitch;
+	GLfloat roll;
 
 	Mat4 m_view_mat;
 	Mat4 m_proj_mat;
