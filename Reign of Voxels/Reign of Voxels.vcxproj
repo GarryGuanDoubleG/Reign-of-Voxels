@@ -157,6 +157,7 @@
     <ClInclude Include="src\graphics.h" />
     <ClInclude Include="src\Gui\Menu.h" />
     <ClInclude Include="src\Gui\Textbox.h" />
+    <ClInclude Include="src\Gui\widget.h" />
     <ClInclude Include="src\server.h" />
     <ClInclude Include="src\shader.h" />
   </ItemGroup>
@@ -166,6 +167,7 @@
     <ClCompile Include="src\graphics.cpp" />
     <ClCompile Include="src\Gui\Menu.cpp" />
     <ClCompile Include="src\Gui\TextBox.cpp" />
+    <ClCompile Include="src\Gui\widget.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\server.cpp" />
     <ClCompile Include="src\shader.cpp" />

@@ -2,10 +2,9 @@
 #include "SFML\OpenGL.hpp"
 #include "Gui\Textbox.h"
 
-TextBox::TextBox(float height, float width)
+TextBox::TextBox(sf::Font *font, float height, float width)
 {
 	m_box.setSize(sf::Vector2f(width, height));
-
 }
 
 void TextBox::HandleInput(sf::Event event)
@@ -40,8 +39,12 @@ void TextBox::Draw(sf::RenderTarget &target)
 {
 	//draw the text box
 	target.draw(m_box);
+	//draw the text
+	target.draw(m_text);
 
-	
+	//display a blinking cursor if selected
+	if (m_selected)
+	{
 
-
+	}
 }

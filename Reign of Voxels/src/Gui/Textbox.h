@@ -4,7 +4,7 @@
 class TextBox
 {
 public: 
-	TextBox(float height, float width = 200.f);
+	TextBox(sf::Font *font, float height, float width = 200.0f);
 
 	void setText(const sf::String &string);	
 	void setCursor(size_t index);

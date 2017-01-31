@@ -4,15 +4,17 @@
 
 Menu::Menu()
 {
-	if (!font_.loadFromFile("Resources/fonts/Quicksand-Regular.otf"))
+	m_font = new sf::Font();
+	if (!m_font->loadFromFile("Resources/fonts/Quicksand-Regular.otf"))
 		printf("Could not load font %s\n", "Resources/fonts/Quicksand-Regular.otf");
 
 	state_ = STATE_IDLE;
+	box = new TextBox(m_font, 100.0f);
 
 	//setting fonts
 	text_.setFillColor(sf::Color::Red);
 	text_.setCharacterSize(50);
-	text_.setFont(font_);
+	text_.setFont(*m_font);
 	text_.setOutlineThickness(1.75f);
 }
 
@@ -28,7 +30,6 @@ void Menu::MenuLoop()
 		{
 			HandleInput(event);
 		}	
-
 		Render();
 	}
 }
@@ -59,16 +60,4 @@ void Menu::HandleInput(sf::Event event)
 	case STATE_TEXTBOX:
 		break;
 	}
-	//if (event.type == sf::Event::TextEntered)
-	//{
-	//	if (event.text.unicode >= 32 && event.text.unicode < 126)
-	//	{
-	//		printf("Text event\n");
-	//		input += (char)event.text.unicode;
-	//	}
-	//	else if (event.text.unicode == 8 && input.length() > 0)
-	//	{
-	//		input.erase(input.length() - 1, input.size());
-	//	}
-	//}
 }

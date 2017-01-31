@@ -31,7 +31,7 @@ class Menu
 public:
 	Menu();
 	~Menu();
-
+	
 	virtual void Render();
 	virtual void MenuLoop();
 	virtual void HandleInput(sf::Event event);
@@ -40,8 +40,8 @@ private:
 	std::string login_name_;
 	MenuState state_;
 
-	sf::Font font_;
+	sf::Font *m_font;
 	sf::Text text_;
 
-	TextBox box;
+	TextBox *box;
 };
