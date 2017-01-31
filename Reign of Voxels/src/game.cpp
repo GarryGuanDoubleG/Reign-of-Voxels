@@ -54,7 +54,7 @@ void GameLoop()
 		{
 			if (event.key.code == sf::Keyboard::Escape)
 			{
-				g_window->close();
+				GraphicsClose();
 				break;
 			}
 		}

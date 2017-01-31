@@ -16,5 +16,8 @@ extern sf::RenderWindow *g_window;
 
 void GraphicsInit();
 void draw(glm::mat4 mvp); // temporary
+void GraphicsClose();
+
+
 
 #endif
