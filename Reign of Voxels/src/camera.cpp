@@ -19,6 +19,8 @@ Camera::Camera()
 	m_pitch = 0.0f;
 	m_yaw = -90.0f;
 	m_roll = 0.0f;
+	
+	m_last_mouse_pos = sf::Mouse::getPosition(*g_window);
 }
 
 Mat4 Camera::GetProj()
@@ -63,16 +65,12 @@ void Camera::HandleInput(sf::Event event)
 	{	
 		GLfloat sensitivity = 0.05f; // mouse sensitivity
 
-		sf::Vector2u win_size = g_window->getSize();
-		sf::Vector2i mouse_pos = sf::Mouse::getPosition();
-		int xcenter = win_size.x / 2;
-		int ycenter = win_size.y / 2;
+		sf::Vector2i mouse_pos = sf::Mouse::getPosition();	
+		sf::Vector2i offset = mouse_pos - m_last_mouse_pos;
+		m_last_mouse_pos = mouse_pos;
 
-		float xoffset = (float)mouse_pos.x - xcenter;
-		float yoffset = (float)mouse_pos.y - ycenter;
-
-		xoffset *= sensitivity;
-		yoffset *= sensitivity;
+		float xoffset = (float)offset.x * sensitivity;
+		float yoffset = (float)offset.y * sensitivity;
 
 		m_yaw += xoffset;
 		m_pitch -= yoffset;
@@ -86,7 +84,9 @@ void Camera::HandleInput(sf::Event event)
 		front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
 		front.y = sin(glm::radians(m_pitch));
 		front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+
 		m_forward = Normalize(front);
+		m_right = Normalize(Cross(m_forward, m_up));
 	}
 
 	m_view_mat = LookAt(m_pos, m_pos + m_forward, m_up);

@@ -19,6 +19,7 @@ public:
 	void Update();
 
 private:
+	sf::Vector2i m_last_mouse_pos;
 	Vec3 m_pos;
 	Vec4 m_vel;
 	Vec3 m_target;
@@ -35,4 +36,6 @@ private:
 	//update the view matrix with new camera values
 	void UpdateView();
 	void MouseInput();
+
+
 };

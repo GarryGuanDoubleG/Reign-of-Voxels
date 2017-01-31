@@ -31,7 +31,6 @@ void GameLoop()
 	Camera *camera = new Camera();
 	glm::mat4 model = glm::mat4(1.0f);
 
-	
 	while (g_window->isOpen())
 	{
 		sf::Event event;
@@ -50,7 +49,5 @@ void GameLoop()
 			}
 			camera->HandleInput(event);
 		}
-
-		sf::Mouse::setPosition(sf::Vector2i(g_window->getSize().x / 2, g_window->getSize().y / 2));
 	}
 }
