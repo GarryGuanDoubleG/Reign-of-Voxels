@@ -98,7 +98,8 @@ void draw(glm::mat4 mvp)
 
 	mvp_location = glGetUniformLocation(g_shader_prog, "mvp");
 	texture_loc = glGetUniformLocation(g_shader_prog, "myTextureSampler");
-
+	
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearBufferfv(GL_COLOR, 0, bg_color);
 	glUseProgram(g_shader_prog);
 
@@ -142,7 +143,7 @@ void GraphicsInit()
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
-	g_texture = LoadTexture("Resources/textures/uvtemplate.bmp");
+	g_texture = LoadTexture("Resources/textures/box_texture.jpg");
 
 	glGenVertexArrays(1, &g_vao);
 	glBindVertexArray(g_vao);

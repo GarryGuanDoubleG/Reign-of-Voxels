@@ -151,9 +151,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actor.h" />
+    <ClInclude Include="src\camera.h" />
     <ClInclude Include="src\client.h" />
     <ClInclude Include="src\command.h" />
     <ClInclude Include="src\game.h" />
+    <ClInclude Include="src\glm.h" />
     <ClInclude Include="src\graphics.h" />
     <ClInclude Include="src\Gui\Menu.h" />
     <ClInclude Include="src\Gui\Textbox.h" />
@@ -164,6 +166,7 @@
     <ClInclude Include="src\texture.hpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\graphics.cpp" />
