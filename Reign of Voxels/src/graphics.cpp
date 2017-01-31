@@ -142,7 +142,7 @@ void GraphicsInit()
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
-	g_texture = loadBMP_custom("Resources/textures/uvtemplate.bmp");
+	g_texture = LoadTexture("Resources/textures/uvtemplate.bmp");
 
 	glGenVertexArrays(1, &g_vao);
 	glBindVertexArray(g_vao);
