@@ -153,7 +153,6 @@
     <ClInclude Include="src\Actor.h" />
     <ClInclude Include="src\client.h" />
     <ClInclude Include="src\command.h" />
-    <ClInclude Include="src\error_logger.h" />
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\graphics.h" />
     <ClInclude Include="src\Gui\Menu.h" />
@@ -161,10 +160,11 @@
     <ClInclude Include="src\model.h" />
     <ClInclude Include="src\server.h" />
     <ClInclude Include="src\shader.h" />
+    <ClInclude Include="src\simple_logger.h" />
+    <ClInclude Include="src\texture.hpp" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\client.cpp" />
-    <ClCompile Include="src\error_logger.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\graphics.cpp" />
     <ClCompile Include="src\Gui\Menu.cpp" />
@@ -172,6 +172,8 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\server.cpp" />
     <ClCompile Include="src\shader.cpp" />
+    <ClCompile Include="src\simple_logger.cpp" />
+    <ClCompile Include="src\texture.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

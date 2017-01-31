@@ -1,7 +1,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "graphics.h"
 #include "shader.h"
-#include "error_logger.h"
+#include "simple_logger.h"
 
 sf::RenderWindow *g_window;
 
@@ -98,10 +98,11 @@ void draw(glm::mat4 mvp)
 	CheckGLError();
 	glUniformMatrix4fv(mvp_location, 1, GL_FALSE, glm::value_ptr(mvp));
 	CheckGLError();
-	glBindVertexArray(g_vao);
-	CheckGLError();
+	glBindVertexArray(2);
+	slog("Hello faggot");
+	SlogCheckGLError();
 	glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
-	CheckGLError();
+	SlogCheckGLError();
 	glBindVertexArray(0);
 	CheckGLError();
 
@@ -129,6 +130,11 @@ void GraphicsInit()
 		exit(1);
 	}
 
+	// Enable depth test
+	glEnable(GL_DEPTH_TEST);
+	// Accept fragment if it closer to the camera than the former one
+	glDepthFunc(GL_LESS);
+
 	glGenVertexArrays(1, &g_vao);
 	glBindVertexArray(g_vao);
 
@@ -142,7 +148,7 @@ void GraphicsInit()
 	glBindBuffer(GL_ARRAY_BUFFER, color_buff);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(g_color_buffer_data), g_color_buffer_data, GL_STATIC_DRAW);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, NULL, NULL);
-	glEnableVertexAttribArray(1);
+	//glEnableVertexAttribArray(1);
 
  	int size = sizeof(g_color_buffer_data);
 	//unbind the buffer and vao after setting the data
