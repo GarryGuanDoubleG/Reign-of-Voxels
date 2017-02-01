@@ -9,12 +9,12 @@ Camera::Camera()
 	m_target = Vec3(0.0f, 0.0f, 0.0f);
 	m_forward = Vec3(0.0f, 0.0f, -1.0f);//get forward direction
 	m_up = Vec3(0.0f, 1.0f, 0.0f); //set default up vector to positive y
-	m_right = Normalize(Cross(m_forward, m_up));
+	m_right = glmNormalize(glmCross(m_forward, m_up));
 	
-	m_view_mat = LookAt(m_pos, m_target, m_up);//set view matrix
+	m_view_mat = glmLookAt(m_pos, m_target, m_up);//set view matrix
 
 	sf::Vector2u win_size = g_window->getSize();
-	m_proj_mat = Perspective(glm::radians(45.0f), (float)win_size.x / win_size.y, 0.1f, 100.0f);
+	m_proj_mat = glmPerspective(glm::radians(45.0f), (float)win_size.x / win_size.y, 0.1f, 100.0f);
 
 	m_pitch = 0.0f;
 	m_yaw = -90.0f;
@@ -85,9 +85,9 @@ void Camera::HandleInput(sf::Event event)
 		front.y = sin(glm::radians(m_pitch));
 		front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
 
-		m_forward = Normalize(front);
-		m_right = Normalize(Cross(m_forward, m_up));
+		m_forward = glmNormalize(front);
+		m_right = glmNormalize(glmCross(m_forward, m_up));
 	}
 
-	m_view_mat = LookAt(m_pos, m_pos + m_forward, m_up);
+	m_view_mat = glmLookAt(m_pos, m_pos + m_forward, m_up);
 }

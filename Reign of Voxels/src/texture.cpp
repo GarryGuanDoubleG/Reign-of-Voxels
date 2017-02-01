@@ -41,3 +41,11 @@ GLuint LoadTexture(const char *filepath)
 
 	return textureID;
 }
+
+GLuint LoadTexture(const char *filename, const char * filepath)
+{
+	std::string name = filepath;
+	name += filename;
+
+	return LoadTexture(name.c_str());
+}

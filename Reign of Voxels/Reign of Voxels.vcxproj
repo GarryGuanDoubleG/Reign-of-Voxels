@@ -69,20 +69,20 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SFML)\lib;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\build\code\Debug;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(assimp)\;$(SFML)\lib;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\build\code\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SFML)\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(assimp)\;$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SFML)\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(assimp)\;$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;$(IncludePath)</IncludePath>
-    <LibraryPath>$(SFML)\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(assimp)\;$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
@@ -94,7 +94,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-network-s-d.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;winmm.lib;gdi32.lib;freetype.lib;jpeg.lib;OpenGL32.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SFML)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -107,7 +107,7 @@
     </ClCompile>
     <Link>
       <AdditionalDependencies>sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-network-s-d.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;winmm.lib;gdi32.lib;freetype.lib;jpeg.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SFML)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -124,7 +124,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-network-s-d.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;winmm.lib;gdi32.lib;freetype.lib;jpeg.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SFML)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -141,7 +141,7 @@
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;sfml-network-s-d.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;winmm.lib;gdi32.lib;freetype.lib;jpeg.lib;OpenGL32.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SFML)\lib;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemGroup>
@@ -159,6 +159,7 @@
     <ClInclude Include="src\graphics.h" />
     <ClInclude Include="src\Gui\Menu.h" />
     <ClInclude Include="src\Gui\Textbox.h" />
+    <ClInclude Include="src\mesh.h" />
     <ClInclude Include="src\model.h" />
     <ClInclude Include="src\server.h" />
     <ClInclude Include="src\shader.h" />
