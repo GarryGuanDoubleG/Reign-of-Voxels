@@ -25,6 +25,24 @@ void Initialize()
 	compile_shaders(); 
 }
 
+void RenderScene(Model *model, Mat4 &mvp)
+{
+	GLfloat bg_color[] = { 0.0f, 0.0f, 0.5f, 0.0f };
+	GLuint mvp_location;
+
+	mvp_location = glGetUniformLocation(g_shader_prog, "mvp");
+
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearBufferfv(GL_COLOR, 0, bg_color);
+	glUseProgram(g_shader_prog);
+
+	glUniformMatrix4fv(mvp_location, 1, GL_FALSE, glm::value_ptr(mvp));
+
+	model->Draw(g_shader_prog);
+
+	g_window->display();
+}
+
 void GameLoop()
 {
 	Model *model = new Model("Resources\\models\\nanosuit\\nanosuit.obj");
@@ -36,28 +54,10 @@ void GameLoop()
 
 	while (g_window->isOpen())
 	{
-		sf::Event event;
-
-		g_delta_clock.restart();
-
 		Mat4 mvp = camera->GetProj() * camera->GetCamView() * model_mat4;
-
-		GLfloat bg_color[] = { 0.0f, 0.0f, 0.5f, 0.0f };
-		GLuint mvp_location;
-
-		mvp_location = glGetUniformLocation(g_shader_prog, "mvp");
-
-		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-		glClearBufferfv(GL_COLOR, 0, bg_color);
-		glUseProgram(g_shader_prog);
-
-		glUniformMatrix4fv(mvp_location, 1, GL_FALSE, glm::value_ptr(mvp));
-
-		model->Draw(g_shader_prog);
-
-		g_window->display();
-		//draw(mvp); // draw a cube 
-
+		RenderScene(model, mvp);
+		
+		sf::Event event;
 		while (g_window->pollEvent(event))
 		{
 			if (event.key.code == sf::Keyboard::Escape)
@@ -67,5 +67,6 @@ void GameLoop()
 			}
 			camera->HandleInput(event);
 		}
+		g_delta_clock.restart();
 	}
 }

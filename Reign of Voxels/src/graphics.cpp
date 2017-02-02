@@ -110,10 +110,8 @@ void draw(glm::mat4 mvp)
 
 	glBindVertexArray(g_vao);
 	glDrawArrays(GL_TRIANGLES, 0, 12 * 3);
-	SlogCheckGLError();
-	glBindVertexArray(0);
 
-	SlogCheckGLError();
+	glBindVertexArray(0);
 	g_window->display();
 }
 
@@ -144,31 +142,10 @@ void GraphicsInit()
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
-
-	g_texture = LoadTexture("Resources/textures/box_texture.jpg");
-
-	glGenVertexArrays(1, &g_vao);
-	glBindVertexArray(g_vao);
-
-	glGenBuffers(1, &vert_buff);
-	glBindBuffer(GL_ARRAY_BUFFER, vert_buff);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_vertex_buffer_data), g_vertex_buffer_data, GL_STATIC_DRAW);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, NULL, NULL);
-	glEnableVertexAttribArray(0);
-
-	glGenBuffers(1, &uv_buff);
-	glBindBuffer(GL_ARRAY_BUFFER, uv_buff);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(g_uv_buffer_data), g_uv_buffer_data, GL_STATIC_DRAW);
-	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, NULL, NULL);
-	glEnableVertexAttribArray(1);
-
-	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, g_texture);
-
-	//unbind the buffer and vao after setting the data
-	glBindVertexArray(0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
+
+//will need a resource manager to handle 
+//cleaning up the gpu states
 void GraphicsClose()
 {
 	g_window->close();
@@ -177,9 +154,4 @@ void GraphicsClose()
 	glDeleteVertexArrays(1,&g_vao);
 	glDeleteProgram(g_shader_prog);
 	glDeleteTextures(1, &g_texture);
-}
-//function for rendering objects throughout the world. dont have a world yet though
-void RenderObject()
-{
-
 }

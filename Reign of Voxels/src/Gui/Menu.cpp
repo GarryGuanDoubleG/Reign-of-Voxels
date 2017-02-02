@@ -55,6 +55,7 @@ void Menu::HandleInput(sf::Event event)
 		g_window->close();
 	switch (state_)
 	{
+		//no gui componenets are selected
 	case STATE_IDLE:
 		break;
 	case STATE_TEXTBOX:

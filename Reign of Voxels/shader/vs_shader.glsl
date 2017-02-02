@@ -7,7 +7,6 @@ out vec2 UV;
 //uniforms
 uniform mat4 mvp;
 
-
 void main(void)
 {
 	gl_Position = mvp * verts;	
