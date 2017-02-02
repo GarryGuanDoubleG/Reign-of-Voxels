@@ -2,9 +2,23 @@
 #include "SFML\OpenGL.hpp"
 #include "Gui\Textbox.h"
 
-TextBox::TextBox(sf::Font *font, float height, float width)
+TextBox::TextBox(sf::Font *font, sf::Vector2f position, float height, float width)
 {
+	int border_size = 2;
+	float color[] = { 1.0f, 1.0f, 1.0f };
+
 	m_box.setSize(sf::Vector2f(width, height));
+	//border color
+	//set position
+	m_box.setPosition(position);
+	//cursor color
+	m_cursor.setFillColor(sf::Color::White);
+	m_cursor.setPosition(sf::Vector2f(position.x + (float)border_size, position.y)); //set it to the left of textbox
+	
+	m_text.setFillColor(sf::Color::White);
+	m_text.setFont(*font);
+
+
 }
 
 void TextBox::HandleInput(sf::Event event)

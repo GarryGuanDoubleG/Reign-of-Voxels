@@ -13,6 +13,9 @@ void GraphicsInit();
 void draw(glm::mat4 mvp); // temporary
 void GraphicsClose();
 
+sf::Vector2f GraphicsGetWinSize();
+sf::Vector2u GraphicsGetWinSizeu();
+
 
 
 #endif

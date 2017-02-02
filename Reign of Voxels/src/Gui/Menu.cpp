@@ -1,12 +1,15 @@
 #include "Menu.h"
 #include "graphics.h"
 
-
 Menu::Menu()
 {
 	m_font = new sf::Font();
 	if (!m_font->loadFromFile("Resources/fonts/Quicksand-Regular.otf"))
 		printf("Could not load font %s\n", "Resources/fonts/Quicksand-Regular.otf");
+
+	sf::Vector2f win_size;
+	win_size.x = g_window->getSize().x;
+	win_size.y = g_window->getSize().y;
 
 	state_ = STATE_IDLE;
 	box = new TextBox(m_font, 100.0f);

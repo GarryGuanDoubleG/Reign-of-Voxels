@@ -4,7 +4,7 @@
 class TextBox
 {
 public: 
-	TextBox(sf::Font *font, float height, float width = 200.0f);
+	TextBox(sf::Font *font, sf::Vector2f position, float height, float width = 200.0f);
 
 	void setText(const sf::String &string);	
 	void setCursor(size_t index);
@@ -19,6 +19,7 @@ private:
 	sf::RectangleShape	m_box;
 	sf::RectangleShape	m_cursor;
 	sf::Vector2i		m_cursor_box;
+
 	int					m_max_text_length;
 	bool				m_selected;
 };
