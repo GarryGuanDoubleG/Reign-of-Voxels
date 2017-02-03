@@ -20,9 +20,9 @@ public:
 	/*
 		Position stuff 
 	*/
-	void setPositiion(const sf::Vector2f &pos);
-	void setPosition(float x, float y);
-	sf::Vector2f getPosition();
+	virtual void setPosition(const sf::Vector2f &pos);
+	virtual void setPosition(float x, float y);
+	virtual sf::Vector2f getPosition();
 	const sf::Vector2f getSize();
 
 	bool isSelectable();

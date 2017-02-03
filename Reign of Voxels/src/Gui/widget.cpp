@@ -1,5 +1,5 @@
 #include "widget.h"
-
+#include "graphics.h"
 Widget::Widget()
 {
 
@@ -14,7 +14,7 @@ int Widget::getID()
 {
 	return m_id;
 }
-void Widget::setPositiion(const sf::Vector2f &pos)
+void Widget::setPosition(const sf::Vector2f &pos)
 {
 	m_position = pos;
 }
@@ -46,7 +46,10 @@ void Widget::HandleInput(sf::Event event)
 			onTextEntered(event.text.unicode);
 		break;
 	case sf::Event::MouseButtonPressed:
+	{
+		onMouseEntered(sf::Mouse::getPosition(*g_window).x, sf::Mouse::getPosition(*g_window).y);
 		break;
+	}
 	default:
 		break;
 	}
