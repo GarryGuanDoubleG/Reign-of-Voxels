@@ -7,11 +7,14 @@
 #include <SFML/OpenGL.hpp>
 #include "glm.h"
 
+
 extern sf::RenderWindow *g_window;
 
 void GraphicsInit();
-void draw(glm::mat4 mvp); // temporary
 void GraphicsClose();
+
+sf::Vector2f GraphicsGetWinSizef();
+sf::Vector2u GraphicsGetWinSizeu();
 
 
 

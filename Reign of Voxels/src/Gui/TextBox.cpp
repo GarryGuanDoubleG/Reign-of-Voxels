@@ -1,10 +1,24 @@
 #include <ctype.h>
+#include <GL\glew.h>
 #include "SFML\OpenGL.hpp"
 #include "Gui\Textbox.h"
+#include "graphics.h"
 
-TextBox::TextBox(sf::Font *font, float height, float width)
+TextBox::TextBox(sf::Font *font, sf::Vector2f position, float height, float width)
 {
+	int border_size = 2;
+	float color[] = { 1.0f, 1.0f, 1.0f };
+
 	m_box.setSize(sf::Vector2f(width, height));
+	//border color
+	//set position
+	m_box.setPosition(position);
+	//cursor color
+	m_cursor.setFillColor(sf::Color::White);
+	m_cursor.setPosition(sf::Vector2f(position.x + (float)border_size, position.y)); //set it to the left of textbox
+	
+	m_text.setFillColor(sf::Color::White);
+	m_text.setFont(*font);
 }
 
 void TextBox::HandleInput(sf::Event event)
@@ -35,12 +49,12 @@ void TextBox::HandleInput(sf::Event event)
 	m_text.setString(m_string);
 }
 
-void TextBox::Draw(sf::RenderTarget &target)
+void TextBox::Draw(sf::RenderTarget &target, sf::RenderStates states)
 {
 	//draw the text box
-	target.draw(m_box);
+	g_window->draw(m_box);
 	//draw the text
-	target.draw(m_text);
+	g_window->draw(m_text);
 
 	//display a blinking cursor if selected
 	if (m_selected)

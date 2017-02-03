@@ -1,21 +1,18 @@
 #include "Menu.h"
 #include "graphics.h"
 
-
 Menu::Menu()
 {
 	m_font = new sf::Font();
+
 	if (!m_font->loadFromFile("Resources/fonts/Quicksand-Regular.otf"))
 		printf("Could not load font %s\n", "Resources/fonts/Quicksand-Regular.otf");
 
+	sf::Vector2f win_size = GraphicsGetWinSizef();
+	
 	state_ = STATE_IDLE;
-	box = new TextBox(m_font, 100.0f);
-
-	//setting fonts
-	text_.setFillColor(sf::Color::Red);
-	text_.setCharacterSize(50);
-	text_.setFont(*m_font);
-	text_.setOutlineThickness(1.75f);
+	
+//	TextBox * login_box = new TextBox(m_font, sf::Vector2f(win_size.x/2.0, win_size.y/2.00f), 100, 300);
 }
 
 //handle menu loop
@@ -38,11 +35,15 @@ void Menu::MenuLoop()
 //will cover the entire window
 void Menu::Render()
 {
+	//set background to black
 	g_window->clear(sf::Color::Black);
 	//save gl states
 	g_window->pushGLStates();
 	//draw text
-	g_window->draw(text_);
+	for (int i = 0; i < m_widgets.size(); i++)
+	{
+		//m_widgets[i].Draw(*g_window, g_window->getSettings());
+	}
 	//restore the gl states
 	g_window->popGLStates();
 	
@@ -51,14 +52,13 @@ void Menu::Render()
 
 void Menu::HandleInput(sf::Event event)
 {
-	if ((event.type == sf::Event::Closed))
+	if ((event.type == sf::Event::Closed) || event.key.code == sf::Keyboard::Escape)
 		g_window->close();
-	switch (state_)
+
+	for (int i = 0; i < m_widgets.size(); i++)
 	{
-		//no gui componenets are selected
-	case STATE_IDLE:
-		break;
-	case STATE_TEXTBOX:
-		break;
+		m_widgets[i].HandleInput(event);
 	}
+
+	g_window->display();
 }

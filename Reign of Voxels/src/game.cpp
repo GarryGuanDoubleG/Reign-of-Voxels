@@ -1,12 +1,11 @@
 #include "game.h"
-#include "glm.h"
 #include "graphics.h"
-#include "Gui\Menu.h"
+#include "glm.h"
 #include "client.h"
 #include "shader.h"
 #include "model.h"
 #include "camera.h"
-
+#include "Gui\Menu.h"
 
 //doing this just to test menu out. should refactor soon
 //sf::Font main_font; 
@@ -45,6 +44,9 @@ void RenderScene(Model *model, Mat4 &mvp)
 
 void GameLoop()
 {
+	//Menu * menu = new Menu();
+	//menu->MenuLoop();
+
 	Model *model = new Model("Resources\\models\\nanosuit\\nanosuit.obj");
 	Camera *camera = new Camera();
 	Mat4 model_mat4 = Mat4(1.0f);

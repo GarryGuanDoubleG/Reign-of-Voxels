@@ -1,25 +1,16 @@
 #pragma once
 #include "SFML\Graphics.hpp"
 #include "command.h"
-#include "Gui\Textbox.h"
+#include "textbox.h"
 
 //list of states to know which to render to
 //do states even make sense idk
 enum MenuState
 {
-	STATE_TEXTBOX,
-	STATE_IDLE
+	STATE_IDLE,
+	STATE_WIDGET
 };
 
-class MenuCommand : public Command
-{
-public: 
-	virtual void execute(Actor *actor) = 0;
-	virtual void execute()
-	{
-
-	}
-};
 /*
 	setting up this menu for login only right now
 	will later make a scene class that menu will extend from
@@ -37,11 +28,7 @@ public:
 	virtual void HandleInput(sf::Event event);
 
 private:
-	std::string login_name_;
 	MenuState state_;
-
 	sf::Font *m_font;
-	sf::Text text_;
-
-	TextBox *box;
+	std::vector<Widget> m_widgets;
 };

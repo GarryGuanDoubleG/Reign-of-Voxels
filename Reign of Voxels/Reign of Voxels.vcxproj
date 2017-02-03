@@ -69,7 +69,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ProjectDir)\Utility;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\include;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(assimp)\;$(SFML)\lib;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\build\code\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -157,8 +157,9 @@
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\glm.h" />
     <ClInclude Include="src\graphics.h" />
-    <ClInclude Include="src\Gui\Menu.h" />
-    <ClInclude Include="src\Gui\Textbox.h" />
+    <ClInclude Include="src\Gui\menu.h" />
+    <ClInclude Include="src\Gui\textbox.h" />
+    <ClInclude Include="src\Gui\widget.h" />
     <ClInclude Include="src\mesh.h" />
     <ClInclude Include="src\model.h" />
     <ClInclude Include="src\server.h" />
@@ -171,8 +172,9 @@
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\graphics.cpp" />
-    <ClCompile Include="src\Gui\Menu.cpp" />
-    <ClCompile Include="src\Gui\TextBox.cpp" />
+    <ClCompile Include="src\Gui\menu.cpp" />
+    <ClCompile Include="src\Gui\textbox.cpp" />
+    <ClCompile Include="src\Gui\widget.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\server.cpp" />
