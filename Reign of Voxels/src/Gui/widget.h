@@ -1,7 +1,8 @@
 #pragma once
 #include <GL/glew.h>
 #include <SFML\Graphics.hpp>
-
+#include <SFML\OpenGL.hpp>
+#include <SFML\Main.hpp>
 enum WidgetState
 {
 	StateIdle,
@@ -28,7 +29,10 @@ public:
 	bool isSelected();
 
 	virtual void HandleInput(sf::Event event);
-	virtual void Draw(sf::RenderTarget &target, sf::RenderStates states);
+	virtual void onTextEntered(sf::Uint32 unicode);
+	virtual void onKeyPressed(sf::Keyboard::Key key);
+	virtual void onMouseEntered(float x, float y);
+	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 protected:
 	int m_id;
 	bool m_is_selected;

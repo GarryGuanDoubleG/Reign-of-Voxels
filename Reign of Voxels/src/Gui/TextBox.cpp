@@ -1,8 +1,10 @@
-#include <ctype.h>
 #include <GL\glew.h>
-#include "SFML\OpenGL.hpp"
 #include "Gui\Textbox.h"
 #include "graphics.h"
+#include "simple_logger.h"
+
+#define uni_isalnum(in) (in >= 0x30 && in < 0x3A)
+#define uni_isalpha(in) ((in >= 0x41 && in <= 0x5A) || (in >= 0x61 && in <= 0x7A))
 
 TextBox::TextBox(sf::Font *font, sf::Vector2f position, float height, float width)
 {
@@ -17,39 +19,41 @@ TextBox::TextBox(sf::Font *font, sf::Vector2f position, float height, float widt
 	m_cursor.setFillColor(sf::Color::White);
 	m_cursor.setPosition(sf::Vector2f(position.x + (float)border_size, position.y)); //set it to the left of textbox
 	
-	m_text.setFillColor(sf::Color::White);
+	m_text.setFillColor(sf::Color::Red);
 	m_text.setFont(*font);
+	m_text.setStyle(sf::Text::Bold);
+	m_text.setString("");
+	m_text.setPosition(sf::Vector2f(position.x + 5.0f, position.y + 5.0f));
+	//string
+	m_string.clear();
+	m_max_text_length = 16;
 }
 
-void TextBox::HandleInput(sf::Event event)
-{
-	int input = event.text.unicode;
 
-	//handle keyboard inputs
-	switch (event.key.code)
+void TextBox::onKeyPressed(sf::Keyboard::Key key)
+{
+
+}
+
+void TextBox::onTextEntered(sf::Uint32 unicode)
+{
+	if (isalpha(unicode) || isalnum(unicode))
 	{
-	case sf::Keyboard::BackSpace:
-		//erase last character
-		if (m_string.getSize() > 0)
-			m_string.erase(m_string.getSize() - 1, m_string.getSize());
-		break;
-	case sf::Event::TextEntered:
-		//add character to textbox string
 		if (m_string.getSize() < m_max_text_length)
 		{
-			if ((iswalpha(input)) || (iswalnum(input)))
-			{
-				m_string += (char)event.text.unicode;
-			}
+			m_string.insert(m_string.getSize(),static_cast<char>(unicode));
+			m_text.setString(m_string);
 		}
-		break;
- 	default:
-		break;
 	}
-	m_text.setString(m_string);
+
 }
 
-void TextBox::Draw(sf::RenderTarget &target, sf::RenderStates states)
+void TextBox::onMouseEntered(float x, float y)
+{
+
+}
+
+void TextBox::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	//draw the text box
 	g_window->draw(m_box);

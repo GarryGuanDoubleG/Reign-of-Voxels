@@ -18,7 +18,7 @@ void GraphicsInit()
 	settings.majorVersion = 4;
 	settings.minorVersion = .0;
 	//Create context
-	g_window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "Reign of Voxels", sf::Style::Default, settings);
+	g_window = new sf::RenderWindow(sf::VideoMode(1280, 720), "Reign of Voxels", sf::Style::Default, settings);
 	g_window->setMouseCursorGrabbed(true);
 	g_window->setMouseCursorVisible(false);
 	g_window->setFramerateLimit(60);
@@ -28,7 +28,6 @@ void GraphicsInit()
 		printf("Error: %s\n", glewGetErrorString(err));
 		exit(1);
 	}
-
 	// Enable depth test
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one

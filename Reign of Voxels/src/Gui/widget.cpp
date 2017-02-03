@@ -35,10 +35,39 @@ const sf::Vector2f Widget::getSize()
 
 void Widget::HandleInput(sf::Event event)
 {
+	//handle keyboard inputs
+	switch (event.type)
+	{
+	case sf::Event::KeyPressed:
+		onKeyPressed(event.key.code);
+		break;
+	case sf::Event::TextEntered:
+		if (event.text.unicode < 128)
+			onTextEntered(event.text.unicode);
+		break;
+	case sf::Event::MouseButtonPressed:
+		break;
+	default:
+		break;
+	}
+}
+
+void Widget::draw(sf::RenderTarget &target, sf::RenderStates states) const
+{
 
 }
 
-void Widget::Draw(sf::RenderTarget &target, sf::RenderStates states)
+void Widget::onKeyPressed(sf::Keyboard::Key key)
+{
+
+}
+
+void Widget::onTextEntered(sf::Uint32 unicode)
+{
+
+}
+
+void Widget::onMouseEntered(float x, float y)
 {
 
 }

@@ -21,7 +21,6 @@ void Model::Draw(GLuint shader)
 		this->meshes[i].Draw(shader);
 }
 
-
 std::vector<Texture> Model::LoadMaterials(aiMaterial *mat, aiTextureType type, std::string type_name)
 {
 	std::vector<Texture> textures;

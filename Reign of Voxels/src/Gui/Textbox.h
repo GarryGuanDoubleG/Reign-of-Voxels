@@ -10,9 +10,10 @@ public:
 	void setText(const sf::String &string);	
 	void setCursor(size_t index);
 
-protected:
-	virtual void HandleInput(sf::Event event);
-	virtual void Draw(sf::RenderTarget &target, sf::RenderStates states);
+	virtual void onKeyPressed(sf::Keyboard::Key key);
+	virtual void onMouseEntered(float x, float y);
+	virtual void onTextEntered(sf::Uint32 unicode);
+	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const override;
 private:
 	
 	sf::String			m_string;

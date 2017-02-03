@@ -12,7 +12,8 @@ Menu::Menu()
 	
 	state_ = STATE_IDLE;
 	
-//	TextBox * login_box = new TextBox(m_font, sf::Vector2f(win_size.x/2.0, win_size.y/2.00f), 100, 300);
+	TextBox * login_box = new TextBox(m_font, sf::Vector2f(win_size.x/2.0 - 150, win_size.y/2.00f - 50.0f), 100, 300);
+	m_widgets.push_back(login_box);
 }
 
 //handle menu loop
@@ -36,17 +37,16 @@ void Menu::MenuLoop()
 void Menu::Render()
 {
 	//set background to black
-	g_window->clear(sf::Color::Black);
+	g_window->clear(sf::Color::Blue);
 	//save gl states
 	g_window->pushGLStates();
 	//draw text
 	for (int i = 0; i < m_widgets.size(); i++)
 	{
-		//m_widgets[i].Draw(*g_window, g_window->getSettings());
+		m_widgets[i]->draw(*g_window, sf::RenderStates::Default);
 	}
 	//restore the gl states
 	g_window->popGLStates();
-	
 	g_window->display();
 }
 
@@ -57,7 +57,7 @@ void Menu::HandleInput(sf::Event event)
 
 	for (int i = 0; i < m_widgets.size(); i++)
 	{
-		m_widgets[i].HandleInput(event);
+		m_widgets[i]->HandleInput(event);
 	}
 
 	g_window->display();

@@ -30,5 +30,5 @@ public:
 private:
 	MenuState state_;
 	sf::Font *m_font;
-	std::vector<Widget> m_widgets;
+	std::vector<Widget*> m_widgets;
 };
