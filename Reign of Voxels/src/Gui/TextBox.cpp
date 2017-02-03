@@ -13,6 +13,7 @@ TextBox::TextBox(sf::Font *font, sf::Vector2f position, float height, float widt
 	int text_size = 24;
 	m_box.setSize(sf::Vector2f(width, height));
 	//set position
+	setPosition(position);
 	m_box.setPosition(position);
 	//padding
 	m_padding = text_size / 2;
@@ -32,9 +33,10 @@ TextBox::TextBox(sf::Font *font, sf::Vector2f position, float height, float widt
 	m_max_text_length = 16;
 }
 
-
 void TextBox::onKeyPressed(sf::Keyboard::Key key)
 {
+	if (!m_selected)
+		return;
 	switch (key)
 	{
 	case sf::Keyboard::Right:
@@ -60,6 +62,8 @@ void TextBox::onKeyPressed(sf::Keyboard::Key key)
 
 void TextBox::onTextEntered(sf::Uint32 unicode)
 {
+	if (!m_selected) return;
+
 	if (isalpha(unicode) || isalnum(unicode))
 	{
 		if (m_string.getSize() < m_max_text_length)
@@ -125,6 +129,4 @@ void TextBox::setCursor(size_t index)
 		m_cursor.setPosition(m_text.findCharacterPos(index).x - m_padding/2, m_text.getPosition().y + m_padding /2);
 		m_cursor_timer.restart();
 	}
-
-
 }

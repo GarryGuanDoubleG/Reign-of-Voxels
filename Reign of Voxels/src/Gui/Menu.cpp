@@ -1,6 +1,6 @@
 #include "Menu.h"
 #include "graphics.h"
-
+#include "label.h"
 Menu::Menu()
 {
 	m_font = new sf::Font();
@@ -12,8 +12,18 @@ Menu::Menu()
 	
 	state_ = STATE_IDLE;
 	
-	TextBox * login_box = new TextBox(m_font, sf::Vector2f(win_size.x/2.0 - 150, win_size.y/2.00f - 50.0f), 100, 300);
+	TextBox * login_box = new TextBox(m_font, sf::Vector2f(win_size.x/2.0 - 150, win_size.y/2.00f - 50.0f), 50, 300);
+	Label * login_label = new Label(m_font, login_box, "Username");
+
+	TextBox * port = new TextBox(m_font, sf::Vector2f(win_size.x / 2.0 - 150, win_size.y / 2.00f + 50.0f), 50, 300);
+	Label * port_label = new Label(m_font, port, "Port#");
+
 	m_widgets.push_back(login_box);
+	m_widgets.push_back(login_label);
+	m_widgets.push_back(port);
+	m_widgets.push_back(port_label);
+
+
 }
 
 //handle menu loop

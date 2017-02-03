@@ -152,11 +152,13 @@
   <ItemGroup>
     <ClInclude Include="src\Actor.h" />
     <ClInclude Include="src\camera.h" />
+    <ClInclude Include="src\cJSON.h" />
     <ClInclude Include="src\client.h" />
     <ClInclude Include="src\command.h" />
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\glm.h" />
     <ClInclude Include="src\graphics.h" />
+    <ClInclude Include="src\Gui\label.h" />
     <ClInclude Include="src\Gui\menu.h" />
     <ClInclude Include="src\Gui\textbox.h" />
     <ClInclude Include="src\Gui\widget.h" />
@@ -169,9 +171,11 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\cJSON.c" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\graphics.cpp" />
+    <ClCompile Include="src\Gui\label.cpp" />
     <ClCompile Include="src\Gui\menu.cpp" />
     <ClCompile Include="src\Gui\textbox.cpp" />
     <ClCompile Include="src\Gui\widget.cpp" />

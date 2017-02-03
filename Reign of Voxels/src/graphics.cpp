@@ -21,7 +21,8 @@ void GraphicsInit()
 	g_window = new sf::RenderWindow(sf::VideoMode(1280, 720), "Reign of Voxels", sf::Style::Default, settings);
 	/*g_window->setMouseCursorGrabbed(false);
 	g_window->setMouseCursorVisible(false);*/
-	g_window->setFramerateLimit(60);
+	g_window->setVerticalSyncEnabled(true);
+
 
 	if ((err = glewInit()) != GLEW_OK)
 	{
