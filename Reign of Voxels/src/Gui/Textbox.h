@@ -7,6 +7,9 @@ class TextBox : public Widget
 public: 
 	TextBox(sf::Font *font, sf::Vector2f position, float height, float width = 200.0f);
 
+	virtual void setPosition(const sf::Vector2f &pos);
+	virtual void setPosition(float x, float y);
+
 	void setCursor(size_t index);
 
 	virtual void onKeyPressed(sf::Keyboard::Key key);
@@ -16,7 +19,6 @@ public:
 private:
 	
 	sf::String			m_string;
-	sf::Text			m_text;
 	sf::RectangleShape	m_box;
 
 	mutable sf::RectangleShape	m_cursor;

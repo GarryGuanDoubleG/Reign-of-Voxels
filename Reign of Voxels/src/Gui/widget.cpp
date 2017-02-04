@@ -74,3 +74,8 @@ void Widget::onMouseEntered(float x, float y)
 {
 
 }
+
+void Widget::onStateChange()
+{
+
+}

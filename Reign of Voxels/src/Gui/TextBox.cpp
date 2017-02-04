@@ -3,7 +3,6 @@
 #include "graphics.h"
 #include "simple_logger.h"
 
-#define CHECKBOUNDS(x,y, bx,by,bw,bh) ((x >= bx && y >= by) && (x <= bx + bw && y <= by + bh))
 #define CURSORPERIOD .75f
 
 TextBox::TextBox(sf::Font *font, sf::Vector2f position, float height, float width)
@@ -14,7 +13,6 @@ TextBox::TextBox(sf::Font *font, sf::Vector2f position, float height, float widt
 	m_box.setSize(sf::Vector2f(width, height));
 	//set position
 	setPosition(position);
-	m_box.setPosition(position);
 	//padding
 	m_padding = text_size / 2;
 	//text
@@ -129,4 +127,17 @@ void TextBox::setCursor(size_t index)
 		m_cursor.setPosition(m_text.findCharacterPos(index).x - m_padding/2, m_text.getPosition().y + m_padding /2);
 		m_cursor_timer.restart();
 	}
+}
+
+void TextBox::setPosition(const sf::Vector2f &pos)
+{
+	m_position = pos;
+	m_box.setPosition(pos);
+}
+void TextBox::setPosition(float x, float y)
+{
+	sf::Vector2f pos = sf::Vector2f(x, y);
+
+	m_position = pos;
+	m_box.setPosition(pos);
 }
