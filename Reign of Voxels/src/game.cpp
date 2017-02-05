@@ -1,11 +1,4 @@
 #include "game.h"
-#include "graphics.h"
-#include "glm.h"
-#include "client.h"
-#include "shader.h"
-#include "model.h"
-#include "camera.h"
-#include "Gui\Menu.h"
 
 //doing this just to test menu out. should refactor soon
 //sf::Font main_font; 
@@ -44,6 +37,7 @@ void RenderScene(Model *model, Mat4 &mvp)
 
 void GameLoop()
 {
+
 	Menu * menu = new Menu();
 	menu->MenuLoop();
 

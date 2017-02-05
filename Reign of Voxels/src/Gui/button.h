@@ -3,14 +3,13 @@
 class Button : public Widget
 {
 public:
-	Button(sf::Font * font, sf::String &string, sf::Vector2f position, float width, float height);
+	Button::Button(sf::Font * font, const sf::String &string, sf::Vector2f position, float width, float height);
+
+	virtual void setPosition(sf::Vector2f position);
 
 	virtual void setString(const sf::String& string);
-
-	virtual void HandleInput();
-	virtual void onKeyPressed(sf::Keyboard::Key key);
 	virtual void onMouseEntered(float x, float y);
-	virtual void onMouseMoved(float x, float y);
+	
 private:
 	virtual void draw(sf::RenderTarget &target, sf::RenderStates states) const;
 

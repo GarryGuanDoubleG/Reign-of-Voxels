@@ -75,6 +75,11 @@ void Widget::onMouseEntered(float x, float y)
 
 }
 
+void Widget::onMouseMoved(float x, float y)
+{
+
+}
+
 void Widget::onStateChange()
 {
 

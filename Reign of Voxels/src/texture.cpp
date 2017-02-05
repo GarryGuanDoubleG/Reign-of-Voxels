@@ -19,7 +19,6 @@ GLuint LoadTexture(const char *filepath)
 
 	size = img_data->getSize();
 
-
 	GLuint textureID;
 	//now generate texture with data
  	glGenTextures(1, &textureID);

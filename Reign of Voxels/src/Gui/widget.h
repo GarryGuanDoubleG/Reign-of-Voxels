@@ -3,6 +3,9 @@
 #include <SFML\Graphics.hpp>
 #include <SFML\OpenGL.hpp>
 #include <SFML\Main.hpp>
+
+#define CHECKBOUNDS(x,y, bx,by,bw,bh) ((x >= bx && y >= by) && (x <= bx + bw && y <= by + bh))
+
 enum WidgetState
 {
 	StateIdle,
@@ -10,12 +13,12 @@ enum WidgetState
 	StateActive
 };
 
-#define CHECKBOUNDS(x,y, bx,by,bw,bh) ((x >= bx && y >= by) && (x <= bx + bw && y <= by + bh))
-
 class Widget : public sf::Drawable
 {
 public:
 	Widget();
+
+	bool is_active;//draw if active
 
 	void setID(int id);
 	int getID();
@@ -45,6 +48,4 @@ protected:
 	sf::Vector2f m_size;
 	
 	sf::Text m_text;
-
-
 };
