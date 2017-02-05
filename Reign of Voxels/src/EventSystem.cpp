@@ -54,3 +54,4 @@ void Subject::Notify(Event event, std::string id)
 		current = current->m_next;
 	}
 
+}

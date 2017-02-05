@@ -146,6 +146,7 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Resources\gui\menu.json" />
     <None Include="shader\fs_shader.glsl" />
     <None Include="shader\vs_shader.glsl" />
   </ItemGroup>
@@ -160,9 +161,11 @@
     <ClInclude Include="src\graphics.h" />
     <ClInclude Include="src\Gui\button.h" />
     <ClInclude Include="src\Gui\label.h" />
+    <ClInclude Include="src\Gui\layout.h" />
     <ClInclude Include="src\Gui\menu.h" />
     <ClInclude Include="src\Gui\textbox.h" />
     <ClInclude Include="src\Gui\widget.h" />
+    <ClInclude Include="src\json.hpp" />
     <ClInclude Include="src\mesh.h" />
     <ClInclude Include="src\model.h" />
     <ClInclude Include="src\server.h" />
@@ -178,6 +181,7 @@
     <ClCompile Include="src\graphics.cpp" />
     <ClCompile Include="src\Gui\button.cpp" />
     <ClCompile Include="src\Gui\label.cpp" />
+    <ClCompile Include="src\Gui\layout.cpp" />
     <ClCompile Include="src\Gui\menu.cpp" />
     <ClCompile Include="src\Gui\textbox.cpp" />
     <ClCompile Include="src\Gui\widget.cpp" />

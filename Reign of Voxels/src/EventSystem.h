@@ -39,3 +39,8 @@ private:
 	Observer * m_head;
 };
 //singleton event system class for broadcasting events
+class EventSystem : public Subject
+{
+public:
+	static EventSystem &instance();
+};

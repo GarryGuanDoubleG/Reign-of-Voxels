@@ -5,40 +5,20 @@
 
 #define CURSORPERIOD .75f
 
-TextBox::TextBox(sf::Font *font, sf::Vector2f position, float height, float width)
+TextBox::TextBox()
 {
-	int border_size = 2;
-	float color[] = { 1.0f, 1.0f, 1.0f };
-	int text_size = 24;
-	m_box.setSize(sf::Vector2f(width, height));
-	//set position
-	setPosition(position);
-	//padding
-	m_padding = text_size / 2;
-	//text
-	m_text.setFillColor(sf::Color::Red);
-	m_text.setFont(*font);
-	m_text.setStyle(sf::Text::Bold);
 	m_text.setString("");
-	m_text.setPosition(sf::Vector2f(position.x + m_padding, position.y + m_padding));
-	m_text.setCharacterSize(text_size);
-	//cursor color
-	m_cursor.setFillColor(sf::Color::Red);
-	m_cursor.setPosition(sf::Vector2f(position.x + (float)border_size, position.y)); //set it to the left of textbox
-	m_cursor.setSize(sf::Vector2f(4, text_size));
-	//string
-	m_string.clear();
-	m_max_text_length = 16;
 }
 
 void TextBox::onKeyPressed(sf::Keyboard::Key key)
 {
 	if (!m_selected)
 		return;
+	sf::String str = m_text.getString();
 	switch (key)
 	{
 	case sf::Keyboard::Right:
-		if (m_cursor_idx < m_string.getSize())
+		if (m_cursor_idx < m_text.getString().getSize())
 			setCursor(m_cursor_idx + 1);
 		break;
 	case sf::Keyboard::Left:
@@ -48,14 +28,14 @@ void TextBox::onKeyPressed(sf::Keyboard::Key key)
 	case sf::Keyboard::BackSpace:
 		if (m_cursor_idx > 0)
 		{
-			m_string.erase(m_cursor_idx - 1);
+			str.erase(m_cursor_idx - 1);
 			setCursor(m_cursor_idx - 1);
 		}
 		break;
 	default:
 		break;
 	}
-	m_text.setString(m_string);
+	m_text.setString(str);
 }
 
 void TextBox::onTextEntered(sf::Uint32 unicode)
@@ -64,10 +44,11 @@ void TextBox::onTextEntered(sf::Uint32 unicode)
 
 	if (isalpha(unicode) || isalnum(unicode))
 	{
-		if (m_string.getSize() < m_max_text_length)
+		if (m_text.getString().getSize() < m_max_text_len)
 		{
-			m_string.insert(m_cursor_idx,static_cast<char>(unicode));
-			m_text.setString(m_string);
+			sf::String str = m_text.getString();
+			str.insert(m_cursor_idx,static_cast<char>(unicode));
+			m_text.setString(str);
 			setCursor(m_cursor_idx + 1);
 		}
 	}
@@ -120,24 +101,44 @@ void TextBox::draw(sf::RenderTarget& target, sf::RenderStates states) const
 
 void TextBox::setCursor(size_t index)
 {
-	if (index <= m_string.getSize())
+	if (index <= m_text.getString().getSize())
 	{
 		m_cursor_idx = index;
 
-		m_cursor.setPosition(m_text.findCharacterPos(index).x - m_padding/2, m_text.getPosition().y + m_padding /2);
+		m_cursor.setPosition(m_text.findCharacterPos(index).x - m_padding.x/4, m_text.getPosition().y + m_padding.y / 2);
 		m_cursor_timer.restart();
 	}
 }
 
 void TextBox::setPosition(const sf::Vector2f &pos)
 {
-	m_position = pos;
+	sf::Vector2f text_pos(pos.x + m_padding.x, pos.y + m_padding.y);
+	sf::Vector2f cursor_pos(text_pos.x - m_padding.x / 2, text_pos.y);
+
 	m_box.setPosition(pos);
+	m_text.setPosition(text_pos);
+	m_cursor.setPosition(cursor_pos);
 }
 void TextBox::setPosition(float x, float y)
 {
-	sf::Vector2f pos = sf::Vector2f(x, y);
+	sf::Vector2f pos(x, y);
+	sf::Vector2f text_pos(pos.x + m_padding.x, pos.y + m_padding.y);
+	sf::Vector2f cursor_pos(text_pos.x - m_padding.x / 2, text_pos.y);
 
-	m_position = pos;
 	m_box.setPosition(pos);
+	m_text.setPosition(text_pos);
+	m_cursor.setPosition(cursor_pos);
+}
+
+void TextBox::setTextSize(unsigned int size)
+{
+	int text_size = size;
+
+	m_text.setCharacterSize(size);
+	m_cursor.setSize(sf::Vector2f(text_size / 8, size));
+}
+void TextBox::setTextColor(sf::Color color)
+{
+	m_text.setFillColor(color);
+	m_cursor.setFillColor(color);
 }

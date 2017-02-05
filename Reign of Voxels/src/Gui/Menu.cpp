@@ -5,28 +5,10 @@
 
 Menu::Menu()
 {
-	m_font = new sf::Font();
-
-	if (!m_font->loadFromFile("Resources/fonts/Quicksand-Regular.otf"))
-		printf("Could not load font %s\n", "Resources/fonts/Quicksand-Regular.otf");
-
-	sf::Vector2f win_size = GraphicsGetWinSizef();
-	
 	state_ = STATE_IDLE;
 	
-	TextBox * login_box = new TextBox(m_font, sf::Vector2f(win_size.x/2.0 - 150, win_size.y/2.00f - 50.0f), 50, 300);
-	Label * login_label = new Label(m_font, login_box, "Username");
-	
-	TextBox * port = new TextBox(m_font, sf::Vector2f(win_size.x / 2.0 - 150, win_size.y / 2.00f + 50.0f), 50, 300);
-	Label * port_label = new Label(m_font, port, "Port#");
-
-	Button * button = new Button(m_font, "Connect", sf::Vector2f(win_size.x / 2.0 - 150, win_size.y / 2.00f + 150.0f), 300, 50);
-
-	m_widgets.push_back(login_box);
-	m_widgets.push_back(login_label);
-	m_widgets.push_back(port);
-	m_widgets.push_back(port_label);
-	m_widgets.push_back(button);
+	m_layout = new Layout();
+	m_widgets = m_layout->LoadMenuLayout(Login);
 }
 
 //handle menu loop
@@ -50,7 +32,7 @@ void Menu::MenuLoop()
 void Menu::Render()
 {
 	//set background to black
-	g_window->clear(sf::Color::Blue);
+	g_window->clear(sf::Color::Black);
 	//save gl states
 	g_window->pushGLStates();
 	//draw text

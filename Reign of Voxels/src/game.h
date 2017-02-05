@@ -11,17 +11,6 @@
 #include "Gui\Menu.h"
 #include "EventSystem.h"
 
-class Game
-{
-public:
-	static Game& instance() { return m_instance; }
-
-	Subject& getEventSystem() { return m_eventsystem; }
-private:
-	static Game m_instance;
-
-	Subject * m_eventsystem;
-};
 void Initialize();
 void GameLoop();
 #endif

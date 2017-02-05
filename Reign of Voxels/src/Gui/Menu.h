@@ -1,6 +1,6 @@
 #pragma once
 #include "SFML\Graphics.hpp"
-#include "command.h"
+#include "layout.h"
 #include "textbox.h"
 
 //list of states to know which to render to
@@ -29,6 +29,6 @@ public:
 
 private:
 	MenuState state_;
-	sf::Font *m_font;
 	std::vector<Widget*> m_widgets;
+	Layout *m_layout;
 };

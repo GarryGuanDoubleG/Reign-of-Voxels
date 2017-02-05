@@ -5,22 +5,25 @@ Widget::Widget()
 
 }
 
-void Widget::setID(int id)
+void Widget::setID(sf::String id)
 {
 	m_id = id;
 }
 
-int Widget::getID()
+sf::String Widget::getID()
 {
 	return m_id;
 }
 void Widget::setPosition(const sf::Vector2f &pos)
 {
-	m_position = pos;
+	m_box.setPosition(pos);
+	m_text.setPosition(sf::Vector2f(pos.x + m_padding.x, pos.y + m_padding.y));
 }
 void Widget::setPosition(float x, float y)
 {
-	m_position = sf::Vector2f(x, y);
+	sf::Vector2f pos(x, y);
+	m_box.setPosition(pos);
+	m_text.setPosition(sf::Vector2f(pos.x + m_padding.x, pos.y + m_padding.y));
 }
 
 sf::Vector2f Widget::getPosition()
@@ -28,11 +31,45 @@ sf::Vector2f Widget::getPosition()
 	return m_position;
 }
 
+void Widget::setSize(float w, float h)
+{
+	m_box.setSize(sf::Vector2f(w, h));
+}
+
 const sf::Vector2f Widget::getSize()
 {
 	return m_size;
 }
 
+void Widget::setFont(sf::Font *font)
+{
+	m_text.setFont(*font);
+}
+
+void Widget::setTextColor(sf::Color color)
+{
+	m_text.setFillColor(color);
+}
+void Widget::setTextSize(unsigned int size)
+{
+	m_text.setCharacterSize(size);
+}
+void Widget::setPadding(sf::Vector2f padding)
+{
+	m_padding = padding;
+}
+void Widget::setString(sf::String str)
+{
+	m_text.setString(str);
+}
+void Widget::setMaxStrLen(int len)
+{
+	m_max_text_len = len;
+}
+void Widget::setBoxColor(sf::Color color)
+{
+	m_box.setFillColor(color);
+}
 void Widget::HandleInput(sf::Event event)
 {
 	//handle keyboard inputs
