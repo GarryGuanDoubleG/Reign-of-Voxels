@@ -7,9 +7,9 @@ using json = nlohmann::json;
 
 enum MenuLayouts
 {
-	Login,
-	Lobby,
-	GameOptions
+	LoginMenu,
+	LobbyMenu,
+	OptionsMenu
 };
 
 class Layout

@@ -3,11 +3,11 @@
 #include "label.h"
 #include "button.h"
 #include "simple_logger.h"
-#include <iostream>
+
 Menu::Menu()
 {	
 	m_layout = new Layout();
-	m_widgets = m_layout->LoadMenuLayout(Login);
+	m_widgets = m_layout->LoadMenuLayout(LoginMenu);
 	//set parent for callback
 	//seems like some coupling but good enough?
 	for (int i = 0; i < m_widgets.size(); i++)
@@ -79,9 +79,8 @@ void Menu::triggerCallBack(sf::String event)
 				data[it.key()] = it.value();
 			}
 		}
+		//broadcast login event
+		Game::instance().getEventSystem().Notify(Event::Login, data);
 	}
 
-	data.dump();
-	std::cout << data.dump() << std::endl;
-	slog("done");
 }

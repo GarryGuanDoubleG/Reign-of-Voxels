@@ -1,9 +1,8 @@
 #pragma once
 #include "SFML\Graphics.hpp"
-#include "EventSystem.h"
 #include "layout.h"
 #include "textbox.h"
-
+#include "game.h"
 /*
 	setting up this menu for login only right now
 	will later make a scene class that menu will extend from

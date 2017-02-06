@@ -1,21 +1,32 @@
 #include "game.h"
-
-//doing this just to test menu out. should refactor soon
-//sf::Font main_font; 
-
-//load fonts.
-//should probably make a font utility class
-//and load everything from start up using cjson for file locations
+#include "simple_logger.h"
 
 sf::Clock g_delta_clock;
 sf::Clock g_clock;
 
-void Initialize()
+Game Game::m_instance;
+
+Game::Game()
 {
-	//initialize funcitons
-	GraphicsInit();
-	compile_shaders(); 
+	//true after Initialize()
+	m_initialized = false;
+	//initialilze members
+	m_instance.m_eventSystem = new Subject();
+	m_instance.m_client = new Client();
+	slog("Game init");
 }
+
+void Game::Initialize()
+{
+	if (!m_initialized)
+	{
+		GraphicsInit();
+		compile_shaders();
+
+		m_initialized = true;
+	}
+}
+
 
 void RenderScene(Model *model, Mat4 &mvp)
 {
@@ -35,9 +46,8 @@ void RenderScene(Model *model, Mat4 &mvp)
 	g_window->display();
 }
 
-void GameLoop()
+void Game::GameLoop()
 {
-
 	Menu * menu = new Menu();
 	menu->MenuLoop();
 

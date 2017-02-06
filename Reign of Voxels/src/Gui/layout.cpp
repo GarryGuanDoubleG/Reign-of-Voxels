@@ -7,6 +7,12 @@
 #include "json.hpp"
 #include "simple_logger.h"
 
+
+/*
+* @brief loads menu layout from a json file and generates widgets based on layout data
+* @param menu specifies which menu layout to load from file
+* @return returns a vector of widget points created according to json file data
+*/
 std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 {
 	json layout;
@@ -15,12 +21,12 @@ std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 
 	switch (menu)
 	{
-	case Login:
+	case LoginMenu:
 		menu_type = "login";
 		break;
-	case Lobby:
+	case LobbyMenu:
 		break;
-	case GameOptions:
+	case OptionsMenu:
 		break;
 	default:
 		break;

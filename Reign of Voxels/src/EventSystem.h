@@ -6,11 +6,9 @@ using json = nlohmann::json;
 
 enum Event
 {
-	//Gui Events
-	onButton
 	//Game events
+	Login
 };
-
 class Subject;
 
 class Observer
@@ -26,6 +24,7 @@ private:
 	Observer * m_next;
 	Observer * m_prev;
 };
+
 class Subject
 {
 public:
@@ -41,8 +40,3 @@ private:
 	Observer * m_head;
 };
 //singleton event system class for broadcasting events
-class EventSystem : public Subject
-{
-public:
-	static EventSystem &instance();
-};

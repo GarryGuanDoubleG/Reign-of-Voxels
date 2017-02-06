@@ -24,7 +24,7 @@ int APIENTRY WinMain(
 {
 	srand(0);
 
-	Initialize();
-	GameLoop();
+	Game::instance().Initialize();
+	Game::instance().GameLoop();
 	return 0;
 }

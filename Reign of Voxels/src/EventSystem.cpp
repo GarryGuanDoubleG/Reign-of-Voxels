@@ -16,7 +16,10 @@ void Subject::addObserver(Observer * observer)
 	observer->m_prev = nullptr;
 	observer->m_next = m_head;
 
-	m_head->m_prev = observer;
+	if (m_head)
+	{
+		m_head->m_prev = observer;
+	}
 	m_head = observer;	
 }
 
@@ -37,7 +40,7 @@ void Subject::Notify(Event event, json json_obj)
 {
 	Observer * current = m_head;
 
-	while (current->m_next)
+	while (current)
 	{
 		current->onNotify(event, json_obj);
 		current = current->m_next;
