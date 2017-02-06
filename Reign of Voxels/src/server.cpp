@@ -1,6 +1,11 @@
 #include <iostream>
 #include "server.h"
 
+Server::Server()
+{
+
+}
+
 void Server::SendData()
 {
 	sf::Packet packet;

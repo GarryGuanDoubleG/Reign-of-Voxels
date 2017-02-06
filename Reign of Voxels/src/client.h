@@ -5,7 +5,7 @@
 #include "SFML/Network.hpp"
 #include "EventSystem.h"
 
-#define SERVER_IP_ADDR "192.138.179.239"
+#define SERVER_IP_ADDR "104.192.170.117"
 #define SERVER_PORT 5000
 
 

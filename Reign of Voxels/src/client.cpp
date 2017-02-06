@@ -24,8 +24,6 @@ void Client::onNotify(Event event, json obj)
 		}
 	}
 
-	std::cout << "client: " << obj.dump() << std::endl;
-	return;
 }
 
 void Client::SendData(std::string data)

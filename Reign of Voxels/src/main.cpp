@@ -23,8 +23,16 @@ int APIENTRY WinMain(
 #endif
 {
 	srand(0);
+	bool is_server = false;;
+	if (argc > 1)
+	{
+		if (argv[1] != "")
+		{
+			is_server = true;
+		}
+	}
 
-	Game::instance().Initialize();
+	Game::instance().Initialize(is_server);
 	Game::instance().GameLoop();
 	return 0;
 }

@@ -13,14 +13,7 @@ private:
 	sf::Int16 port;
 	std::string data;
 public:
-	Server(const std::string & name)
-	{
-		username = name;
-		if (socket.bind(port) != sf::Socket::Done)
-		{
-			printf("Error binding \n");
-		}
-	}
+	Server();
 	~Server();
 
 	void SendData();
