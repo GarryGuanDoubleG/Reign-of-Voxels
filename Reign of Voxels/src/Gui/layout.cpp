@@ -137,6 +137,11 @@ void Layout::LoadWidgetData(json data, Widget *widget)
 		widget->setMaxStrLen(data["max_str_length"]);
 	}
 
+	if (data.find("event") != data.end())
+	{
+		widget->setEvent(data["event"]);
+	}
+
 	widget->setPadding(m_padding);
 	widget->setPosition(sf::Vector2f(posx, posy));
 	widget->setTextColor(text_color);

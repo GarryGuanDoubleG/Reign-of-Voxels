@@ -2,13 +2,18 @@
 #include "graphics.h"
 #include "label.h"
 #include "button.h"
-
+#include "simple_logger.h"
+#include <iostream>
 Menu::Menu()
-{
-	state_ = STATE_IDLE;
-	
+{	
 	m_layout = new Layout();
 	m_widgets = m_layout->LoadMenuLayout(Login);
+	//set parent for callback
+	//seems like some coupling but good enough?
+	for (int i = 0; i < m_widgets.size(); i++)
+	{
+		m_widgets[i]->setParent(this);
+	}
 }
 
 //handle menu loop
@@ -54,6 +59,29 @@ void Menu::HandleInput(sf::Event event)
 	{
 		m_widgets[i]->HandleInput(event);
 	}
+}
 
-	g_window->display();
+void Menu::triggerCallBack(sf::String event)
+{
+	json data;
+	if (event == "login")
+	{
+		for (int i = 0; i < m_widgets.size(); i++)
+		{
+			// get textbox data and merge it into a single obj
+			json widget_data = m_widgets[i]->getData();
+			
+			if (widget_data.is_null())
+				continue;
+
+			for (json::iterator it = widget_data.begin(); it != widget_data.end(); ++it)
+			{
+				data[it.key()] = it.value();
+			}
+		}
+	}
+
+	data.dump();
+	std::cout << data.dump() << std::endl;
+	slog("done");
 }

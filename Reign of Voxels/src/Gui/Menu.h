@@ -1,15 +1,8 @@
 #pragma once
 #include "SFML\Graphics.hpp"
+#include "EventSystem.h"
 #include "layout.h"
 #include "textbox.h"
-
-//list of states to know which to render to
-//do states even make sense idk
-enum MenuState
-{
-	STATE_IDLE,
-	STATE_WIDGET
-};
 
 /*
 	setting up this menu for login only right now
@@ -26,9 +19,8 @@ public:
 	virtual void Render();
 	virtual void MenuLoop();
 	virtual void HandleInput(sf::Event event);
-
+	virtual void triggerCallBack(sf::String event);
 private:
-	MenuState state_;
 	std::vector<Widget*> m_widgets;
 	Layout *m_layout;
 };

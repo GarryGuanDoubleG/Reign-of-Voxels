@@ -1,5 +1,7 @@
 #include "widget.h"
 #include "graphics.h"
+#include "menu.h"
+
 Widget::Widget()
 {
 
@@ -14,6 +16,17 @@ sf::String Widget::getID()
 {
 	return m_id;
 }
+
+void Widget::setEvent(std::string event)
+{
+	m_event = event;
+}
+
+sf::String Widget::getEvent(std::string event)
+{
+	return m_event;
+}
+
 void Widget::setPosition(const sf::Vector2f &pos)
 {
 	m_box.setPosition(pos);
@@ -29,6 +42,11 @@ void Widget::setPosition(float x, float y)
 sf::Vector2f Widget::getPosition()
 {
 	return m_position;
+}
+
+void Widget::setParent(Menu * parent)
+{
+	this->m_parent = parent;
 }
 
 void Widget::setSize(float w, float h)
@@ -120,4 +138,15 @@ void Widget::onMouseMoved(float x, float y)
 void Widget::onStateChange()
 {
 
+}
+
+void Widget::triggerCallBack()
+{
+	m_parent->triggerCallBack(this->m_event);
+}
+
+json Widget::getData()
+{
+	json data = nullptr;
+	return data;
 }

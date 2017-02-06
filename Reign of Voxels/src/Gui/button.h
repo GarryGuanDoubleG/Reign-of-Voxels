@@ -4,7 +4,6 @@ class Button : public Widget
 {
 public:
 	Button::Button();
-
 	virtual void onMouseEntered(float x, float y);
 	
 private:

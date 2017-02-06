@@ -1,7 +1,7 @@
 #include "EventSystem.h"
 
 
-void Observer::onNotify(Event event, cJSON obj)
+void Observer::onNotify(Event event, json obj)
 {
 
 }
@@ -33,7 +33,7 @@ void Subject::removeObserver(Observer * observer)
 	}
 }
 
-void Subject::Notify(Event event, cJSON json_obj)
+void Subject::Notify(Event event, json json_obj)
 {
 	Observer * current = m_head;
 
@@ -53,5 +53,4 @@ void Subject::Notify(Event event, std::string id)
 		current->onNotify(event, id);
 		current = current->m_next;
 	}
-
 }

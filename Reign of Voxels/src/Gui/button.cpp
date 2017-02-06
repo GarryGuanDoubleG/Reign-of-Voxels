@@ -21,7 +21,7 @@ void Button::onMouseEntered(float x, float y)
 	//if button click, trigger callbacks
 	if (CHECKBOUNDS(x, y, pos.x, pos.y, width, height))
 	{
-		setString("Click");
+		triggerCallBack();
 	}
 
 }

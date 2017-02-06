@@ -142,3 +142,13 @@ void TextBox::setTextColor(sf::Color color)
 	m_text.setFillColor(color);
 	m_cursor.setFillColor(color);
 }
+
+json TextBox::getData()
+{
+	json obj;
+	std::string id = m_id;
+	std::string data = m_text.getString();
+	
+	obj[id] = data;
+	return obj;
+}

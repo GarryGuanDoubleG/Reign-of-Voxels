@@ -61,6 +61,7 @@
 				"type": "button",
 				"id": "login",
 				"string": "Login",
+				"event": "login",
 				"text_size": 48,
 				"width": 200,
 				"height": 100,
