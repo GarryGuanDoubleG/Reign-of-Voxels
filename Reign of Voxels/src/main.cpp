@@ -3,16 +3,10 @@
 *
 * Implements the main class.
 */
-#ifndef _DEBUG
 #include <windows.h>
-#endif
-
 #include "game.h"
 
-#ifdef _DEBUG
 
-int main(int argc, char *argv[])
-#else
 
 int APIENTRY WinMain(
 	HINSTANCE   hInstance,
@@ -20,17 +14,8 @@ int APIENTRY WinMain(
 	LPSTR       lpCmdLine,
 	int         nCmdShow
 )
-#endif
 {
 	srand(0);
-	bool is_server = false;;
-	if (argc > 1)
-	{
-		if (argv[1] != "")
-		{
-			is_server = true;
-		}
-	}
 
 	Game::instance().Initialize();
 	Game::instance().GameLoop();
