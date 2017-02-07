@@ -50,7 +50,11 @@ void Client::onNotify(Event event, json obj)
 void Client::ConnectHost()
 {
 	ENetAddress address;
+	ENetPeer *peer;
 	ENetEvent event;
+	std::string message;
+	int serviceResult;
+
 	/* Connect to some.server.net:1234. */
 	enet_address_set_host(&address, SERVER_IP_ADDR);
 	address.port = SERVER_PORT;
@@ -76,6 +80,66 @@ void Client::ConnectHost()
 		/* had run out without any significant event.            */
 		enet_peer_reset(m_server);
 	}
+
+	bool done = false;
+	message = "Hi There\n";
+	while (!done)
+	{
+		serviceResult = 1;
+
+		/* Keep doing host_service until no events are left */
+		while (serviceResult > 0)
+		{
+			serviceResult = enet_host_service(m_client, &event, 0);
+
+			switch (event.type)
+			{
+			case ENET_EVENT_TYPE_CONNECT:
+				printf("A new client connected from %x:%u.\n",
+					event.peer->address.host,
+					event.peer->address.port);
+
+				event.peer->data = (void*)"New User";
+				done = true;
+				break;
+
+			case ENET_EVENT_TYPE_RECEIVE:
+				printf("A packet of length %u containing '%s' was "
+					"received from %s on channel %u.\n",
+					event.packet->dataLength,
+					event.packet->data,
+					event.peer->data,
+					event.channelID);
+
+				/* Clean up the packet now that we're done using it. */
+				enet_packet_destroy(event.packet);
+
+				break;
+
+			case ENET_EVENT_TYPE_DISCONNECT:
+				printf("%s disconected.\n", event.peer->data);
+
+				break;
+			}
+
+		}
+
+
+		//printf("Say> %s", message);
+
+		if(message == "quit" || message =="exit")
+		{
+			break;
+		}
+
+		if (message.length() > 0)
+		{
+			ENetPacket *packet = enet_packet_create(message.c_str(), message.length() + 1, ENET_PACKET_FLAG_RELIABLE);
+			enet_peer_send(m_server, 0, packet);
+		}
+	}
+
+
 	std::string test = "test";
 	SendData(test);
 }
