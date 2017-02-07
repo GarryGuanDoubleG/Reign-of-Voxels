@@ -21,9 +21,6 @@
     <Filter Include="json">
       <UniqueIdentifier>{0ae89267-fb73-4e80-9ac5-4f7fa86ee825}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Server">
-      <UniqueIdentifier>{e709d0f4-a53b-463a-ad8f-b6204f66c856}</UniqueIdentifier>
-    </Filter>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -101,9 +98,6 @@
     <ClInclude Include="src\Gui\layout.h">
       <Filter>Header Files\Gui</Filter>
     </ClInclude>
-    <ClInclude Include="Server\server.hpp">
-      <Filter>Server</Filter>
-    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\shader.cpp">
@@ -156,9 +150,6 @@
     </ClCompile>
     <ClCompile Include="src\Gui\layout.cpp">
       <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="Server\server.cpp">
-      <Filter>Server</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

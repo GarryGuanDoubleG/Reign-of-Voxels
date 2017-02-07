@@ -42,7 +42,7 @@ void Client::onNotify(Event event, json obj)
 			std::string port = obj["port"];
 			m_port = std::stoi(port);
 		}
-		SendData(obj.dump());
+		ConnectHost();
 	}
 
 }
@@ -67,6 +67,7 @@ void Client::ConnectHost()
 		event.type == ENET_EVENT_TYPE_CONNECT)
 	{
 		puts("Garry Guan has succeeded.");
+		slog("Connected to Host: success");
 	}
 	else
 	{
@@ -75,10 +76,23 @@ void Client::ConnectHost()
 		/* had run out without any significant event.            */
 		enet_peer_reset(m_server);
 	}
+	std::string test = "test";
+	SendData(test);
 }
 
 void Client::SendData(std::string data)
 {
+	/* Create a reliable packet of size 7 containing "packet\0" */
+	ENetPacket * packet = enet_packet_create(data.c_str(),
+		strlen("packet") + 1,
+		ENET_PACKET_FLAG_RELIABLE);
+	/* Extend the packet so and append the string "foo", so it now */
+	/* contains "packetfoo\0"                                      */
+	
+	/* Send the packet to the peer over channel id 0. */
+	/* One could also broadcast the packet by         */
+	/* enet_host_broadcast (host, 0, packet);         */
+	enet_peer_send(m_server, 0, packet);
 
 }
 

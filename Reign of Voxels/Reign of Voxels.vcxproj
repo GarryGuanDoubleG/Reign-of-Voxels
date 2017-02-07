@@ -151,7 +151,6 @@
     <None Include="shader\vs_shader.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="Server\server.hpp" />
     <ClInclude Include="src\Actor.h" />
     <ClInclude Include="src\camera.h" />
     <ClInclude Include="src\client.h" />
@@ -175,7 +174,6 @@
     <ClInclude Include="src\texture.hpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="Server\server.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\EventSystem.cpp" />
