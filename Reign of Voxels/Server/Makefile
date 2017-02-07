@@ -1,19 +1,17 @@
-CXX=clang++
-CXXFLAGS=-g -std=c++11 -Wall -pedantic
+C=clang++
+CFLAGS=-g -std=c++11 -Wall -pedantic
 
-LIBS= -lsfml-network
+LIBS= -lenet
 
 %.o: %.c $(DEPS)
 	$(CC) -c -o $@ $< $(CFLAGS)
 
-server: server.o json.o
-	g++ -o server server.o json.o $(LIBS)
+server: server.o 
+	g++ -o server server.o $(CLFAGS) $(LIBS)
 
-json.o: json.hpp
-	g++ -c json.hpp
-	
-server.o: server.cpp
-	g++ -c server.cpp
+
+server.o: server.cpp json.hpp
+	g++ -c server.cpp json.hpp $(CFLAGS)
 	
 clean:
 	rm *.o server

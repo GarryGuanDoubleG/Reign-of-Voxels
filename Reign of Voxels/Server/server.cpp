@@ -1,5 +1,4 @@
 #include <enet/enet.h>
-#include <iostream>
 #include <map>
 #include "json.hpp"
 
@@ -27,6 +26,8 @@ void Init()
 			"An error occurred while trying to create an ENet server host.\n");
 		exit(EXIT_FAILURE);
 	}
+	else
+		printf("success\n");
 
 }
 
@@ -41,17 +42,22 @@ void runUdpServer(unsigned short port)
 	int pack_per_sec = 30;
 	int time_interval = 1000 / pack_per_sec;  
 	/* Wait up to 1000 milliseconds for an event. */
-	while (enet_host_service(g_server, &event, time_interval) > 0)
+	char data[] = "Client info";
+	while(true)
 	{
-		switch (event.type)
+		while (enet_host_service(g_server, &event, time_interval) > 0)
 		{
+			switch (event.type)
+			{
 		case ENET_EVENT_TYPE_CONNECT:
+		{
 			printf("A new client connected from %x:%u.\n",
 				event.peer->address.host,
 				event.peer->address.port);
 			/* Store any relevant client information here. */
-			event.peer->data = "Client information";
+			event.peer->data = data;
 			break;
+		}
 		case ENET_EVENT_TYPE_RECEIVE:
 			printf("A packet of length %u containing %s was received from %s on channel %u.\n",
 				event.packet->dataLength,
@@ -67,11 +73,12 @@ void runUdpServer(unsigned short port)
 			event.peer->data = NULL;
 		}
 	}
-
+	}
 }
 
 int main()
 {
+	Init();
 	runUdpServer(5000);
 	CloseServer();
 	system("pause");
