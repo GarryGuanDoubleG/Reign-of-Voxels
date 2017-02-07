@@ -10,23 +10,19 @@ Game::Game()
 {
 	//true after Initialize()
 	m_initialized = false;
+	//initialilze members
+	m_instance.m_eventSystem = new Subject();
+	m_instance.m_client = new Client();
 	slog("Game init");
 }
 
-void Game::Initialize(bool is_server)
+void Game::Initialize()
 {
 	if (!m_initialized)
 	{
 		GraphicsInit();
 		compile_shaders();
-		if (is_server)
-			m_server = new Server();
-		else
-		{
-			//initialilze members
-			m_instance.m_eventSystem = new Subject();
-			m_client = new Client();
-		}			
+
 		m_initialized = true;
 	}
 }

@@ -1,6 +1,8 @@
 #include "SFML/Network.hpp"
 #include <iostream>
 
+std::map<int, sf::IpAddress> g_client_map;
+
 void runUdpServer(unsigned short port)
 {
 	// Create a socket to receive a message from anyone
@@ -12,7 +14,7 @@ void runUdpServer(unsigned short port)
 	std::cout << "Server is listening to port " << port << ", waiting for a message... " << std::endl;
 
 	// Wait for a message
-	char in[128];
+	char in[512];
 	std::size_t received;
 	sf::IpAddress sender;
 	unsigned short senderPort;

@@ -32,7 +32,7 @@ int APIENTRY WinMain(
 		}
 	}
 
-	Game::instance().Initialize(is_server);
+	Game::instance().Initialize();
 	Game::instance().GameLoop();
 	return 0;
 }

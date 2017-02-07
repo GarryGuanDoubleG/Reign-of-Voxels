@@ -18,7 +18,7 @@ public:
 
 	Game();
 	static Game&	instance() { return m_instance; }
-	void			Initialize(bool is_server);
+	void			Initialize();
 	void			GameLoop();
 
 	Subject&		getEventSystem() { return *m_eventSystem; }
