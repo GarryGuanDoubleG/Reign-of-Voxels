@@ -4,19 +4,19 @@
 #include "textbox.h"
 #include "button.h"
 #include "label.h"
-#include "json.hpp"
+#include "Json.hpp"
 #include "simple_logger.h"
 
 
 /*
-* @brief loads menu layout from a json file and generates widgets based on layout data
+* @brief loads menu layout from a Json file and generates widgets based on layout data
 * @param menu specifies which menu layout to load from file
-* @return returns a vector of widget points created according to json file data
+* @return returns a vector of widget points created according to Json file data
 */
 std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 {
-	json layout;
-	std::string path = "Resources\\gui\\menu.json";
+	Json layout;
+	std::string path = "Resources\\gui\\menu.Json";
 	std::string menu_type = "";
 
 	switch (menu)
@@ -36,7 +36,7 @@ std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 	in >> layout;
 	layout = layout[menu_type];
 
-	json widgets = layout["widgets"];
+	Json widgets = layout["widgets"];
 	std::vector<Widget*> widget_list;
 
 	m_font = new sf::Font();
@@ -46,10 +46,10 @@ std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 	m_padding = sf::Vector2f(layout["padding"][0], layout["padding"][1]);
 	m_margin = sf::Vector2f(layout["margin"][0], layout["margin"][1]);
 
-	for (json::iterator it = widgets.begin(); it != widgets.end(); ++it)
+	for (Json::iterator it = widgets.begin(); it != widgets.end(); ++it)
 	{
 		Widget *widget = NULL;
-		json data = *it;
+		Json data = *it;
 		std::string type = data["type"];
 
 		float posx, posy;
@@ -71,7 +71,7 @@ std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 	return widget_list;
 }
 
-void Layout::LoadWidgetData(json data, Widget *widget)
+void Layout::LoadWidgetData(Json data, Widget *widget)
 {
 	int posx, posy;
 	int width, height;
@@ -123,7 +123,7 @@ void Layout::LoadWidgetData(json data, Widget *widget)
 	}
 	//get text color rgb
 	sf::Color text_color;
-	json color = data["text_color"];
+	Json color = data["text_color"];
 	text_color = sf::Color(color[0], color[1], color[2], color[3]);
 
 	//set box color

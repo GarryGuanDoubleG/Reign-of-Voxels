@@ -1,7 +1,8 @@
 #include "Menu.h"
+#include "scene.h"
 #include "graphics.h"
 #include "label.h"
-#include "button.h"
+#include "button.h"`
 #include "simple_logger.h"
 
 Menu::Menu()
@@ -19,17 +20,15 @@ Menu::Menu()
 //handle menu loop
 //will later extend class for different types of menus
 //doing login first to set up for network
-void Menu::MenuLoop()
+void Menu::SceneLoop()
 {
-	while (g_window->isOpen())
+
+	sf::Event event;
+	while (g_window->pollEvent(event))
 	{
-		sf::Event event;
-		while (g_window->pollEvent(event))
-		{
-			HandleInput(event);
-		}	
-		Render();
-	}
+		HandleInput(event);
+	}	
+	Render();
 }
 
 //render the menu to the screen
@@ -63,18 +62,18 @@ void Menu::HandleInput(sf::Event event)
 
 void Menu::triggerCallBack(sf::String event)
 {
-	json data;
+	Json data;
 	if (event == "login")
 	{
 		for (int i = 0; i < m_widgets.size(); i++)
 		{
 			// get textbox data and merge it into a single obj
-			json widget_data = m_widgets[i]->getData();
+			Json widget_data = m_widgets[i]->getData();
 			
 			if (widget_data.is_null())
 				continue;
 
-			for (json::iterator it = widget_data.begin(); it != widget_data.end(); ++it)
+			for (Json::iterator it = widget_data.begin(); it != widget_data.end(); ++it)
 			{
 				data[it.key()] = it.value();
 			}

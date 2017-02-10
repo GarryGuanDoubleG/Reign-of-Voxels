@@ -3,21 +3,19 @@
 #include "game.h"
 #include "simple_logger.h"
 
-Client::Client()
+Client::Client(void)
 {
 	if (enet_initialize() != 0)
 		slog("Failed to start enet");
 
-	m_client = enet_host_create(NULL,
-		1,
-		2,
-		0,
-		0);
+	//client host with 2 channel connection and unthrottled bandwidth
+	m_client = enet_host_create(NULL, 1, 2, 0, 0);
 
 	if (m_client == NULL)
 		slog("Failed to initiate client");
 
-	ConnectHost();
+	m_thread = new sf::Thread(&Client::ConnectionEvent, this);
+
 	Game::instance().getEventSystem().addObserver(this);
 }
 
@@ -28,7 +26,7 @@ Client::~Client()
 	enet_host_destroy(m_client);
 }
 
-void Client::onNotify(Event event, json obj)
+void Client::onNotify(Event event, Json obj)
 {
 	if (event == Event::Login)
 	{
@@ -44,7 +42,6 @@ void Client::onNotify(Event event, json obj)
 		}
 		ConnectHost();
 	}
-
 }
 
 void Client::ConnectHost()
@@ -53,25 +50,21 @@ void Client::ConnectHost()
 	ENetPeer *peer;
 	ENetEvent event;
 	std::string message;
-	int serviceResult;
-
+	int serviceResult = 1;
+	Json data;
 	/* Connect to some.server.net:1234. */
-	enet_address_set_host(&address, SERVER_IP_ADDR);
+	enet_address_set_host(&address, "localhost");
 	address.port = SERVER_PORT;
 	/* Initiate the connection, allocating the two channels 0 and 1. */
 	m_server = enet_host_connect(m_client, &address, 2, 0);
 	if (m_server == NULL)
 	{
-		fprintf(stderr,
-			"No available peers for initiating an ENet connection.\n");
-		exit(EXIT_FAILURE);
+		slog("Could not connect to server");
 	}
 	/* Wait up to 5 seconds for the connection attempt to succeed. */
-	if (enet_host_service(m_client, &event, 5000) > 0 &&
-		event.type == ENET_EVENT_TYPE_CONNECT)
+	if (enet_host_service(m_client, &event, 5000) > 0 && event.type == ENET_EVENT_TYPE_CONNECT)
 	{
-		puts("Garry Guan has succeeded.");
-		slog("Connected to Host: success");
+		m_connected = true;
 	}
 	else
 	{
@@ -81,67 +74,56 @@ void Client::ConnectHost()
 		enet_peer_reset(m_server);
 	}
 
-	bool done = false;
-	message = "Hi There\n";
-	while (!done)
+	data["type"] = Login;
+	data["username"] = m_username;
+	data["port"] = m_port;
+
+	SendData(data);
+	m_thread->launch();
+}
+
+void Client::ConnectionEvent()
+{
+	ENetEvent event;
+	int packs_per_sec = 30;
+	int delta_time = 1000 / packs_per_sec;
+	
+	while (m_connected)
 	{
-		serviceResult = 1;
+		enet_host_service(m_client, &event, delta_time);
 
-		/* Keep doing host_service until no events are left */
-		while (serviceResult > 0)
+		switch (event.type)
 		{
-			serviceResult = enet_host_service(m_client, &event, 0);
-
-			switch (event.type)
-			{
-			case ENET_EVENT_TYPE_CONNECT:
-				printf("A new client connected from %x:%u.\n",
-					event.peer->address.host,
-					event.peer->address.port);
-
-				event.peer->data = (void*)"New User";
-				done = true;
-				break;
-
-			case ENET_EVENT_TYPE_RECEIVE:
-				printf("A packet of length %u containing '%s' was "
-					"received from %s on channel %u.\n",
-					event.packet->dataLength,
-					event.packet->data,
-					event.peer->data,
-					event.channelID);
-
-				/* Clean up the packet now that we're done using it. */
-				enet_packet_destroy(event.packet);
-
-				break;
-
-			case ENET_EVENT_TYPE_DISCONNECT:
-				printf("%s disconected.\n", event.peer->data);
-
-				break;
-			}
-
-		}
-
-
-		//printf("Say> %s", message);
-
-		if(message == "quit" || message =="exit")
-		{
+		case ENET_EVENT_TYPE_CONNECT:
+			
 			break;
-		}
 
-		if (message.length() > 0)
-		{
-			ENetPacket *packet = enet_packet_create(message.c_str(), message.length() + 1, ENET_PACKET_FLAG_RELIABLE);
-			enet_peer_send(m_server, 0, packet);
+		case ENET_EVENT_TYPE_RECEIVE:
+			ReceiveServerEvent(event);
+			/* Clean up the packet now that we're done using it. */
+			enet_packet_destroy(event.packet);
+			break;
+
+		case ENET_EVENT_TYPE_DISCONNECT:
+			printf("%s disconected.\n", event.peer->data);
+			break;
 		}
 	}
 
+}
 
-	std::string test = "test";
-	SendData(test);
+void Client::ReceiveServerEvent(ENetEvent event)
+{
+	Json data = Json::parse(event.packet->data);
+	Event game_event = data["event"];
+	
+	std::cout << "Data: " << data.dump() << std::endl;
+	switch (game_event)
+	{
+	case Login:
+
+		break;
+	}
 }
 
 void Client::SendData(std::string data)
@@ -160,9 +142,12 @@ void Client::SendData(std::string data)
 
 }
 
-void Client::SendData(json data)
+void Client::SendData(Json data)
 {
+	std::string message = data.dump();
 
+	ENetPacket *packet = enet_packet_create(message.c_str(), message.length() + 1, ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(m_server, 0, packet);
 }
 
 

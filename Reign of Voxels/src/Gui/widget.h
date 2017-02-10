@@ -3,12 +3,12 @@
 #include <SFML\Graphics.hpp>
 #include <SFML\OpenGL.hpp>
 #include <SFML\Main.hpp>
-#include "json.hpp"
+#include "Json.hpp"
 
 #define CHECKBOUNDS(x,y, bx,by,bw,bh) ((x >= bx && y >= by) && (x <= bx + bw && y <= by + bh))
 
 class Menu;
-using json = nlohmann::json;
+using Json = nlohmann::json;
 
 enum WidgetState
 {
@@ -54,7 +54,7 @@ public:
 	bool isSelectable();
 	bool isSelected();
 	
-	virtual json getData();
+	virtual Json getData();
 	//callbacks
 	virtual void HandleInput(sf::Event event);
 	virtual void onTextEntered(sf::Uint32 unicode);

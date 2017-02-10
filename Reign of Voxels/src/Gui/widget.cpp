@@ -145,8 +145,8 @@ void Widget::triggerCallBack()
 	m_parent->triggerCallBack(this->m_event);
 }
 
-json Widget::getData()
+Json Widget::getData()
 {
-	json data = nullptr;
+	Json data = nullptr;
 	return data;
 }

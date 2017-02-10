@@ -14,8 +14,6 @@
 int main(int argc, char *argv[])
 #else
 
-
-
 int APIENTRY WinMain(
 	HINSTANCE   hInstance,
 	HINSTANCE   hPrevInstance,

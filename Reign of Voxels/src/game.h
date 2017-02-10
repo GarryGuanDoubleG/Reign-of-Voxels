@@ -8,6 +8,7 @@
 #include "shader.h"
 #include "model.h"
 #include "camera.h"
+#include "scene.h"
 #include "Gui\Menu.h"
 #include "server.h"
 #include "client.h"
@@ -26,6 +27,7 @@ public:
 private:
 	static Game m_instance;
 
+	SceneManager *m_sceneManager;
 	Subject		*m_eventSystem;
 	Client		*m_client;
 	Server		*m_server;

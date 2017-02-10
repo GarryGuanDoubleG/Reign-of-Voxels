@@ -14,7 +14,7 @@ public:
 	virtual void setTextColor(sf::Color color);
 	void setCursor(size_t index);
 
-	virtual json getData();
+	virtual Json getData();
 
 	virtual void onKeyPressed(sf::Keyboard::Key key);
 	virtual void onMouseEntered(float x, float y);

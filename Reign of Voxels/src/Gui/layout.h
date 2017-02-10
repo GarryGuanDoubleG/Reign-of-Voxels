@@ -1,9 +1,9 @@
 #pragma once
 #include "graphics.h"
-#include "json.hpp"
+#include "Json.hpp"
 #include "widget.h"
 
-using json = nlohmann::json;
+using Json = nlohmann::json;
 
 enum MenuLayouts
 {
@@ -16,7 +16,7 @@ class Layout
 {
 public:
 	std::vector<Widget*> LoadMenuLayout(MenuLayouts menu);
-	void LoadWidgetData(json data, Widget *widget);
+	void LoadWidgetData(Json data, Widget *widget);
 	sf::Font &getFont();
 
 	sf::Vector2f getBoxSize();

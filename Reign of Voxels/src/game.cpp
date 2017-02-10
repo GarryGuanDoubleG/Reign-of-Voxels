@@ -11,6 +11,7 @@ Game::Game()
 	//true after Initialize()
 	m_initialized = false;
 	//initialilze members
+	m_instance.m_sceneManager = new SceneManager();
 	m_instance.m_eventSystem = new Subject();
 	m_instance.m_client = new Client();
 	slog("Game init");
@@ -49,7 +50,7 @@ void RenderScene(Model *model, Mat4 &mvp)
 void Game::GameLoop()
 {
 	Menu * menu = new Menu();
-	menu->MenuLoop();
+	menu->SceneLoop();
 
 	//Model *model = new Model("Resources\\models\\nanosuit\\nanosuit.obj");
 	//Camera *camera = new Camera();
