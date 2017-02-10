@@ -10,10 +10,10 @@ Game::Game()
 {
 	//true after Initialize()
 	m_initialized = false;
-	//initialilze members
-	m_instance.m_sceneManager = new SceneManager();
+	m_instance.m_sceneManager = new SceneManager(new Menu(LoginMenu)); // first scene will be menu
 	m_instance.m_eventSystem = new Subject();
 	m_instance.m_client = new Client();
+	//initialilze members
 	slog("Game init");
 }
 
@@ -23,12 +23,13 @@ void Game::Initialize()
 	{
 		GraphicsInit();
 		compile_shaders();
-
+		m_eventSystem->addObserver(m_sceneManager);
+		m_eventSystem->addObserver(m_client);
 		m_initialized = true;
 	}
 }
 
-
+//function meant for testing model loading code
 void RenderScene(Model *model, Mat4 &mvp)
 {
 	GLfloat bg_color[] = { 0.0f, 0.0f, 0.5f, 0.0f };
@@ -49,8 +50,10 @@ void RenderScene(Model *model, Mat4 &mvp)
 
 void Game::GameLoop()
 {
-	Menu * menu = new Menu();
-	menu->SceneLoop();
+	while (g_window->isOpen())
+	{
+		m_sceneManager->RunScene();
+	}
 
 	//Model *model = new Model("Resources\\models\\nanosuit\\nanosuit.obj");
 	//Camera *camera = new Camera();

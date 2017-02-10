@@ -25,6 +25,7 @@ std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 		menu_type = "login";
 		break;
 	case LobbyMenu:
+		menu_type = "lobby";
 		break;
 	case OptionsMenu:
 		break;

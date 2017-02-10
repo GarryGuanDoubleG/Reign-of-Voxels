@@ -15,8 +15,6 @@ Client::Client(void)
 		slog("Failed to initiate client");
 
 	m_thread = new sf::Thread(&Client::ConnectionEvent, this);
-
-	Game::instance().getEventSystem().addObserver(this);
 }
 
 Client::~Client()
@@ -120,8 +118,8 @@ void Client::ReceiveServerEvent(ENetEvent event)
 	std::cout << "Data: " << data.dump() << std::endl;
 	switch (game_event)
 	{
-	case Login:
-
+	case JoinLobby:
+		Game::instance().getEventSystem().Notify(JoinLobby);
 		break;
 	}
 }

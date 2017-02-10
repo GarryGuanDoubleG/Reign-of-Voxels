@@ -5,17 +5,6 @@
 #include "button.h"`
 #include "simple_logger.h"
 
-Menu::Menu()
-{	
-	m_layout = new Layout();
-	m_widgets = m_layout->LoadMenuLayout(LoginMenu);
-	//set parent for callback
-	//seems like some coupling but good enough?
-	for (int i = 0; i < m_widgets.size(); i++)
-	{
-		m_widgets[i]->setParent(this);
-	}
-}
 
 //handle menu loop
 //will later extend class for different types of menus

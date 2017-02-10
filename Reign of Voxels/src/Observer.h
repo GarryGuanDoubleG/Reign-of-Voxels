@@ -20,8 +20,9 @@ class Observer
 public: Observer()
 	: m_next(nullptr)
 {}
-		virtual void onNotify(Event event, Json obj) = 0;
-		virtual void onNotify(Event event, std::string id);
+		virtual void onNotify(Event event) {};
+		virtual void onNotify(Event event, Json obj) {};
+		virtual void onNotify(Event event, std::string id) {};
 private:
 	//doubly ll for constant time removal
 	Observer * m_next;

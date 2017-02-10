@@ -11,15 +11,25 @@
 	and a scene manager, this way I can push and pop scenes for easy
 	management
 */
-class Menu : public Scene
+class Menu : virtual public Scene
 {
 public:
-	Menu();
+	Menu(MenuLayouts layout)
+		: m_layout()
+	{
+		m_widgets = m_layout->LoadMenuLayout(layout);
+		//set parent for callback
+		//seems like some coupling but good enough?
+		for (int i = 0; i < m_widgets.size(); i++)
+		{
+			m_widgets[i]->setParent(this);
+		}
+	};
 	~Menu();
 	
 	virtual void Render();
 	virtual void SceneLoop();
-	virtual void HandleInput();
+	virtual void HandleInput(sf::Event event);
 	virtual void triggerCallBack(sf::String event);
 private:
 	std::vector<Widget*> m_widgets;

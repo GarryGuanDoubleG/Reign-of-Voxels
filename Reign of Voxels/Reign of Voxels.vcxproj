@@ -189,7 +189,7 @@
     <ClCompile Include="src\Gui\widget.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\model.cpp" />
-    <ClCompile Include="src\Observer.cpp" />
+    <ClCompile Include="src\Scene.cpp" />
     <ClCompile Include="src\server.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\simple_logger.cpp" />

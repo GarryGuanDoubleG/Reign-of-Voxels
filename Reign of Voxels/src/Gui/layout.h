@@ -2,15 +2,9 @@
 #include "graphics.h"
 #include "Json.hpp"
 #include "widget.h"
+#include "scene.h"
 
 using Json = nlohmann::json;
-
-enum MenuLayouts
-{
-	LoginMenu,
-	LobbyMenu,
-	OptionsMenu
-};
 
 class Layout
 {

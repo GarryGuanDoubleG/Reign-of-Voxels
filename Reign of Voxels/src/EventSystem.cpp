@@ -46,3 +46,14 @@ void Subject::Notify(Event event, std::string id)
 		current = current->m_next;
 	}
 }
+
+void Subject::Notify(Event event)
+{
+	Observer * current = m_head;
+
+	while (current->m_next)
+	{
+		current->onNotify(event);
+		current = current->m_next;
+	}
+}
