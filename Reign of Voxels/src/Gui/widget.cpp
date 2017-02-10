@@ -76,8 +76,10 @@ void Widget::setPadding(sf::Vector2f padding)
 {
 	m_padding = padding;
 }
-void Widget::setString(sf::String str)
+void Widget::setString(std::string str)
 {
+	std::string string = str;
+	std::cout << "label " << string << std::endl;
 	m_text.setString(str);
 }
 void Widget::setMaxStrLen(int len)

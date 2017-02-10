@@ -14,7 +14,7 @@ class Client : public Observer
 public:
 	Client();
 	~Client();
-	virtual void onNotify(Event event, Json obj);
+	virtual void onNotify(Event event, Json &obj);
 	void ConnectHost();
 	void SendData(std::string data);
 	void SendData(Json obj);
@@ -31,7 +31,5 @@ private:
 	sf::Uint32		m_port;
 	sf::Clock		m_packet_clock; //time since last packet sent
 };
-
-
 
 #endif

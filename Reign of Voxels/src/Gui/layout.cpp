@@ -87,6 +87,16 @@ void Layout::LoadWidgetData(Json data, Widget *widget)
 		std::string id = data["id"];
 		widget->setID(id);
 	}
+
+	//set width and height
+	if (data.find("width") != data.end() && data.find("height") != data.end())
+	{
+		width = data["width"];
+		height = data["height"];
+
+		widget->setSize(width, height);
+	}
+
 	//get position
 	if (data["position"].is_string())
 	{
@@ -94,6 +104,16 @@ void Layout::LoadWidgetData(Json data, Widget *widget)
 		{
 			posx = g_window->getSize().x / 2;
 			posy = g_window->getSize().y / 2;
+		}
+		else if (data["position"] == "br")//bottom right
+		{
+			posx = g_window->getSize().x - width;
+			posy = g_window->getSize().y - height;
+		}
+		else if (data["position"] == "bl")//bottom right
+		{
+			posx = 0;
+			posy = g_window->getSize().y - height;
 		}
 	}
 	else if (data["position"].is_array())
@@ -109,14 +129,6 @@ void Layout::LoadWidgetData(Json data, Widget *widget)
 
 		posx += x;
 		posy += y;
-	}
-	//set width and height
-	if (data.find("width") != data.end() && data.find("height") != data.end())
-	{
-		width = data["width"];
-		height = data["height"];
-
-		widget->setSize(width, height);
 	}
 	if (data.find("text_size") != data.end())
 	{

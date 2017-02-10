@@ -4,12 +4,6 @@
 
 #define MAX_SCENES 10
 #define MAX_PENDING_EVENTS 100
-enum MenuLayouts
-{
-	LoginMenu,
-	LobbyMenu,
-	OptionsMenu
-};
 
 class Scene
 {
@@ -27,11 +21,12 @@ public:
 	void pushScene(Scene * scene);
 	void popScene();
 	void RunScene();
+	void HandleEvents();
 
-	virtual void onNotify(Event event);
+	virtual void onNotify(Event event, Json &data);
 private:
 	//ring buffer event queue
-	Event			m_pending_events[100];
+	Json			m_pending_events[100];
 	int				m_event_head,
 					m_event_tail;
 	//input queue for only top scene

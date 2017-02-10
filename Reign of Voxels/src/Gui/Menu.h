@@ -4,6 +4,9 @@
 #include "textbox.h"
 #include "scene.h"
 #include "game.h"
+#include "json.hpp"
+
+using Json = nlohmann::json;
 
 /*
 	setting up this menu for login only right now
@@ -14,17 +17,8 @@
 class Menu : virtual public Scene
 {
 public:
-	Menu(MenuLayouts layout)
-		: m_layout()
-	{
-		m_widgets = m_layout->LoadMenuLayout(layout);
-		//set parent for callback
-		//seems like some coupling but good enough?
-		for (int i = 0; i < m_widgets.size(); i++)
-		{
-			m_widgets[i]->setParent(this);
-		}
-	};
+	Menu(MenuLayouts layout);
+	Menu(MenuLayouts layout, Json &data);
 	~Menu();
 	
 	virtual void Render();

@@ -6,6 +6,14 @@
 
 using Json = nlohmann::json;
 
+enum MenuLayouts
+{
+	LoginMenu,
+	LobbyMenu,
+	OptionsMenu
+};
+
+
 class Layout
 {
 public:

@@ -33,13 +33,14 @@ enum Event
 	Chat,
 	Start
 };
-
+std::map<enet_uint32, GameInstance *> g_player_instance_map;
 GameInstance *g_instances; // indexed by port #
 
 void SendData(ENetPeer *player, Json &data)
 {
 	ENetPacket *packet = enet_packet_create(data.dump().c_str(), data.dump().length() + 1, ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(player, 1, packet);
+	enet_packet_destroy(packet);
 }
 
 void SendMessage(ENetPeer *player, std::string message, Event event)
@@ -51,6 +52,7 @@ void SendMessage(ENetPeer *player, std::string message, Event event)
 
 	ENetPacket *packet = enet_packet_create(response.dump().c_str(), response.dump().length() + 1, ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(player, 1, packet);
+	enet_packet_destroy(packet);
 }
 
 void onClientLogin(ENetEvent event, Json &data)
@@ -96,16 +98,22 @@ void onClientLogin(ENetEvent event, Json &data)
 		else
 		{
 			Json instance_info;
+			instance_info["event"] = JoinLobby;
 
-			instance_info["event"] = Login;
+			//add player to gmae instance map 
+			g_player_instance_map[client->connectID] = instance;
+
 			for (int i = 0; i < MAX_PLAYERS_PER_INSTANCE; i++)
 			{
 				ENetPeer *player = instance->players[i];
 				if (player)
 				{
-					instance_info["players"].push_back(instance->data[i]["username"]);
+					std::string id = "p" + std::to_string(i + 1);
+					std::cout << "id is " << id << std::endl;
+					instance_info[id] = instance->data[i]["username"];
 				}
 			}
+			std::cout << "instance info " << instance_info.dump() << std::endl;
 			SendData(client, instance_info);
 		}
 	}
@@ -199,8 +207,17 @@ void ServerLoop()
 				break;
 			}
 			case ENET_EVENT_TYPE_DISCONNECT:
-				printf("%s disconnected.\n", event.peer->data);
+				printf("Client disconnected\n");
 				/* Reset the peer's client information. */
+				GameInstance * instance = g_player_instance_map[event.peer->connectID];
+				if (instance)
+				{
+					for (int i = 0; i < MAX_PLAYERS_PER_INSTANCE; i++)
+					{
+						if (instance->players[i] == event.peer)
+							instance->players[i] = NULL;
+					}
+				}
 				event.peer->data = NULL;
 			}
 		}

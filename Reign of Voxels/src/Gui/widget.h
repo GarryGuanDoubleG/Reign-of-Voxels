@@ -7,7 +7,6 @@
 
 #define CHECKBOUNDS(x,y, bx,by,bw,bh) ((x >= bx && y >= by) && (x <= bx + bw && y <= by + bh))
 
-class Menu;
 using Json = nlohmann::json;
 
 enum WidgetState
@@ -17,6 +16,7 @@ enum WidgetState
 	StateActive
 };
 
+class Menu;
 class Widget : public sf::Drawable
 {
 public:
@@ -49,7 +49,7 @@ public:
 	virtual void setTextColor(sf::Color color);
 	virtual void setBoxColor(sf::Color color);
 	//display text
-	void setString(sf::String str);
+	void setString(std::string str);
 	void setMaxStrLen(int len);
 	bool isSelectable();
 	bool isSelected();

@@ -74,8 +74,8 @@
 	},
 	"lobby":
 	{
-		"font": "Resources/fonts/darkcrystaloutline.ttf",
-		"padding": [16, 8],
+		"font": "Resources/fonts/Quicksand-Bold.otf",
+		"padding": [16, 4],
 		"margin":[0, 25],
 		"textsize": 32,
 		"widgets":
@@ -83,40 +83,48 @@
 			{
 				"type": "label",
 				"id": "p1",
+				"width": 400,
+				"height": 50,
 				"text_size": 48,
 				"string": "",
 				"position": "center",
-				"offset": [-160, -400],
+				"offset": [-160, -60],
 				"text_color": [255,0,0,255],
 				"box_color": [128,255,128,255]
 			},
 			{
 				"type": "label",
 				"id": "p2",
+				"width": 400,
+				"height": 50,
 				"text_size": 48,
 				"string": "",
 				"position": "center",
-				"offset": [-160, -200],
+				"offset": [-160, -10],
 				"text_color": [255,255,255,255],
 				"box_color": [255,0,0,255]
 			},
 			{
 				"type": "label",
 				"id": "p3",
+				"width": 400,
+				"height": 50,
 				"text_size": 48,
 				"string": "",
 				"position": "center",
-				"offset": [-160, -0],
+				"offset": [-160, 50],
 				"text_color": [255,0,0,255],
 				"box_color": [255,0,255,255]
 			},
 			{
 				"type": "label",
 				"id": "p4",
+				"width": 400,
+				"height": 50,
 				"text_size": 48,
 				"string": "",
 				"position": "center",
-				"offset": [-160, 200],
+				"offset": [-160, 110],
 				"text_color": [255,0,0,255],
 				"box_color": [255,255,0,255]
 			},
@@ -129,8 +137,7 @@
 				"max_str_length": 16,
 				"width": 315,
 				"height": 50,				
-				"offset": [-150, -75],
-				"position": "center",								
+				"position": "bl",								
 				"text_color": [255,0,0,255],
 				"box_color": [255,255,255,255]
 			},
@@ -143,7 +150,6 @@
 				"width": 300,
 				"height": 200,
 				"position": "br",
-				"offset": [-150, 100],
 				"text_color": [255,255,255,255],
 				"box_color": [0,0,255,255]				
 			}

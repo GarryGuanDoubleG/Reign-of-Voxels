@@ -15,8 +15,11 @@ void Label::setText(const sf::String &string)
 
 void Label::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
-	if(m_is_active)
+	if (m_is_active)
+	{
+		g_window->draw(m_box);
 		g_window->draw(m_text);
+	}
 }
 
 void Label::setSubLabel()

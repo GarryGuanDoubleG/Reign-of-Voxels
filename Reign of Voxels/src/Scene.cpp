@@ -1,10 +1,14 @@
 #include "scene.h"
 #include "Gui\menu.h"
-
+#include "scene.h"
 SceneManager::SceneManager(Scene *scene)
 {
 	m_numScenes = 0;
 	pushScene(scene);
+
+	m_event_head = 0;
+	m_event_tail = 0;
+	//set events to -1 for no events
 }
 
 void SceneManager::pushScene(Scene * scene)
@@ -22,27 +26,44 @@ void SceneManager::RunScene()
 	while (g_window->isOpen())
 	{
 		m_scenes[m_numScenes - 1]->SceneLoop();
+		HandleEvents();
 	}
 }
 
-void SceneManager::onNotify(Event event)
+void SceneManager::HandleEvents()
 {
-	m_pending_events[m_event_head++] = event;
-	if (m_event_head >= MAX_PENDING_EVENTS)
+
+	while (m_event_head != m_event_tail)
 	{
-		m_event_head = 0;//reset head to beginning of array
+			Event game_event = m_pending_events[m_event_head]["event"];
+			switch (game_event)
+			{
+			case JoinLobby:
+			{
+				pushScene(new Menu(LobbyMenu, m_pending_events[m_event_head]));
+				break;
+			}
+			default:
+				break;
+			}
+
+		m_pending_events[m_event_head++] = nullptr; //clean up and increment head
+
+		if (m_event_head >= MAX_PENDING_EVENTS)
+			m_event_head = 0;	
 	}
+}
 
-
-
+void SceneManager::onNotify(Event event, Json &data)
+{
 	switch (event)
 	{
 	case JoinLobby:
-	{
-		pushScene(new Menu(LobbyMenu));
+		m_pending_events[m_event_tail++] = data;
 		break;
-	}
 	default:
 		break;
 	}
+	if (m_event_tail >= MAX_PENDING_EVENTS)
+		m_event_tail = 0;
 }

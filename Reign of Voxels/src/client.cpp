@@ -24,7 +24,7 @@ Client::~Client()
 	enet_host_destroy(m_client);
 }
 
-void Client::onNotify(Event event, Json obj)
+void Client::onNotify(Event event, Json &obj)
 {
 	if (event == Event::Login)
 	{
@@ -93,9 +93,7 @@ void Client::ConnectionEvent()
 		switch (event.type)
 		{
 		case ENET_EVENT_TYPE_CONNECT:
-			
 			break;
-
 		case ENET_EVENT_TYPE_RECEIVE:
 			ReceiveServerEvent(event);
 			/* Clean up the packet now that we're done using it. */
@@ -119,9 +117,10 @@ void Client::ReceiveServerEvent(ENetEvent event)
 	switch (game_event)
 	{
 	case JoinLobby:
-		Game::instance().getEventSystem().Notify(JoinLobby);
+		Game::instance().getEventSystem().Notify(JoinLobby, data);
 		break;
 	}
+
 }
 
 void Client::SendData(std::string data)

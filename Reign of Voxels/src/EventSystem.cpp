@@ -25,13 +25,13 @@ void Subject::removeObserver(Observer * observer)
 	}
 }
 
-void Subject::Notify(Event event, Json Json_obj)
+void Subject::Notify(Event event, Json &json_obj)
 {
 	Observer * current = m_head;
 
 	while (current)
 	{
-		current->onNotify(event, Json_obj);
+		current->onNotify(event, json_obj);
 		current = current->m_next;
 	}
 }
@@ -40,7 +40,7 @@ void Subject::Notify(Event event, std::string id)
 {
 	Observer * current = m_head;
 
-	while (current->m_next)
+	while (current)
 	{
 		current->onNotify(event, id);
 		current = current->m_next;
@@ -51,7 +51,7 @@ void Subject::Notify(Event event)
 {
 	Observer * current = m_head;
 
-	while (current->m_next)
+	while (current)
 	{
 		current->onNotify(event);
 		current = current->m_next;

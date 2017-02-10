@@ -1,10 +1,39 @@
 #include "Menu.h"
 #include "scene.h"
+#include "layout.h"
 #include "graphics.h"
 #include "label.h"
 #include "button.h"`
 #include "simple_logger.h"
 
+Menu::Menu(MenuLayouts layout) : m_layout(new Layout())
+{
+	m_widgets = m_layout->LoadMenuLayout(layout);
+	//set parent for callback
+	//seems like some coupling but good enough?
+	for (int i = 0; i < m_widgets.size(); i++)
+	{
+		m_widgets[i]->setParent(this);
+	}
+};
+
+Menu::Menu(MenuLayouts layout, Json &data)
+	: m_layout(new Layout())
+{
+	m_widgets = m_layout->LoadMenuLayout(layout);
+
+	for (int i = 0; i < m_widgets.size(); i++)
+	{
+		std::string id = m_widgets[i]->getID();
+
+		if (data.find(id) != data.end())
+		{
+			m_widgets[i]->setString(data[id]);
+		}
+
+		m_widgets[i]->setParent(this);
+	}
+}
 
 //handle menu loop
 //will later extend class for different types of menus
