@@ -15,8 +15,7 @@ public:
 	void addObserver(Observer * observer);
 	void removeObserver(Observer * observer);
 	void Notify(Event event, Json &obj);
-	void Notify(Event event, std::string id); //usually used for gui events
-	void Notify(Event event);
+	//void Notify(Event event, std::string id); //usually used for gui events
 private:
 	Observer * m_head;
 

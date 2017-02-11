@@ -32,29 +32,11 @@ void Game::Initialize()
 	}
 }
 
-//function meant for testing model loading code
-void RenderScene(Model *model, Mat4 &mvp)
-{
-	GLfloat bg_color[] = { 0.0f, 0.0f, 0.5f, 0.0f };
-	GLuint mvp_location;
-
-	mvp_location = glGetUniformLocation(g_shader_prog, "mvp");
-
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearBufferfv(GL_COLOR, 0, bg_color);
-	glUseProgram(g_shader_prog);
-
-	glUniformMatrix4fv(mvp_location, 1, GL_FALSE, glm::value_ptr(mvp));
-
-	model->Draw(g_shader_prog);
-
-	g_window->display();
-}
-
 void Game::GameLoop()
 {
 	while (g_window->isOpen())
 	{
+		g_delta_clock.restart();
 		m_sceneManager->SceneFrame();
 	}
 }

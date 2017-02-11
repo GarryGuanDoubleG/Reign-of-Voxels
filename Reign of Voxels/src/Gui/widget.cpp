@@ -7,12 +7,12 @@ Widget::Widget()
 
 }
 
-void Widget::setID(sf::String id)
+void Widget::setID(std::string id)
 {
 	m_id = id;
 }
 
-sf::String Widget::getID()
+std::string Widget::getID()
 {
 	return m_id;
 }

@@ -9,10 +9,8 @@ to use for rendering
 class Model
 {
 public:
-	Model(GLchar * filepath)
-	{
-		this->LoadModel(filepath);
-	}
+	Model(GLchar * filepath);
+	~Model();
 	void Draw(GLuint shader);
 private:
 	std::vector<Texture>textures_loaded;

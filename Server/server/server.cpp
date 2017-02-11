@@ -222,16 +222,19 @@ void ServerLoop()
 			case ENET_EVENT_TYPE_DISCONNECT:
 				printf("Client disconnected\n");
 				/* Reset the peer's client information. */
-		/*		GameInstance * instance = g_player_instance_map[event.peer->connectID];
+				GameInstance * instance = g_player_instance_map[event.peer->connectID];
 				if (instance)
 				{
 					for (int i = 0; i < MAX_PLAYERS_PER_INSTANCE; i++)
 					{
-						if (instance->players[i] == event.peer)
+						if (instance->players[i]->connectID == event.peer->connectID)
+						{
+							free(instance->players[i]);
 							instance->players[i] = NULL;
+						}
 					}
 				}
-				event.peer->data = NULL;*/
+				event.peer->data = NULL;
 			}
 		}
 	}

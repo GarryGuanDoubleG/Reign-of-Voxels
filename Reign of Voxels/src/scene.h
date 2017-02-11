@@ -8,6 +8,7 @@
 class Scene : public Observer
 {
 public:
+	virtual ~Scene() {};
 	virtual void SceneFrame() = 0;
 	virtual void Render() = 0;
 	virtual void HandleInput(sf::Event event) = 0;

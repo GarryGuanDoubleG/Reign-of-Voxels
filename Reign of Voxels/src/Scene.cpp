@@ -1,6 +1,8 @@
 #include "scene.h"
 #include "Gui\menu.h"
 #include "scene.h"
+#include "GameScene.h"
+
 SceneManager::SceneManager(Scene *scene)
 {
 	m_numScenes = 0;
@@ -18,7 +20,7 @@ void SceneManager::pushScene(Scene * scene)
 
 void SceneManager::popScene()
 {
-	delete(m_scenes[--m_numScenes]);
+	delete m_scenes[--m_numScenes];
 	m_scenes[m_numScenes] = NULL;
 }
 
@@ -35,13 +37,12 @@ void SceneManager::HandleEvents()
 			Event game_event = m_pending_events[m_event_head]["event"];
 			switch (game_event)
 			{
-			case JoinLobby:
-			{
+			case JoinLobby:			
 				pushScene(new Menu(LobbyMenu, m_pending_events[m_event_head]));
 				break;
-			}
-			case JoinPlayer:
-				break;
+			case Start:
+				popScene();
+				pushScene(new GameScene());
 			default:
 				break;
 			}
@@ -57,8 +58,10 @@ void SceneManager::onNotify(Event event, Json &data)
 	switch (event)
 	{
 	case JoinLobby:
-		m_pending_events[m_event_tail++] = data; //queue up event
+		m_pending_events[m_event_tail++] = data; //queue up events relevant to us
 		break;
+	case Start:
+		m_pending_events[m_event_tail++] = data;
 	default:
 		break;
 	}

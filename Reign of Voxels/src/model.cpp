@@ -1,6 +1,14 @@
 #include "model.h"
 #include "simple_logger.h"
 
+Model::Model(GLchar * filepath)
+{
+	this->LoadModel(filepath);
+}
+Model::~Model()
+{
+
+}
 void Model::LoadModel(std::string path)
 {
 	Assimp::Importer importer;
@@ -14,6 +22,7 @@ void Model::LoadModel(std::string path)
 	this->directory = path.substr(0, path.find_last_of('\\') + 1);
 	this->ProcessNode(scene->mRootNode, scene);
 }
+
 
 void Model::Draw(GLuint shader)
 {

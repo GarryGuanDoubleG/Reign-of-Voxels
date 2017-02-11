@@ -18,7 +18,7 @@ class Layout
 {
 public:
 	std::vector<Widget*> LoadMenuLayout(MenuLayouts menu);
-	void LoadWidgetData(Json data, Widget *widget);
+	void LoadWidgetData(Json &data, Widget *widget);
 	sf::Font &getFont();
 
 	sf::Vector2f getBoxSize();

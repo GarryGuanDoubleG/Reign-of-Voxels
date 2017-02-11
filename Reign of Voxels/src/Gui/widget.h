@@ -22,8 +22,8 @@ class Widget : public sf::Drawable
 public:
 	Widget();
 
-	void setID(sf::String id);
-	sf::String getID();
+	void setID(std::string id);
+	std::string getID();
 
 	//gui event
 	void setEvent(std::string event);

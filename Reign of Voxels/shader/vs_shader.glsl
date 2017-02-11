@@ -5,10 +5,12 @@ layout (location = 2) in vec2 verts_UV;
 
 out vec2 UV;
 //uniforms
-uniform mat4 mvp;
+uniform mat4 model;
+uniform mat4 view;
+uniform mat4 projection;
 
 void main(void)
 {
-	gl_Position = mvp * verts;	
+	gl_Position = projection * view * model * verts;	
 	UV = verts_UV;	
 }

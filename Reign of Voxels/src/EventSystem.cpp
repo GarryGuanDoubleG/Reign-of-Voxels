@@ -36,24 +36,13 @@ void Subject::Notify(Event event, Json &json_obj)
 	}
 }
 
-void Subject::Notify(Event event, std::string id)
-{
-	Observer * current = m_head;
-
-	while (current)
-	{
-		current->onNotify(event, id);
-		current = current->m_next;
-	}
-}
-
-void Subject::Notify(Event event)
-{
-	Observer * current = m_head;
-
-	while (current)
-	{
-		current->onNotify(event);
-		current = current->m_next;
-	}
-}
+//void Subject::Notify(Event event, std::string id)
+//{
+//	Observer * current = m_head;
+//
+//	while (current)
+//	{
+//		current->onNotify(event, id);
+//		current = current->m_next;
+//	}
+//}

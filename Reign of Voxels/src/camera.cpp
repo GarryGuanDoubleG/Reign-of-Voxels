@@ -23,12 +23,16 @@ Camera::Camera()
 	m_last_mouse_pos = sf::Mouse::getPosition(*g_window);
 }
 
+Camera::~Camera()
+{
+
+}
 Mat4 Camera::GetProj()
 {
 	return m_proj_mat;
 }
 
-Mat4 Camera::GetCamView()
+Mat4 Camera::GetViewMat()
 {
 	return m_view_mat;
 }

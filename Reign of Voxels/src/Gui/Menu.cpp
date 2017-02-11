@@ -29,6 +29,18 @@ Menu::Menu(MenuLayouts layout, Json &data)
 	Game::instance().getEventSystem().addObserver(this);
 }
 
+Menu::~Menu()
+{
+	Game::instance().getEventSystem().removeObserver(this);
+	for (int i = 0; i < m_widgets.size(); i++)
+	{
+		delete(m_widgets[i]);
+		m_widgets[i] = NULL;
+	}
+
+	delete(m_layout);
+}
+
 void Menu::UpdateWidgets(Json &data)
 {
 	for (int i = 0; i < m_widgets.size(); i++)
@@ -112,6 +124,13 @@ void Menu::triggerCallBack(sf::String event)
 		}
 		//broadcast login event
 		Game::instance().getEventSystem().Notify(Event::Login, data);
+	}
+
+	if (event == "start")
+	{
+		Json data;
+		data["event"] = Event::Start;
+		Game::instance().getEventSystem().Notify(Event::Start, data);
 	}
 
 }

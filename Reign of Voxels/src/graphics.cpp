@@ -1,8 +1,9 @@
 #include <glm/gtc/type_ptr.hpp>
 #include "graphics.h"
 #include "shader.h"
-#include "simple_logger.h"
+#include "glm.h"
 #include "texture.hpp"
+#include "simple_logger.h"
 
 sf::RenderWindow *g_window;
 
@@ -42,6 +43,7 @@ void GraphicsClose()
 	g_window->close();
 }
 
+
 sf::Vector2f GraphicsGetWinSizef()
 {
 	float w = g_window->getSize().x;
@@ -54,4 +56,3 @@ sf::Vector2u GraphicsGetWinSizeu()
 {
 	return g_window->getSize();
 }
-

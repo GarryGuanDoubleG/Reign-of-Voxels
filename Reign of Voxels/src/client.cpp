@@ -123,10 +123,15 @@ void Client::onReceiveData(ENetEvent event)
 	Event game_event = data["event"];
 	
 	std::cout << "Data: " << data.dump() << std::endl;
+
 	//received data from server
 	//have it throw an event and let listeners do whatevs
 	//should queue events to avoid loading client thread
-	Game::instance().getEventSystem().Notify(game_event, data);
+
+	if (game_event == Error)
+		std::cout << "Error: " << data["msg"] << std::endl;
+	else
+		Game::instance().getEventSystem().Notify(game_event, data);
 }
 
 void Client::SendData(std::string data)

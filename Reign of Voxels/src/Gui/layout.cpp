@@ -16,7 +16,7 @@
 std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 {
 	Json layout;
-	std::string path = "Resources\\gui\\menu.Json";
+	std::string path = "C:/Users/Garry/Documents/Visual Studio 2015/Projects/Reign of Voxels/Reign of Voxels/Resources/gui/menu.json";
 	std::string menu_type = "";
 
 	switch (menu)
@@ -72,31 +72,24 @@ std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 	return widget_list;
 }
 
-void Layout::LoadWidgetData(Json data, Widget *widget)
+void Layout::LoadWidgetData(Json &data, Widget *widget)
 {
 	int posx, posy;
 	int width, height;
-	
-
 	widget->setFont(m_font);
 	//widget->setMargin(m_margin);
 	widget->setPadding(m_padding);
 
 	if (data.find("id") != data.end())
-	{
-		std::string id = data["id"];
-		widget->setID(id);
-	}
+		widget->setID(data["id"]);
 
 	//set width and height
 	if (data.find("width") != data.end() && data.find("height") != data.end())
 	{
 		width = data["width"];
 		height = data["height"];
-
 		widget->setSize(width, height);
 	}
-
 	//get position
 	if (data["position"].is_string())
 	{
@@ -110,7 +103,7 @@ void Layout::LoadWidgetData(Json data, Widget *widget)
 			posx = g_window->getSize().x - width;
 			posy = g_window->getSize().y - height;
 		}
-		else if (data["position"] == "bl")//bottom right
+		else if (data["position"] == "bl")//bottom left
 		{
 			posx = 0;
 			posy = g_window->getSize().y - height;

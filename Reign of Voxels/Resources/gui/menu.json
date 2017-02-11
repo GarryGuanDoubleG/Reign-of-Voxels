@@ -2,7 +2,7 @@
 	"name": "menu",
 	"login":
 	{
-		"font": "Resources/fonts/Quicksand-Bold.otf",
+		"font": "C:/Users/Garry/Documents/Visual Studio 2015/Projects/Reign of Voxels/Reign of Voxels/Resources/fonts/darkcrystaloutline.ttf",
 		"padding": [16, 8],
 		"margin":[0, 25],
 		"textsize": 32,
@@ -145,10 +145,10 @@
 				"type": "button",
 				"id": "login",
 				"string": "Start",
-				"event": "StartInstance",
+				"event": "start",
 				"text_size": 48,
-				"width": 300,
-				"height": 200,
+				"width": 400,
+				"height": 100,
 				"position": "br",
 				"text_color": [255,255,255,255],
 				"box_color": [0,0,255,255]				
