@@ -18,21 +18,18 @@ void SceneManager::pushScene(Scene * scene)
 
 void SceneManager::popScene()
 {
-	m_scenes[--m_numScenes] = NULL;
+	delete(m_scenes[--m_numScenes]);
+	m_scenes[m_numScenes] = NULL;
 }
 
-void SceneManager::RunScene()
+void SceneManager::SceneFrame()
 {
-	while (g_window->isOpen())
-	{
-		m_scenes[m_numScenes - 1]->SceneLoop();
-		HandleEvents();
-	}
+	m_scenes[m_numScenes - 1]->SceneFrame();
+	HandleEvents();
 }
 
 void SceneManager::HandleEvents()
 {
-
 	while (m_event_head != m_event_tail)
 	{
 			Event game_event = m_pending_events[m_event_head]["event"];
@@ -43,10 +40,11 @@ void SceneManager::HandleEvents()
 				pushScene(new Menu(LobbyMenu, m_pending_events[m_event_head]));
 				break;
 			}
+			case JoinPlayer:
+				break;
 			default:
 				break;
 			}
-
 		m_pending_events[m_event_head++] = nullptr; //clean up and increment head
 
 		if (m_event_head >= MAX_PENDING_EVENTS)
@@ -59,7 +57,7 @@ void SceneManager::onNotify(Event event, Json &data)
 	switch (event)
 	{
 	case JoinLobby:
-		m_pending_events[m_event_tail++] = data;
+		m_pending_events[m_event_tail++] = data; //queue up event
 		break;
 	default:
 		break;

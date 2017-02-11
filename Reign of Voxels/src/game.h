@@ -10,7 +10,6 @@
 #include "camera.h"
 #include "scene.h"
 #include "Gui\Menu.h"
-#include "server.h"
 #include "client.h"
 
 class Game
@@ -30,7 +29,6 @@ private:
 	SceneManager *m_sceneManager;
 	Subject		*m_eventSystem;
 	Client		*m_client;
-	Server		*m_server;
 
 	bool		m_initialized;
 	bool		m_is_client;

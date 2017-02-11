@@ -22,23 +22,37 @@ Menu::Menu(MenuLayouts layout, Json &data)
 {
 	m_widgets = m_layout->LoadMenuLayout(layout);
 
+	UpdateWidgets(data);
+	for (int i = 0; i < m_widgets.size(); i++)
+		m_widgets[i]->setParent(this);
+
+	Game::instance().getEventSystem().addObserver(this);
+}
+
+void Menu::UpdateWidgets(Json &data)
+{
 	for (int i = 0; i < m_widgets.size(); i++)
 	{
-		std::string id = m_widgets[i]->getID();
+		std::string id = m_widgets[i]->getID();	
+		if (data.find(id) != data.end())		
+			m_widgets[i]->setString(data[id]);		
+	}
+}
 
-		if (data.find(id) != data.end())
-		{
-			m_widgets[i]->setString(data[id]);
-		}
-
-		m_widgets[i]->setParent(this);
+void Menu::onNotify(Event event, Json &data)
+{
+	switch (event)
+	{
+	case JoinPlayer:
+		UpdateWidgets(data);
+		break;
 	}
 }
 
 //handle menu loop
 //will later extend class for different types of menus
 //doing login first to set up for network
-void Menu::SceneLoop()
+void Menu::SceneFrame()
 {
 
 	sf::Event event;

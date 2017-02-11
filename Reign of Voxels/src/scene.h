@@ -5,10 +5,10 @@
 #define MAX_SCENES 10
 #define MAX_PENDING_EVENTS 100
 
-class Scene
+class Scene : public Observer
 {
 public:
-	virtual void SceneLoop() = 0;
+	virtual void SceneFrame() = 0;
 	virtual void Render() = 0;
 	virtual void HandleInput(sf::Event event) = 0;
 };
@@ -20,7 +20,7 @@ public:
 	~SceneManager();
 	void pushScene(Scene * scene);
 	void popScene();
-	void RunScene();
+	void SceneFrame();
 	void HandleEvents();
 
 	virtual void onNotify(Event event, Json &data);

@@ -41,9 +41,8 @@ void Widget::setPosition(float x, float y)
 
 sf::Vector2f Widget::getPosition()
 {
-	return m_position;
+	return m_box.getPosition();
 }
-
 void Widget::setParent(Menu * parent)
 {
 	this->m_parent = parent;
@@ -56,7 +55,7 @@ void Widget::setSize(float w, float h)
 
 const sf::Vector2f Widget::getSize()
 {
-	return m_size;
+	return m_box.getSize();
 }
 
 void Widget::setFont(sf::Font *font)

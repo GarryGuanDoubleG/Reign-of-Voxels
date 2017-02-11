@@ -155,7 +155,7 @@
     <ClInclude Include="src\camera.h" />
     <ClInclude Include="src\client.h" />
     <ClInclude Include="src\command.h" />
-    <ClInclude Include="src\EventSystem.h" />
+    <ClInclude Include="src\eventSystem.h" />
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\glm.h" />
     <ClInclude Include="src\graphics.h" />
@@ -168,9 +168,8 @@
     <ClInclude Include="src\json.hpp" />
     <ClInclude Include="src\mesh.h" />
     <ClInclude Include="src\model.h" />
-    <ClInclude Include="src\Observer.h" />
+    <ClInclude Include="src\observer.h" />
     <ClInclude Include="src\scene.h" />
-    <ClInclude Include="src\server.h" />
     <ClInclude Include="src\shader.h" />
     <ClInclude Include="src\simple_logger.h" />
     <ClInclude Include="src\texture.hpp" />
@@ -178,7 +177,7 @@
   <ItemGroup>
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\client.cpp" />
-    <ClCompile Include="src\EventSystem.cpp" />
+    <ClCompile Include="src\eventSystem.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\graphics.cpp" />
     <ClCompile Include="src\Gui\button.cpp" />
@@ -189,8 +188,7 @@
     <ClCompile Include="src\Gui\widget.cpp" />
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\model.cpp" />
-    <ClCompile Include="src\Scene.cpp" />
-    <ClCompile Include="src\server.cpp" />
+    <ClCompile Include="src\scene.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\simple_logger.cpp" />
     <ClCompile Include="src\texture.cpp" />

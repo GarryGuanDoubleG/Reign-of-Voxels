@@ -8,6 +8,7 @@ enum Event
 	Error,
 	Login,
 	JoinLobby,
+	JoinPlayer,
 	Input,
 	Chat,
 	Start

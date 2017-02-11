@@ -22,9 +22,13 @@ public:
 	~Menu();
 	
 	virtual void Render();
-	virtual void SceneLoop();
+	virtual void SceneFrame();
 	virtual void HandleInput(sf::Event event);
-	virtual void triggerCallBack(sf::String event);
+	virtual void triggerCallBack(sf::String event);		
+
+	virtual void onNotify(Event event, Json &data);
+
+	void UpdateWidgets(Json &data);
 private:
 	std::vector<Widget*> m_widgets;
 	Layout *m_layout;

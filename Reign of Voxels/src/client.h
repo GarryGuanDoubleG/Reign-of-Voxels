@@ -18,13 +18,12 @@ public:
 	void ConnectHost();
 	void SendData(std::string data);
 	void SendData(Json obj);
-	void onReceiveData(std::string data);
 
 	void ConnectionEvent();
-	void ReceiveServerEvent(ENetEvent event);
+	void onReceiveData(ENetEvent event);
 private:
 	bool			m_connected;//connected to server
-	sf::Thread		*m_thread;
+	sf::Thread		m_thread;
 	ENetHost		*m_client;
 	ENetPeer		*m_server;
 	std::string		m_username;

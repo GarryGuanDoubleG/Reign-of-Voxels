@@ -72,8 +72,6 @@ protected:
 	bool m_is_selected;
 	bool m_is_active;//draw if active
 
-	sf::Vector2f m_position;
-	sf::Vector2f m_size;
 	sf::Vector2f m_padding;
 
 	sf::Text m_text;

@@ -29,6 +29,7 @@ enum Event
 	Error,
 	Login,
 	JoinLobby,
+	JoinPlayer,
 	Input,
 	Chat,
 	Start
@@ -38,9 +39,11 @@ GameInstance *g_instances; // indexed by port #
 
 void SendData(ENetPeer *player, Json &data)
 {
+	std::cout << "player port is " << player->address.port << std::endl;
+
 	ENetPacket *packet = enet_packet_create(data.dump().c_str(), data.dump().length() + 1, ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(player, 1, packet);
-	enet_packet_destroy(packet);
+	//enet_packet_destroy(packet);
 }
 
 void SendMessage(ENetPeer *player, std::string message, Event event)
@@ -48,7 +51,6 @@ void SendMessage(ENetPeer *player, std::string message, Event event)
 	Json response;
 	response["event"] = event;
 	response["msg"] = message;
-
 
 	ENetPacket *packet = enet_packet_create(response.dump().c_str(), response.dump().length() + 1, ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(player, 1, packet);
@@ -105,21 +107,32 @@ void onClientLogin(ENetEvent event, Json &data)
 
 			for (int i = 0; i < MAX_PLAYERS_PER_INSTANCE; i++)
 			{
-				ENetPeer *player = instance->players[i];
-				if (player)
+				if (instance->players[i])
 				{
 					std::string id = "p" + std::to_string(i + 1);
 					std::cout << "id is " << id << std::endl;
 					instance_info[id] = instance->data[i]["username"];
 				}
 			}
+			//send instance info to new player
 			std::cout << "instance info " << instance_info.dump() << std::endl;
 			SendData(client, instance_info);
+
+			//change event to a player joined
+			instance_info["event"] = JoinPlayer;
+			//update players already in lobby
+			for (int i = 0; i < MAX_PLAYERS_PER_INSTANCE; i++)
+			{
+				if (instance->players[i] && (instance->players[i] != client))
+				{
+					SendData(instance->players[i], instance_info);
+				}
+			}
 		}
 	}
 }
 
-void onClientReceiveData(ENetEvent event)
+void onReceiveData(ENetEvent event)
 {
 	ENetPeer * player = event.peer;
 	ENetPacket *packet = event.packet;
@@ -144,7 +157,7 @@ void InitServer()
 	g_address.port = LOGIN_PORT;
 
 	g_server = enet_host_create(&g_address /* the address to bind the server host to */,
-		MAX_CLIENTS      /* allow up to 32 clients and/or outgoing connections */,
+		MAX_CLIENTS      /* allow up to MAX clients and/or outgoing connections */,
 		2      /* allow up to 2 channels to be used, 0 and 1 */,
 		0      /* assume any amount of incoming bandwidth */,
 		0      /* assume any amount of outgoing bandwidth */);
@@ -199,9 +212,9 @@ void ServerLoop()
 			{
 				char host_ip[64];
 				enet_address_get_host_ip(&event.peer->address, host_ip, 64);
-				printf("host ip is %s\n", host_ip);
+				printf("host ip is %s\n, port is %u", host_ip, event.peer->address.port);
 
-				onClientReceiveData(event);
+				onReceiveData(event);
 				//destroy packet after use
 				enet_packet_destroy(event.packet);
 				break;
@@ -209,7 +222,7 @@ void ServerLoop()
 			case ENET_EVENT_TYPE_DISCONNECT:
 				printf("Client disconnected\n");
 				/* Reset the peer's client information. */
-				GameInstance * instance = g_player_instance_map[event.peer->connectID];
+		/*		GameInstance * instance = g_player_instance_map[event.peer->connectID];
 				if (instance)
 				{
 					for (int i = 0; i < MAX_PLAYERS_PER_INSTANCE; i++)
@@ -218,7 +231,7 @@ void ServerLoop()
 							instance->players[i] = NULL;
 					}
 				}
-				event.peer->data = NULL;
+				event.peer->data = NULL;*/
 			}
 		}
 	}
