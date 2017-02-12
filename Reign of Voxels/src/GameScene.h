@@ -13,6 +13,7 @@ public:
 
 	virtual void SceneFrame();
 	virtual void Render() ;
+	virtual void onNotify(Event event, sf::Event &input);
 	virtual void HandleInput(sf::Event event) ;
 private:
 

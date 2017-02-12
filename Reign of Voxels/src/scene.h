@@ -1,5 +1,4 @@
 #pragma once
-#include "graphics.h"
 #include "EventSystem.h"
 
 #define MAX_SCENES 10
@@ -34,6 +33,5 @@ private:
 	Scene			*m_scenes[MAX_SCENES];//scene stack
 	int				m_numScenes; // number of scenes on stack
 	//commands can be notified immediately
-
 };
 

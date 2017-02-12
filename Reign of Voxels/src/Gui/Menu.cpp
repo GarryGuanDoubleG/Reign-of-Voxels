@@ -1,7 +1,7 @@
 #include "Menu.h"
 #include "scene.h"
 #include "layout.h"
-#include "graphics.h"
+#include "game.h"
 #include "label.h"
 #include "button.h"`
 #include "simple_logger.h"
@@ -15,6 +15,7 @@ Menu::Menu(MenuLayouts layout) : m_layout(new Layout())
 	{
 		m_widgets[i]->setParent(this);
 	}
+	Game::instance().getEventSystem().addObserver(this);
 };
 
 Menu::Menu(MenuLayouts layout, Json &data)
@@ -70,16 +71,17 @@ void Menu::onNotify(Event event, Json &data)
 	}
 }
 
+void Menu::onNotify(Event event, sf::Event &input)
+{
+	HandleInput(input);
+}
+
 //handle menu loop
 //will later extend class for different types of menus
 //doing login first to set up for network
 void Menu::SceneFrame()
 {
 	sf::Event event;
-	while (g_window->pollEvent(event))
-	{
-		HandleInput(event);
-	}	
 	Render();
 }
 
@@ -88,17 +90,17 @@ void Menu::SceneFrame()
 void Menu::Render()
 {
 	//set background to black
-	g_window->clear(sf::Color::Black);
+	Game::instance().getWindow()->clear(sf::Color::Black);
 	//save gl states
-	g_window->pushGLStates();
+	Game::instance().getWindow()->pushGLStates();
 	//draw text
 	for (int i = 0; i < m_widgets.size(); i++)
 	{
-		m_widgets[i]->draw(*g_window, sf::RenderStates::Default);
+		m_widgets[i]->draw(*Game::instance().getWindow(), sf::RenderStates::Default);
 	}
 	//restore the gl states
-	g_window->popGLStates();
-	g_window->display();
+	Game::instance().getWindow()->popGLStates();
+	Game::instance().getWindow()->display();
 }
 
 void Menu::HandleInput(sf::Event event)
@@ -107,12 +109,12 @@ void Menu::HandleInput(sf::Event event)
 	{
 		Json data = nullptr;
 		Game::instance().getEventSystem().Notify(Close, data);
-		GraphicsClose();
 	}
 	for (int i = 0; i < m_widgets.size(); i++)
 		m_widgets[i]->HandleInput(event);
 }
 
+//widgets are triggered and return data to menu
 void Menu::triggerCallBack(sf::String event)
 {
 	Json data;

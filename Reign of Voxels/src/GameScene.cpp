@@ -18,12 +18,6 @@ GameScene::~GameScene()
 void GameScene::SceneFrame()
 {
 	Render();
-
-	sf::Event event;
-	while (g_window->pollEvent(event))
-	{
-		m_camera->HandleInput(event);
-	}
 }
 
 void GameScene::Render()
@@ -48,9 +42,15 @@ void GameScene::Render()
 	glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(m_camera->GetProj()));
 
 	m_model->Draw(g_shader_prog);
-	g_window->display();
+	Game::instance().getWindow()->display();
 }
+
+void GameScene::onNotify(Event event, sf::Event &input)
+{
+	HandleInput(input);
+}
+
 void GameScene::HandleInput(sf::Event event)
 {
-
+	m_camera->HandleInput(event);
 }

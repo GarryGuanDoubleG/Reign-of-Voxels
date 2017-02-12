@@ -5,7 +5,9 @@
 #include <string.h>
 #include <sstream>
 #include <iostream>
-#include "graphics.h"
+#include <GL/glew.h>
+#include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
 #include "glm.h"
 #include "texture.hpp"
 

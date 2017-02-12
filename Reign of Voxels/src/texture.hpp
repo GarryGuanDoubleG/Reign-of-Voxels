@@ -1,5 +1,7 @@
 #pragma once
 #include <assimp/scene.h>
+#include "SFML\Graphics.hpp"
+
 struct Texture
 {
 	GLuint id;

@@ -1,5 +1,6 @@
 #include "label.h"
-#include "graphics.h"
+#include "game.h"
+
 #define OFFSETY 32.0f
 
 Label::Label()
@@ -12,8 +13,8 @@ void Label::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	if (m_is_active)
 	{
-		g_window->draw(m_box);
-		g_window->draw(m_text);
+		Game::instance().getWindow()->draw(m_box);		
+		Game::instance().getWindow()->draw(m_text);
 	}
 }
 

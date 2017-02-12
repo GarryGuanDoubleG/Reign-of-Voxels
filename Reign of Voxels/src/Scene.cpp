@@ -2,6 +2,7 @@
 #include "Gui\menu.h"
 #include "scene.h"
 #include "GameScene.h"
+#include "game.h"
 
 SceneManager::SceneManager(Scene *scene)
 {
@@ -13,6 +14,13 @@ SceneManager::SceneManager(Scene *scene)
 
 	Game::instance().getEventSystem().addObserver(this);
 	//set events to -1 for no events
+}
+
+SceneManager::~SceneManager()
+{
+	while (--m_numScenes >= 0)
+		delete m_scenes[m_numScenes];
+	Game::instance().getEventSystem().removeObserver(this);
 }
 
 void SceneManager::pushScene(Scene * scene)

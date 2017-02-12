@@ -13,14 +13,14 @@ Camera::Camera()
 	
 	m_view_mat = glmLookAt(m_pos, m_target, m_up);//set view matrix
 
-	sf::Vector2u win_size = g_window->getSize();
+	sf::Vector2u win_size = Game::instance().getWindow()->getSize();
 	m_proj_mat = glmPerspective(glm::radians(45.0f), (float)win_size.x / win_size.y, 0.1f, 100.0f);
 
 	m_pitch = 0.0f;
 	m_yaw = -90.0f;
 	m_roll = 0.0f;
 	
-	m_last_mouse_pos = sf::Mouse::getPosition(*g_window);
+	m_last_mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
 }
 
 Camera::~Camera()

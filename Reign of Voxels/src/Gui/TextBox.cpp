@@ -1,6 +1,6 @@
 #include <GL\glew.h>
 #include "Gui\Textbox.h"
-#include "graphics.h"
+#include "game.h"
 #include "simple_logger.h"
 
 #define CURSORPERIOD .75f
@@ -85,15 +85,15 @@ void TextBox::onMouseEntered(float x, float y)
 void TextBox::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	//draw the text box
-	g_window->draw(m_box);
+	Game::instance().getWindow()->draw(m_box);
 	//draw the text
-	g_window->draw(m_text);
+	Game::instance().getWindow()->draw(m_text);
 	//display a blinking cursor if selected
 	if (m_selected)
 	{
 		if (m_cursor_timer.getElapsedTime().asSeconds() <= CURSORPERIOD)
 		{
-			g_window->draw(m_cursor);
+			Game::instance().getWindow()->draw(m_cursor);
 			m_cursor_timer.restart();
 		}
 	}

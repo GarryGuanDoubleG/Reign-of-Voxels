@@ -1,12 +1,12 @@
 #include <iostream>
 #include <fstream>
+#include "game.h"
 #include "Layout.h"
 #include "textbox.h"
 #include "button.h"
 #include "label.h"
 #include "Json.hpp"
 #include "simple_logger.h"
-
 
 /*
 * @brief loads menu layout from a Json file and generates widgets based on layout data
@@ -95,18 +95,18 @@ void Layout::LoadWidgetData(Json &data, Widget *widget)
 	{
 		if (data["position"] == "center")
 		{
-			posx = g_window->getSize().x / 2;
-			posy = g_window->getSize().y / 2;
+			posx = Game::instance().getWindow()->getSize().x / 2;
+			posy = Game::instance().getWindow()->getSize().y / 2;
 		}
 		else if (data["position"] == "br")//bottom right
 		{
-			posx = g_window->getSize().x - width;
-			posy = g_window->getSize().y - height;
+			posx = Game::instance().getWindow()->getSize().x - width;
+			posy = Game::instance().getWindow()->getSize().y - height;
 		}
 		else if (data["position"] == "bl")//bottom left
 		{
 			posx = 0;
-			posy = g_window->getSize().y - height;
+			posy = Game::instance().getWindow()->getSize().y - height;
 		}
 	}
 	else if (data["position"].is_array())

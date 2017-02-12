@@ -3,7 +3,6 @@
 #include "layout.h"
 #include "textbox.h"
 #include "scene.h"
-#include "game.h"
 #include "json.hpp"
 
 using Json = nlohmann::json;
@@ -27,7 +26,7 @@ public:
 	virtual void triggerCallBack(sf::String event);		
 
 	virtual void onNotify(Event event, Json &data);
-
+	virtual void onNotify(Event event, sf::Event &input);
 	void UpdateWidgets(Json &data);
 private:
 	std::vector<Widget*> m_widgets;

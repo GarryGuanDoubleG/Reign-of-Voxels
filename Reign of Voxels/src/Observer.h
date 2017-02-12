@@ -12,6 +12,7 @@ public:
 		m_prev(nullptr)
 	{};
 		virtual void onNotify(Event event, Json &obj) {};
+		virtual void onNotify(Event event, sf::Event &input) {};
 private:
 	//doubly ll for constant time removal
 	Observer * m_next;

@@ -160,7 +160,6 @@
     <ClInclude Include="src\game.h" />
     <ClInclude Include="src\GameScene.h" />
     <ClInclude Include="src\glm.h" />
-    <ClInclude Include="src\graphics.h" />
     <ClInclude Include="src\Gui\button.h" />
     <ClInclude Include="src\Gui\label.h" />
     <ClInclude Include="src\Gui\layout.h" />
@@ -182,7 +181,6 @@
     <ClCompile Include="src\eventSystem.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\GameScene.cpp" />
-    <ClCompile Include="src\graphics.cpp" />
     <ClCompile Include="src\Gui\button.cpp" />
     <ClCompile Include="src\Gui\label.cpp" />
     <ClCompile Include="src\Gui\layout.cpp" />

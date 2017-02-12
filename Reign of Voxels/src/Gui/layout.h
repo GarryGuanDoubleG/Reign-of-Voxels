@@ -1,5 +1,5 @@
 #pragma once
-#include "graphics.h"
+#include "game.h"
 #include "Json.hpp"
 #include "widget.h"
 #include "scene.h"

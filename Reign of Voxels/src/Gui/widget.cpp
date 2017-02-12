@@ -1,5 +1,5 @@
 #include "widget.h"
-#include "graphics.h"
+#include "game.h"
 #include "menu.h"
 
 Widget::Widget()
@@ -103,7 +103,7 @@ void Widget::HandleInput(sf::Event event)
 		break;
 	case sf::Event::MouseButtonPressed:
 	{
-		onMouseEntered(sf::Mouse::getPosition(*g_window).x, sf::Mouse::getPosition(*g_window).y);
+		onMouseEntered(sf::Mouse::getPosition(*Game::instance().getWindow()).x, sf::Mouse::getPosition(*Game::instance().getWindow()).y);
 		break;
 	}
 	default:

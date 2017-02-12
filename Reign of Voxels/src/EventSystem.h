@@ -14,7 +14,7 @@ public:
 	void addObserver(Observer * observer);
 	void removeObserver(Observer * observer);
 	void Notify(Event event, Json &obj);
-	void Notify(Event event, sf::Event input);
+	void Notify(Event event, sf::Event &input);
 private:
 	Observer * m_head;
 };

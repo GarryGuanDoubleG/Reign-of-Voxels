@@ -34,3 +34,14 @@ void EventSystem::Notify(Event event, Json &json_obj)
 		current = current->m_next;
 	}
 }
+
+void EventSystem::Notify(Event event, sf::Event &input)
+{
+	Observer * current = m_head;
+
+	while (current)
+	{
+		current->onNotify(event, input);
+		current = current->m_next;
+	}
+}

@@ -1,8 +1,9 @@
 #pragma once
 #ifndef _GAME_H_
 #define _GAME_H_
-
-#include "graphics.h"
+#include <GL/glew.h>
+#include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
 #include "EventSystem.h"
 #include "glm.h"
 #include "shader.h"
@@ -17,23 +18,30 @@ class Game
 public:
 
 	Game();
-	static Game&	instance() { return m_instance; }
-	void			Initialize();
-	void			Close();
-	void			GameLoop();
+	~Game();
 
-	EventSystem&		getEventSystem() { return *m_eventSystem; }
-	
+	void					Initialize();
+	void					GameLoop();
+	static Game&			instance();
+	EventSystem&			getEventSystem();
+	sf::RenderWindow*	getWindow();
 private:
-	static Game m_instance;
 
-	SceneManager	*m_sceneManager;
-	EventSystem		*m_eventSystem;
-	Client			*m_client;
+	void					GraphicsInit();
+	void					Close();
 
-	bool		m_running;
-	bool		m_initialized;
-	bool		m_is_client;
+	static Game				m_instance;
+	sf::RenderWindow		*m_window;
+	
+	//managers
+	SceneManager			*m_sceneManager;
+	EventSystem				*m_eventSystem;
+	Client					*m_client;
+
+	//flags
+	bool					m_running;
+	bool					m_initialized;
+	bool					m_is_client;
 };
 
 #endif
