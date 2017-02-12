@@ -43,11 +43,17 @@ Menu::~Menu()
 
 void Menu::UpdateWidgets(Json &data)
 {
+	std::cout << "update labels " << data.dump() << std::endl;
+
 	for (int i = 0; i < m_widgets.size(); i++)
 	{
 		std::string id = m_widgets[i]->getID();	
 		if (data.find(id) != data.end())		
-			m_widgets[i]->setString(data[id]);		
+			m_widgets[i]->setString(data[id]);
+		else if (id == "p1" || id == "p2" || id == "p3" || id == "p4")
+		{
+			m_widgets[i]->setString(""); //must have left
+		}
 	}
 }
 
@@ -58,6 +64,9 @@ void Menu::onNotify(Event event, Json &data)
 	case JoinPlayer:
 		UpdateWidgets(data);
 		break;
+	case LeavePlayer:
+		UpdateWidgets(data);
+		break;	
 	}
 }
 
@@ -66,7 +75,6 @@ void Menu::onNotify(Event event, Json &data)
 //doing login first to set up for network
 void Menu::SceneFrame()
 {
-
 	sf::Event event;
 	while (g_window->pollEvent(event))
 	{
@@ -95,13 +103,14 @@ void Menu::Render()
 
 void Menu::HandleInput(sf::Event event)
 {
-	if ((event.type == sf::Event::Closed) || event.key.code == sf::Keyboard::Escape)
-		g_window->close();
-
-	for (int i = 0; i < m_widgets.size(); i++)
+	if (event.key.code == sf::Keyboard::Escape)
 	{
-		m_widgets[i]->HandleInput(event);
+		Json data = nullptr;
+		Game::instance().getEventSystem().Notify(Close, data);
+		GraphicsClose();
 	}
+	for (int i = 0; i < m_widgets.size(); i++)
+		m_widgets[i]->HandleInput(event);
 }
 
 void Menu::triggerCallBack(sf::String event)
@@ -119,7 +128,13 @@ void Menu::triggerCallBack(sf::String event)
 
 			for (Json::iterator it = widget_data.begin(); it != widget_data.end(); ++it)
 			{
-				data[it.key()] = it.value();
+				if (it.key() == "port")
+				{
+					std::string port = it.value(); // store it as an int
+					data["port"] = std::stoi(port);
+				}
+				else
+					data[it.key()] = it.value();
 			}
 		}
 		//broadcast login event

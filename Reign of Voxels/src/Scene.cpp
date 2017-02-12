@@ -10,6 +10,8 @@ SceneManager::SceneManager(Scene *scene)
 
 	m_event_head = 0;
 	m_event_tail = 0;
+
+	Game::instance().getEventSystem().addObserver(this);
 	//set events to -1 for no events
 }
 

@@ -13,6 +13,8 @@ Client::Client(void) : m_thread(&Client::ConnectionEvent, this)
 
 	if (m_client == NULL)
 		slog("Failed to initiate client");
+
+	Game::instance().getEventSystem().addObserver(this);
 }
 
 Client::~Client()
@@ -24,19 +26,24 @@ Client::~Client()
 
 void Client::onNotify(Event event, Json &obj)
 {
-	if (event == Event::Login)
+
+	switch (event)
 	{
+	case Login:
 		if (obj.find("username") != obj.end())
-		{
-			std::string username = obj["username"];
-			m_username = username;
-		}
-		if (obj.find("port") != obj.end())
-		{
-			std::string port = obj["port"];
-			m_port = std::stoi(port);
-		}
+			m_username = obj["username"];
+		if (obj.find("port") != obj.end())		
+			m_port = obj["port"];
+
 		ConnectHost();
+		break;
+	case Close:
+		slog("Disconnected");
+		if (m_connected)
+			enet_peer_disconnect(m_server, 0);
+		break;
+	default:
+		break;
 	}
 }
 

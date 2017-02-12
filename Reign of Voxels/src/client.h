@@ -21,13 +21,14 @@ public:
 
 	void ConnectionEvent();
 	void onReceiveData(ENetEvent event);
+
+	std::string		m_username;
+	sf::Uint32		m_port;
 private:
 	bool			m_connected;//connected to server
 	sf::Thread		m_thread;
 	ENetHost		*m_client;
 	ENetPeer		*m_server;
-	std::string		m_username;
-	sf::Uint32		m_port;
 	sf::Clock		m_packet_clock; //time since last packet sent
 };
 

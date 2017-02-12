@@ -19,17 +19,19 @@ public:
 	Game();
 	static Game&	instance() { return m_instance; }
 	void			Initialize();
+	void			Close();
 	void			GameLoop();
 
-	Subject&		getEventSystem() { return *m_eventSystem; }
+	EventSystem&		getEventSystem() { return *m_eventSystem; }
 	
 private:
 	static Game m_instance;
 
-	SceneManager *m_sceneManager;
-	Subject		*m_eventSystem;
-	Client		*m_client;
+	SceneManager	*m_sceneManager;
+	EventSystem		*m_eventSystem;
+	Client			*m_client;
 
+	bool		m_running;
 	bool		m_initialized;
 	bool		m_is_client;
 };

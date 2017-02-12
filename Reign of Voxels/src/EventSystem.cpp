@@ -1,6 +1,6 @@
 #include "EventSystem.h"
 
-void Subject::addObserver(Observer * observer)
+void EventSystem::addObserver(Observer * observer)
 {
 	observer->m_prev = nullptr;
 	observer->m_next = m_head;
@@ -12,7 +12,7 @@ void Subject::addObserver(Observer * observer)
 	m_head = observer;	
 }
 
-void Subject::removeObserver(Observer * observer)
+void EventSystem::removeObserver(Observer * observer)
 {
 	if (m_head == observer)
 	{
@@ -21,11 +21,10 @@ void Subject::removeObserver(Observer * observer)
 	else
 	{
 		observer->m_prev->m_next = observer->m_next;
-		delete(observer);
 	}
 }
 
-void Subject::Notify(Event event, Json &json_obj)
+void EventSystem::Notify(Event event, Json &json_obj)
 {
 	Observer * current = m_head;
 
@@ -35,14 +34,3 @@ void Subject::Notify(Event event, Json &json_obj)
 		current = current->m_next;
 	}
 }
-
-//void Subject::Notify(Event event, std::string id)
-//{
-//	Observer * current = m_head;
-//
-//	while (current)
-//	{
-//		current->onNotify(event, id);
-//		current = current->m_next;
-//	}
-//}

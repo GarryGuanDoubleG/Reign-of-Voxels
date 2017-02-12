@@ -10,7 +10,6 @@ class Label : public Widget
 {
 public:
 	Label();
-	void setText(const sf::String &string);
 	const sf::String& getText() const;
 
 	void Label::setSubLabel();//set it to small text below assigned widget

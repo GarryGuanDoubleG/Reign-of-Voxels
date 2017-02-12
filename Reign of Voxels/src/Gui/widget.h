@@ -51,8 +51,6 @@ public:
 	//display text
 	void setString(std::string str);
 	void setMaxStrLen(int len);
-	bool isSelectable();
-	bool isSelected();
 	
 	virtual Json getData();
 	//callbacks

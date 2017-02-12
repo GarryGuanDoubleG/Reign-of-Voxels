@@ -8,11 +8,6 @@ Label::Label()
 	m_is_active = true;
 }
 
-void Label::setText(const sf::String &string)
-{
-	m_text.setString(string);
-}
-
 void Label::draw(sf::RenderTarget& target, sf::RenderStates states) const
 {
 	if (m_is_active)
