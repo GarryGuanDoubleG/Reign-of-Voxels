@@ -34,9 +34,15 @@ void Client::onNotify(Event event, Json &obj)
 			m_username = obj["username"];
 		if (obj.find("port") != obj.end())		
 			m_port = obj["port"];
-
 		ConnectHost();
 		break;
+	case Start: 		// game started
+	{
+		Json data;
+		data["event"] = Start;
+		SendData(data);
+		break;
+	}
 	case Close:
 		slog("Disconnected");
 		if (m_connected)
@@ -84,7 +90,7 @@ void Client::ConnectHost()
 	}
 	if (m_connected)
 	{
-		data["type"] = Login;
+		data["event"] = Login;
 		data["username"] = m_username;
 		data["port"] = m_port;
 
@@ -158,8 +164,6 @@ void Client::SendData(std::string data)
 
 void Client::SendData(Json data)
 {
-	std::string message = data.dump();
-
-	ENetPacket *packet = enet_packet_create(message.c_str(), message.length() + 1, ENET_PACKET_FLAG_RELIABLE);
+	ENetPacket *packet = enet_packet_create(data.dump().c_str(), data.dump().length() + 1, ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(m_server, 0, packet);
 }

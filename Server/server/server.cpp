@@ -34,6 +34,7 @@ enum Event
 	Input,
 	Chat,
 	Start,
+	InitGame,
 	Close
 };
 std::map<ENetPeer *, GameInstance *> g_player_instance_map;
@@ -59,7 +60,7 @@ void SendMessage(ENetPeer *player, std::string message, Event event)
 	enet_packet_destroy(packet);
 }
 
-void UpdateInstance(GameInstance *instance, ENetPeer *sender, Json &data)
+void UpdateOthers(GameInstance *instance, ENetPeer *sender, Json &data)
 {
 	//update players already in lobby
 	for (int i = 0; i < MAX_PLAYERS_PER_INSTANCE; i++)
@@ -70,6 +71,18 @@ void UpdateInstance(GameInstance *instance, ENetPeer *sender, Json &data)
 		}
 	}
 }
+void UpdateInstance(GameInstance *instance, Json &data)
+{
+	//update players already in lobby
+	for (int i = 0; i < MAX_PLAYERS_PER_INSTANCE; i++)
+	{
+		if (instance->players[i])
+		{
+			SendData(instance->players[i], data);
+		}
+	}
+}
+
 void onClientLogin(ENetEvent event, Json &data)
 {
 	enet_uint32		port = (((int)data["port"]) % 100) + 1; //ports are 1 too 100. Whatever number ppl put will just use the first 3 digits
@@ -131,31 +144,31 @@ void onClientLogin(ENetEvent event, Json &data)
 			instance_info["event"] = JoinPlayer;
 			//add player to game instance map 
 			g_player_instance_map[client] = instance;
-			UpdateInstance(instance, client, instance_info);			
+			UpdateOthers(instance, client, instance_info);			
 		}
 	}
 }
 
-void onReceiveData(ENetEvent event)
+void onReceiveData(ENetEvent &event)
 {
 	ENetPeer * player = event.peer;
-	ENetPacket *packet = event.packet;
-	Json data = Json::parse(packet->data);
-
-	Event game_event = data["type"];
-
+	Json data = Json::parse(event.packet->data);
+	Event game_event = data["event"];
 	switch (game_event)
 	{
-	case Login:
-		onClientLogin(event, data);
-		break;
-	case Chat:
-		break;
-	case Start:
-		break;
+		case Login:
+			onClientLogin(event, data);
+			break;
+		case Chat:
+			break;
+		case Start:
+		{
+			Json new_event;
+			new_event["event"] = InitGame;
+			UpdateInstance(g_player_instance_map[event.peer], new_event);
+			break;
+		}
 	}
-
-
 }
 
 //set server ip and config
@@ -252,9 +265,8 @@ void ServerLoop()
 						}
 					}
 					std::cout << "update player \n" << update_players.dump() << std::endl;
-					UpdateInstance(instance, event.peer, update_players);
+					UpdateOthers(instance, event.peer, update_players);
 				}
-
 				event.peer->data = NULL;
 			}
 		}

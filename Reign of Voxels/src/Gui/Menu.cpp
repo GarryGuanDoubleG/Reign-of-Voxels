@@ -147,5 +147,4 @@ void Menu::triggerCallBack(sf::String event)
 		data["event"] = Event::Start;
 		Game::instance().getEventSystem().Notify(Event::Start, data);
 	}
-
 }

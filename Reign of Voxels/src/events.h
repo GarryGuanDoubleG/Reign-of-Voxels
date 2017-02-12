@@ -10,5 +10,6 @@ enum Event
 	Input,
 	Chat,
 	Start,
+	InitGame,
 	Close
 };

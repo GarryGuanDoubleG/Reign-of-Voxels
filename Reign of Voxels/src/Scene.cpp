@@ -42,7 +42,7 @@ void SceneManager::HandleEvents()
 			case JoinLobby:			
 				pushScene(new Menu(LobbyMenu, m_pending_events[m_event_head]));
 				break;
-			case Start:
+			case InitGame:
 				popScene();
 				pushScene(new GameScene());
 			default:
@@ -62,7 +62,7 @@ void SceneManager::onNotify(Event event, Json &data)
 	case JoinLobby:
 		m_pending_events[m_event_tail++] = data; //queue up events relevant to us
 		break;
-	case Start:
+	case InitGame:
 		m_pending_events[m_event_tail++] = data;
 	default:
 		break;
