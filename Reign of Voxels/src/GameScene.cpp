@@ -3,9 +3,11 @@
 
 GameScene::GameScene()
 {
-	m_camera = new Camera();
-	//m_model = new Model("C:\\Users\\Garry\\Documents\Visual Studio 2015\\Projects\\Reign of Voxels\\Reign of Voxels\\Resources\\models\\nanosuit\\nanosuit.obj");
-	m_model = new Model("Resources\\models\\nanosuit\\nanosuit.obj");
+	m_camera = new Camera();	
+	//m_model = new Model("Resources\\models\\nanosuit\\nanosuit.obj");
+
+
+
 	//subscribe to global events
 	Game::instance().getEventSystem().addObserver(this);
 }
@@ -41,8 +43,9 @@ void GameScene::Render()
 	glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(m_camera->GetViewMat()));
 	glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(m_camera->GetProj()));
 
-	m_model->Draw(g_shader_prog);
-	Game::instance().getWindow()->display();
+	if(m_model)
+		m_model->Draw(g_shader_prog);
+	
 }
 
 void GameScene::onNotify(Event event, sf::Event &input)

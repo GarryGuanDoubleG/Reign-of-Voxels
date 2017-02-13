@@ -189,7 +189,7 @@ void Client::onReceiveData(ENetEvent event)
 
 void Client::SendData(Json &data)
 {
-	char type = PacketJson;
+	char type = PacketJson;//rip type safety
 	std::string pack = type + data.dump();
 	std::cout << "pack " << pack << std::endl;
 
