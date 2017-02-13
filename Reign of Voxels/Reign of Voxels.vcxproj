@@ -170,6 +170,7 @@
     <ClInclude Include="src\mesh.h" />
     <ClInclude Include="src\model.h" />
     <ClInclude Include="src\observer.h" />
+    <ClInclude Include="src\packet.h" />
     <ClInclude Include="src\scene.h" />
     <ClInclude Include="src\shader.h" />
     <ClInclude Include="src\simple_logger.h" />

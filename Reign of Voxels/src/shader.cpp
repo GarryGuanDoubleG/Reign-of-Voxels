@@ -88,7 +88,6 @@ GLuint compile_shaders(void)
 	compile_attach_shader("shader/vs_shader.glsl", GL_VERTEX_SHADER, program);
 	compile_attach_shader("shader/fs_shader.glsl", GL_FRAGMENT_SHADER, program);
 
-
 	glLinkProgram(program);
 	glGetProgramiv(program, GL_LINK_STATUS, &result);
 

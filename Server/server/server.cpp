@@ -1,8 +1,7 @@
 #include <enet/enet.h>
 #include <map>
 #include <iostream>
-#include "json.hpp"
-
+#include "packet.h"
 //set up list of used ports for game instances
 //set up map of client id and client ip addr
 ENetAddress g_address;
@@ -15,7 +14,6 @@ ENetHost * g_server;
 #define MAX_INSTANCES 100
 #define MAX_PLAYERS_PER_INSTANCE 4
 
-using Json = nlohmann::json;
 //Struct containg all the players in a game instance
 typedef struct
 {
@@ -31,12 +29,14 @@ enum Event
 	JoinLobby,
 	JoinPlayer,
 	LeavePlayer,
-	Input,
+	ClientInput,
+	ServerInput,
 	Chat,
 	Start,
 	InitGame,
 	Close
 };
+
 std::map<ENetPeer *, GameInstance *> g_player_instance_map;
 GameInstance *g_instances; // indexed by port #
 
@@ -44,8 +44,23 @@ void SendData(ENetPeer *player, Json &data)
 {
 	std::cout << "player port is " << player->address.port << std::endl;
 
-	ENetPacket *packet = enet_packet_create(data.dump().c_str(), data.dump().length() + 1, ENET_PACKET_FLAG_RELIABLE);
-	enet_peer_send(player, 1, packet);
+	int type = PacketJson;
+	std::string packet = std::to_string(type) + data.dump();
+
+	std::cout << "packet out " << packet << std::endl;
+
+	ENetPacket *enet_packet = enet_packet_create(packet.c_str(), packet.length() + 1, ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(player, 1, enet_packet);
+	//enet_packet_destroy(packet);
+}
+void SendData(ENetPeer *player, RoVInput &data)
+{
+	char buffer[sizeof(RoVInput) + 1];
+	buffer[0] = '2';
+	memcpy(buffer + 1, &data, sizeof(RoVInput));
+
+	ENetPacket *enet_packet = enet_packet_create(buffer, sizeof(buffer), ENET_PACKET_FLAG_RELIABLE);
+	enet_peer_send(player, 1, enet_packet);
 	//enet_packet_destroy(packet);
 }
 
@@ -55,9 +70,7 @@ void SendMessage(ENetPeer *player, std::string message, Event event)
 	response["event"] = event;
 	response["msg"] = message;
 
-	ENetPacket *packet = enet_packet_create(response.dump().c_str(), response.dump().length() + 1, ENET_PACKET_FLAG_RELIABLE);
-	enet_peer_send(player, 1, packet);
-	enet_packet_destroy(packet);
+	SendData(player, response);
 }
 
 void UpdateOthers(GameInstance *instance, ENetPeer *sender, Json &data)
@@ -72,6 +85,18 @@ void UpdateOthers(GameInstance *instance, ENetPeer *sender, Json &data)
 	}
 }
 void UpdateInstance(GameInstance *instance, Json &data)
+{
+	//update players already in lobby
+	for (int i = 0; i < MAX_PLAYERS_PER_INSTANCE; i++)
+	{
+		if (instance->players[i])
+		{
+			SendData(instance->players[i], data);
+		}
+	}
+}
+
+void UpdateInstance(GameInstance *instance, RoVInput &data)
 {
 	//update players already in lobby
 	for (int i = 0; i < MAX_PLAYERS_PER_INSTANCE; i++)
@@ -149,25 +174,53 @@ void onClientLogin(ENetEvent event, Json &data)
 	}
 }
 
-void onReceiveData(ENetEvent &event)
+void onReceiveJson(ENetEvent &event)
 {
-	ENetPeer * player = event.peer;
-	Json data = Json::parse(event.packet->data);
+	Json data = Json::parse(&event.packet->data[1]);
 	Event game_event = data["event"];
 	switch (game_event)
 	{
-		case Login:
-			onClientLogin(event, data);
-			break;
-		case Chat:
-			break;
-		case Start:
-		{
-			Json new_event;
-			new_event["event"] = InitGame;
-			UpdateInstance(g_player_instance_map[event.peer], new_event);
-			break;
-		}
+	case Login:
+		onClientLogin(event, data);
+		break;
+	case Chat:
+		break;
+	case Start:
+	{
+		Json new_event;
+		new_event["event"] = InitGame;
+		UpdateInstance(g_player_instance_map[event.peer], new_event);
+		break;
+	}
+	}
+}
+void onReceiveSfEvent(ENetEvent &event)
+{
+	RoVInput input = *(RoVInput*)event.packet->data;
+
+	GameInstance * instance;
+	instance = g_player_instance_map[event.peer];
+
+	UpdateInstance(instance, input);
+}
+
+
+void onReceiveData(ENetEvent &event)
+{
+	//first byte of info is the type
+	enet_uint8 type = event.packet->data[0];
+	switch ((PacketEnum)type)
+	{
+	case PacketJson:
+	{
+		onReceiveJson(event);
+		break;
+	}
+	case PacketSfEvent:
+		onReceiveSfEvent(event);
+		break;
+	default:
+		break;
 	}
 }
 

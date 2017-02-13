@@ -15,9 +15,13 @@ public:
 	Client();
 	~Client();
 	virtual void onNotify(Event event, Json &obj);
-	void ConnectHost();
+	virtual void onNotify(Event event, sf::Event &input);
+	
+	void ConnectHost();//login
+	
 	void SendData(std::string data);
-	void SendData(Json obj);
+	void SendData(Json &obj);
+	void SendInput(sf::Event event);
 
 	void ConnectionEvent();
 	void onReceiveData(ENetEvent event);
@@ -25,6 +29,7 @@ public:
 	std::string		m_username;
 	sf::Uint32		m_port;
 private:
+	bool			m_game_started;
 	bool			m_connected;//connected to server
 	sf::Thread		m_thread;
 	ENetHost		*m_client;

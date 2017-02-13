@@ -98,9 +98,10 @@ void Game::GameLoop()
 		g_delta_clock.restart();
 
 		m_window->clear(sf::Color::Black);
+		
 		while (m_window->pollEvent(event))
 		{
-			m_eventSystem->Notify(Input, event);
+			m_eventSystem->Notify(ClientInput, event);
 		}
 
 		m_sceneManager->SceneFrame();

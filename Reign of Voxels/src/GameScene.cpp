@@ -47,7 +47,8 @@ void GameScene::Render()
 
 void GameScene::onNotify(Event event, sf::Event &input)
 {
-	HandleInput(input);
+	if(event == ServerInput)
+		HandleInput(input);
 }
 
 void GameScene::HandleInput(sf::Event event)

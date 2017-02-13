@@ -1,9 +1,14 @@
 #include <iostream>
 #include "client.h"
+#include "packet.h"
 #include "game.h"
 #include "simple_logger.h"
 
-Client::Client(void) : m_thread(&Client::ConnectionEvent, this)
+
+
+Client::Client(void) :	m_thread(&Client::ConnectionEvent, this),
+						m_game_started(false),
+						m_connected(false)
 {
 	if (enet_initialize() != 0)
 		slog("Failed to start enet");
@@ -32,7 +37,7 @@ void Client::onNotify(Event event, Json &obj)
 	case Login:
 		if (obj.find("username") != obj.end())
 			m_username = obj["username"];
-		if (obj.find("port") != obj.end())		
+		if (obj.find("port") != obj.end())
 			m_port = obj["port"];
 		ConnectHost();
 		break;
@@ -41,6 +46,7 @@ void Client::onNotify(Event event, Json &obj)
 		Json data;
 		data["event"] = Start;
 		SendData(data);
+		m_game_started = true;
 		break;
 	}
 	case Close:
@@ -49,6 +55,19 @@ void Client::onNotify(Event event, Json &obj)
 			enet_peer_disconnect(m_server, 0);
 		break;
 	default:
+		break;
+	}
+}
+
+void Client::onNotify(Event event, sf::Event &input)
+{
+	switch (event)
+	{
+	case ClientInput:
+		if (m_connected && m_game_started)
+		{
+			SendInput(input);
+		}
 		break;
 	}
 }
@@ -132,38 +151,58 @@ void Client::ConnectionEvent()
 
 void Client::onReceiveData(ENetEvent event)
 {
-	Json data = Json::parse(event.packet->data);
-	Event game_event = data["event"];
-	
-	std::cout << "Data: " << data.dump() << std::endl;
+	char ctype = event.packet->data[0];
+	int type = ctype - '0';
+	if (type == (int)PacketJson)
+	{
+		std::cout << "packet in " << (char *)&event.packet->data[1] << std::endl;
+		Json data = Json::parse(&event.packet->data[1]);
+		Event game_event = data["event"];
 
-	//received data from server
-	//have it throw an event and let listeners do whatevs
-	//should queue events to avoid loading client thread
+		std::cout << "Data: " << data.dump() << std::endl;
 
-	if (game_event == Error)
-		std::cout << "Error: " << data["msg"] << std::endl;
-	else
-		Game::instance().getEventSystem().Notify(game_event, data);
+		//received data from server
+		//have it throw an event and let listeners do whatevs
+		//should queue events to avoid loading client thread
+		switch (game_event)
+		{
+		case Error:
+			std::cout << "Error: " << data["msg"] << std::endl;
+			break;
+		case ServerInput:
+		{
+			/*	std::string temp = data["input"];
+				sf::Event new_input = *(sf::Event*)(*(void*)temp.c_str());*/
+			break;
+		}
+		default:
+			Game::instance().getEventSystem().Notify(game_event, data);
+			break;
+		}
+	}
+	else if (type == (int)PacketSfEvent)
+	{
+		RoVInput input = *(RoVInput*)&event.packet->data[1];
+		Game::instance().getEventSystem().Notify(Event::ServerInput, input.event);
+	}
 }
 
-void Client::SendData(std::string data)
+void Client::SendData(Json &data)
 {
-	/* Create a reliable packet of size 7 containing "packet\0" */
-	ENetPacket * packet = enet_packet_create(data.c_str(),
-		strlen("packet") + 1,
-		ENET_PACKET_FLAG_RELIABLE);
-	/* Extend the packet so and append the string "foo", so it now */
-	/* contains "packetfoo\0"                                      */
-	
-	/* Send the packet to the peer over channel id 0. */
-	/* One could also broadcast the packet by         */
-	/* enet_host_broadcast (host, 0, packet);         */
+	char type = PacketJson;
+	std::string pack = type + data.dump();
+	std::cout << "pack " << pack << std::endl;
+
+	ENetPacket *packet = enet_packet_create(pack.c_str(), pack.length() + 1, ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(m_server, 0, packet);
 }
 
-void Client::SendData(Json data)
+void Client::SendInput(sf::Event event)
 {
-	ENetPacket *packet = enet_packet_create(data.dump().c_str(), data.dump().length() + 1, ENET_PACKET_FLAG_RELIABLE);
+	RoVInput my_input;
+	my_input.type = (int)PacketSfEvent;
+	my_input.event = event;
+
+	ENetPacket *packet = enet_packet_create(&my_input, sizeof(RoVInput), ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(m_server, 0, packet);
 }

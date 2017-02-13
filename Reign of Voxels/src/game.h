@@ -24,7 +24,7 @@ public:
 	void					GameLoop();
 	static Game&			instance();
 	EventSystem&			getEventSystem();
-	sf::RenderWindow*	getWindow();
+	sf::RenderWindow*		getWindow();
 private:
 
 	void					GraphicsInit();
@@ -39,6 +39,7 @@ private:
 	Client					*m_client;
 
 	//flags
+	bool					m_in_game;
 	bool					m_running;
 	bool					m_initialized;
 	bool					m_is_client;
