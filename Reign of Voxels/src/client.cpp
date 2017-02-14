@@ -3,8 +3,6 @@
 #include "packet.h"
 #include "game.h"
 #include "simple_logger.h"
-
-
 /**
 * constructor
 * initializes enet and creates enet host and subscribes to global event system

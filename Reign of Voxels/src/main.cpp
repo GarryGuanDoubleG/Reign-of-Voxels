@@ -6,11 +6,17 @@
 #ifndef _DEBUG
 #include <windows.h>
 #endif
-
 #include "game.h"
-
+/**
+* Main entry-point for this application.
+*
+* @author Garry Guan
+*/
 #ifdef _DEBUG
-
+/**
+* @param argc The number of command - line arguments provided.
+* @param argv An array of command - line argument strings.
+*/
 int main(int argc, char *argv[])
 #else
 

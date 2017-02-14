@@ -1,7 +1,6 @@
 #include "label.h"
 #include "game.h"
 
-#define OFFSETY 32.0f
 //! A constructor.
 /*!
 Constructor for a GUI label widget used for the menu scene

@@ -1,13 +1,13 @@
 #include "game.h"
 #include "simple_logger.h"
 
-sf::Clock Game::g_delta_clock;
-sf::Clock Game::g_clock;
+sf::Clock Game::g_delta_clock; /**<timer that tracks time since last iteration of game loop*/
+sf::Clock Game::g_clock; /**<tracks total time since ininitation of gamescene*/  
 
-Game Game::m_instance;
+Game Game::m_instance; /**<singleton instance of game */ 
 
-#define SCREEN_WIDTH 1280
-#define SCREEN_HEIGHT 720
+#define SCREEN_WIDTH 1280 /**<width of the window */ 
+#define SCREEN_HEIGHT 720 /**<height of the window */ 
 
 /**
 * Constructor
