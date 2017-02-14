@@ -31,7 +31,6 @@ Client::~Client()
 
 void Client::onNotify(Event event, Json &obj)
 {
-
 	switch (event)
 	{
 	case Login:
@@ -63,11 +62,9 @@ void Client::onNotify(Event event, sf::Event &input)
 {
 	switch (event)
 	{
-	case ClientInput:
+	case ClientInput:		
 		if (m_connected && m_game_started)
-		{
 			SendInput(input);
-		}
 		break;
 	}
 }

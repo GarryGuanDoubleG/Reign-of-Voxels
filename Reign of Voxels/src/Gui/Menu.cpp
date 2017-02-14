@@ -81,7 +81,6 @@ void Menu::onNotify(Event event, sf::Event &input)
 //doing login first to set up for network
 void Menu::SceneFrame()
 {
-	sf::Event event;
 	Render();
 }
 
@@ -105,11 +104,6 @@ void Menu::Render()
 
 void Menu::HandleInput(sf::Event event)
 {
-	if (event.key.code == sf::Keyboard::Escape)
-	{
-		Json data = nullptr;
-		Game::instance().getEventSystem().Notify(Close, data);
-	}
 	for (int i = 0; i < m_widgets.size(); i++)
 		m_widgets[i]->HandleInput(event);
 }

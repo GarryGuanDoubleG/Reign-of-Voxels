@@ -22,7 +22,7 @@ void Widget::setEvent(std::string event)
 	m_event = event;
 }
 
-sf::String Widget::getEvent(std::string event)
+sf::String Widget::getEvent()
 {
 	return m_event;
 }

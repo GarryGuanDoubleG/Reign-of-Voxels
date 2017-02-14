@@ -1,8 +1,8 @@
 #include "game.h"
 #include "simple_logger.h"
 
-sf::Clock g_delta_clock;
-sf::Clock g_clock;
+sf::Clock Game::g_delta_clock;
+sf::Clock Game::g_clock;
 
 Game Game::m_instance;
 
@@ -68,7 +68,7 @@ void Game::Initialize()
 	m_initialized = true;
 }
 
-void Game::Close()
+void Game::GameClose()
 {
 	Json event;
 	event["event"] = Event::Close;
@@ -90,8 +90,9 @@ sf::RenderWindow*	Game::getWindow()
 { 
 	return m_window; 
 }
-
-
+/*
+ *
+*/
 void Game::GameLoop()
 {
 	m_running = true;
@@ -106,10 +107,12 @@ void Game::GameLoop()
 		
 		while (m_window->pollEvent(event))
 		{
-			m_eventSystem->Notify(ClientInput, event);
+			if (event.key.code == sf::Keyboard::Escape)
+				GameClose();
+			else
+				m_eventSystem->Notify(ClientInput, event);
 		}
-
 		m_sceneManager->SceneFrame();
-		//m_window->display();
 	}
+	m_window->close();
 }

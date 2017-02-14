@@ -4,17 +4,18 @@
 #include <SFML/OpenGL.hpp>
 #include "model.h"
 
-
 enum VoxelType
 {
-	Default = 0,
-	Grass,
-	Dirt,
-	Wood,
-	Mineral,
-	Energy,
+	Default = 0, /**<  */  
+	Grass, /**<  */  
+	Dirt, /**<  */  
+	Wood, /**<  */  
+	Mineral, /**<  */  
+	Energy, /**<  */  
 };
-
+/**
+*
+*/
 class Voxel
 {
 public:
@@ -25,9 +26,8 @@ public:
 	void SetActive(bool active);
 
 private:
-	bool m_active;
-	VoxelType m_voxelType;
-	//static float size; //size of each side
-	static Model *m_voxel;
+	bool m_active; /**<  */  
+	VoxelType m_voxelType; /**<  */  
 
+	static Model *m_voxel; /**<  */  
 };

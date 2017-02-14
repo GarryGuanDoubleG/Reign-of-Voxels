@@ -62,7 +62,6 @@ void GameScene::Render()
 				}
 			}
 		}
-
 	}
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	Game::instance().getWindow()->display();
@@ -70,8 +69,8 @@ void GameScene::Render()
 
 void GameScene::onNotify(Event event, sf::Event &input)
 {
-	if(event == ServerInput)
-		HandleInput(input);
+	if (event == ServerInput)
+		HandleInput(input); 
 }
 
 void GameScene::HandleInput(sf::Event event)

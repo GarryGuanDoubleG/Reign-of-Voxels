@@ -7,16 +7,18 @@
 #include <glm/gtc/constants.hpp> // glm::pi
 #include <glm/gtc/type_ptr.hpp>
 
-#define Vec4 glm::vec4
-#define Vec3 glm::vec3
-#define Vec2 glm::vec2
 
-#define Mat4 glm::mat4
-#define Mat3 glm::mat3
-#define Mat2 glm::mat2
+#define Vec4 glm::vec4/**<replace glm::vec4 with Vec4 type  */
+#define Vec3 glm::vec3/**<replace glm::vec4 with Vec3 type  */
+#define Vec2 glm::vec2 /**<replace glm::vec4 with Vec2 type  */
 
-#define glmNormalize glm::normalize
-#define glmCross glm::cross
+#define Mat4 glm::mat4/**<replace glm::mat4 with Mat4 type  */
+#define Mat3 glm::mat3/**<replace glm::mat3 with Mat3 type  */
+#define Mat2 glm::mat2/**<replace glm::mat2 with Mat2 type  */
 
-#define glmLookAt glm::lookAt
-#define glmPerspective glm::perspective
+#define glmNormalize glm::normalize/**<define glm::normalize to glmNormalize for convenience */
+#define glmCross glm::cross /**<define glm::cross to glmCross for convenience */
+
+#define glmLookAt glm::lookAt /**<define glm::lookat to glmLookAt for convenience  */  
+#define glmPerspective glm::perspective /**< define glm::perspective to glmPerspective for convenience */  
+

@@ -1,12 +1,9 @@
 #include "Voxel.h"
 
-Model * Voxel::m_voxel;
-
 Voxel::Voxel()
 {
 	m_active = false;
 	m_voxelType = Default;
-
 }
 
 Voxel::~Voxel()

@@ -40,14 +40,14 @@ std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 	Json widgets = layout["widgets"];
 	std::vector<Widget*> widget_list;
 
+	//set font
 	m_font = new sf::Font();
 	std::cout << "font path: " << layout["font"] << std::endl;
 
 	if (!m_font->loadFromFile(layout["font"]))
 		slog("Failed to load font");
-
+	//set padding
 	m_padding = sf::Vector2f(layout["padding"][0], layout["padding"][1]);
-	m_margin = sf::Vector2f(layout["margin"][0], layout["margin"][1]);
 
 	for (Json::iterator it = widgets.begin(); it != widgets.end(); ++it)
 	{
@@ -79,7 +79,6 @@ void Layout::LoadWidgetData(Json &data, Widget *widget)
 	int posx, posy;
 	int width, height;
 	widget->setFont(m_font);
-	//widget->setMargin(m_margin);
 	widget->setPadding(m_padding);
 
 	if (data.find("id") != data.end())
@@ -167,17 +166,7 @@ sf::Font & Layout::getFont()
 	return *m_font;
 }
 
-sf::Vector2f Layout::getBoxSize()
-{
-	return sf::Vector2f(100.0f, 50.0f);
-}
-
 sf::Vector2f Layout::getPadding()
 {
 	return sf::Vector2f(10.0f, 10.0f);
-}
-
-sf::Vector2f Layout::getMargin()
-{
-	return sf::Vector2f(0, 0);
 }

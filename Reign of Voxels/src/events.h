@@ -2,15 +2,15 @@
 
 enum Event
 {
-	Error,
-	Login,
-	JoinLobby,
-	JoinPlayer,
-	LeavePlayer,
-	ClientInput,
-	ServerInput,
-	Chat,
-	Start,
-	InitGame,
-	Close
+	Error, /**< Server has encountered an error */  
+	Login, /**< Player starts to login */  
+	JoinLobby, /**< Login succeeds and joins a lobby */  
+	JoinPlayer, /**< Another player joins same lobby  */  
+	LeavePlayer, /**< Someone in lobby left */  
+	ClientInput, /**< Player input locally */  
+	ServerInput,/**<  Player input sent from server*/  
+	Chat, /**<  Player typed something in chat*/  
+	Start, /**< Player starts the game*/  
+	InitGame, /**< Server response to inform all players to initiate game*/  
+	Close /**< Close the game and start cleaning up*/  
 };

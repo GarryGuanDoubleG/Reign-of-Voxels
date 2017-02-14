@@ -3,7 +3,7 @@
 #include <SFML\Graphics.hpp>
 #include "json.hpp"
 
-using Json = nlohmann::json;
+using Json = nlohmann::json; /**< convenience specified by nlohmann himself */  
 //first byte of the packet used for intepretting value
 enum PacketEnum
 {
