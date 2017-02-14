@@ -1,5 +1,9 @@
 #pragma once
-#include "GL\glew.h"
+#include <GL/glew.h>
+#include <SFML/Graphics.hpp>
+#include <SFML/OpenGL.hpp>
+#include "model.h"
+
 
 enum VoxelType
 {
@@ -22,8 +26,8 @@ public:
 
 private:
 	bool m_active;
-	static float size; //size of each side
 	VoxelType m_voxelType;
+	//static float size; //size of each side
+	static Model *m_voxel;
 
-	static GLuint m_vao, m_vbo;
 };

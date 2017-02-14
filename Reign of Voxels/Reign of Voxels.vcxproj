@@ -175,6 +175,7 @@
     <ClInclude Include="src\shader.h" />
     <ClInclude Include="src\simple_logger.h" />
     <ClInclude Include="src\texture.hpp" />
+    <ClInclude Include="src\Voxel.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\camera.cpp" />
@@ -195,6 +196,7 @@
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\simple_logger.cpp" />
     <ClCompile Include="src\texture.cpp" />
+    <ClCompile Include="src\Voxel.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

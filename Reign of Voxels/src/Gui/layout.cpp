@@ -16,7 +16,7 @@
 std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 {
 	Json layout;
-	std::string path = "C:/Users/Garry/Documents/Visual Studio 2015/Projects/Reign of Voxels/Reign of Voxels/Resources/gui/menu.json";
+	std::string path = "Resources\\gui\\menu.json";
 	std::string menu_type = "";
 
 	switch (menu)
@@ -41,6 +41,8 @@ std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 	std::vector<Widget*> widget_list;
 
 	m_font = new sf::Font();
+	std::cout << "font path: " << layout["font"] << std::endl;
+
 	if (!m_font->loadFromFile(layout["font"]))
 		slog("Failed to load font");
 

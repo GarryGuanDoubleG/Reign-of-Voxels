@@ -6,6 +6,9 @@ sf::Clock g_clock;
 
 Game Game::m_instance;
 
+#define SCREEN_WIDTH 1280
+#define SCREEN_HEIGHT 720
+
 //event system needs to be initialized first
 Game::Game()
 	: m_eventSystem(new EventSystem()),
@@ -34,10 +37,12 @@ void Game::GraphicsInit()
 	settings.majorVersion = 4;
 	settings.minorVersion = .0;
 	//Create context
-	m_window = new sf::RenderWindow(sf::VideoMode(1920, 1080), "Reign of Voxels", sf::Style::Default, settings);
-	/*Game::instance().getWindow()->setMouseCursorGrabbed(false);
-	Game::instance().getWindow()->setMouseCursorVisible(false);*/
+	m_window = new sf::RenderWindow(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Reign of Voxels", sf::Style::Default, settings);
+	Game::instance().getWindow()->setMouseCursorGrabbed(true);
+	/*Game::instance().getWindow()->setMouseCursorVisible(false);*/
 	m_window->setVerticalSyncEnabled(true);
+
+
 
 	if ((err = glewInit()) != GLEW_OK)
 	{
@@ -105,6 +110,6 @@ void Game::GameLoop()
 		}
 
 		m_sceneManager->SceneFrame();
-		m_window->display();
+		//m_window->display();
 	}
 }

@@ -2,7 +2,7 @@
 	"name": "menu",
 	"login":
 	{
-		"font": "C:/Users/Garry/Documents/Visual Studio 2015/Projects/Reign of Voxels/Reign of Voxels/Resources/fonts/darkcrystaloutline.ttf",
+		"font": "Resources/fonts/darkcrystaloutline.ttf",
 		"padding": [16, 8],
 		"margin":[0, 25],
 		"textsize": 32,

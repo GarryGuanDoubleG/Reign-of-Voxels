@@ -16,6 +16,7 @@ void Mesh::Draw(GLuint shader) const
 	// Bind appropriate textures
 	GLuint diffuseNr = 1;
 	GLuint specularNr = 1;
+	
 	for (GLuint i = 0; i < this->textures.size(); i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding

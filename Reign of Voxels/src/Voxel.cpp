@@ -1,20 +1,12 @@
 #include "Voxel.h"
 
+Model * Voxel::m_voxel;
+
 Voxel::Voxel()
 {
 	m_active = false;
 	m_voxelType = Default;
 
-	//set vao
-	if (!m_vao)
-	{
-		glGenVertexArrays(1, &m_vao);
-		glBindVertexArray(m_vao);
-
-		glGenBuffers(1, &m_vbo);
-		glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-
-	}
 }
 
 Voxel::~Voxel()
