@@ -1,7 +1,7 @@
-#include "sceneManager.h"
-#include "Gui\menu.h"
-#include "GameScene.h"
-#include "game.h"
+#include "sceneManager.hpp"
+#include "Gui\menu.hpp"
+#include "GameScene.hpp"
+#include "game.hpp"
 /** Constructor
 * @brief initalizes members to 0 and pushes a new scene onto the stack
 * @param scene the scene to push onto scene stack

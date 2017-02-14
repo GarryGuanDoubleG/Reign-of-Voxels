@@ -1,5 +1,5 @@
 #pragma once
-#include "scene.h"
+#include "scene.hpp"
 /**
 * Manages which scene is activately handles events using a stack
 */

@@ -1,4 +1,4 @@
-#include "model.h"
+#include "model.hpp"
 #include "simple_logger.h"
 /** Constructor
 * Loads model data using Assimp

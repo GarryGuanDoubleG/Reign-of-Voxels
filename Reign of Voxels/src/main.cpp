@@ -4,9 +4,9 @@
 * Implements the main class.
 */
 #ifndef _DEBUG
-#include <windows.h>
+#include <windows.hpp>
 #endif
-#include "game.h"
+#include "game.hpp"
 /**
 * Main entry-point for this application.
 *

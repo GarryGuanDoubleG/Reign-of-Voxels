@@ -1,6 +1,6 @@
 #pragma once
 #include <GL/glew.h>
-#include "Gui\widget.h"
+#include "Gui\widget.hpp"
 /**
 * A textbox widget. Handles text input and max character limit
 */

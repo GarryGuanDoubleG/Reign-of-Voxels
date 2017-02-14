@@ -1,5 +1,5 @@
 #pragma once
-#include "events.h"
+#include "events.hpp"
 #include "json.hpp"
 using Json = nlohmann::json; /**< convenience specified by nlohmann himself */  
 /**

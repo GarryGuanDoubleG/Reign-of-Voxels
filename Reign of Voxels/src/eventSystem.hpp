@@ -1,7 +1,7 @@
 #pragma once
 #include <string>
 #include "SFML\Graphics.hpp"
-#include "Observer.h"
+#include "Observer.hpp"
 #include "Json.hpp"
 
 /**

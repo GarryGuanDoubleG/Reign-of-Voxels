@@ -1,5 +1,5 @@
-#include "label.h"
-#include "game.h"
+#include "label.hpp"
+#include "game.hpp"
 
 //! A constructor.
 /*!

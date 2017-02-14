@@ -8,7 +8,7 @@
 #include <GL/glew.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-#include "glm.h"
+#include "glm.hpp"
 #include "texture.hpp"
 
 //should probably move these into a utility file

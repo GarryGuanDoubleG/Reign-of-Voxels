@@ -1,4 +1,4 @@
-#include "game.h"
+#include "game.hpp"
 #include "simple_logger.h"
 
 sf::Clock Game::g_delta_clock; /**<timer that tracks time since last iteration of game loop*/
@@ -127,9 +127,9 @@ void Game::GameLoop()
 		
 		while (m_window->pollEvent(event))
 		{
-			if (event.key.code == sf::Keyboard::Escape)
+			/*if (event.key.code == sf::Keyboard::Escape)
 				GameClose();
-			else
+			else*/
 				m_eventSystem->Notify(ClientInput, event);
 		}
 		m_sceneManager->SceneFrame();

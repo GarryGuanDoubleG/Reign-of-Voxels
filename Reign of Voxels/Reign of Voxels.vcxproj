@@ -151,32 +151,6 @@
     <None Include="shader\vs_shader.glsl" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="src\Actor.h" />
-    <ClInclude Include="src\camera.h" />
-    <ClInclude Include="src\client.h" />
-    <ClInclude Include="src\events.h" />
-    <ClInclude Include="src\eventSystem.h" />
-    <ClInclude Include="src\game.h" />
-    <ClInclude Include="src\GameScene.h" />
-    <ClInclude Include="src\glm.h" />
-    <ClInclude Include="src\Gui\button.h" />
-    <ClInclude Include="src\Gui\label.h" />
-    <ClInclude Include="src\Gui\layout.h" />
-    <ClInclude Include="src\Gui\menu.h" />
-    <ClInclude Include="src\Gui\textbox.h" />
-    <ClInclude Include="src\Gui\widget.h" />
-    <ClInclude Include="src\mesh.h" />
-    <ClInclude Include="src\model.h" />
-    <ClInclude Include="src\observer.h" />
-    <ClInclude Include="src\packet.h" />
-    <ClInclude Include="src\scene.h" />
-    <ClInclude Include="src\sceneManager.h" />
-    <ClInclude Include="src\shader.h" />
-    <ClInclude Include="src\simple_logger.h" />
-    <ClInclude Include="src\texture.hpp" />
-    <ClInclude Include="src\Voxel.h" />
-  </ItemGroup>
-  <ItemGroup>
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\eventSystem.cpp" />
@@ -196,6 +170,33 @@
     <ClCompile Include="src\simple_logger.cpp" />
     <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\Voxel.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="src\Actor.hpp" />
+    <ClInclude Include="src\camera.hpp" />
+    <ClInclude Include="src\client.hpp" />
+    <ClInclude Include="src\events.hpp" />
+    <ClInclude Include="src\eventSystem.hpp" />
+    <ClInclude Include="src\game.hpp" />
+    <ClInclude Include="src\GameScene.hpp" />
+    <ClInclude Include="src\glm.hpp" />
+    <ClInclude Include="src\Gui\button.hpp" />
+    <ClInclude Include="src\Gui\label.hpp" />
+    <ClInclude Include="src\Gui\layout.hpp" />
+    <ClInclude Include="src\Gui\Menu.hpp" />
+    <ClInclude Include="src\Gui\textbox.hpp" />
+    <ClInclude Include="src\Gui\widget.hpp" />
+    <ClInclude Include="src\mesh.hpp" />
+    <ClInclude Include="src\model.hpp" />
+    <ClInclude Include="src\observer.hpp" />
+    <ClInclude Include="src\packet.hpp" />
+    <ClInclude Include="src\scene.hpp" />
+    <ClInclude Include="src\sceneManager.hpp" />
+    <ClInclude Include="src\shader.hpp" />
+    <ClInclude Include="src\simple_logger.h" />
+    <ClInclude Include="src\texture.hpp" />
+    <ClInclude Include="src\Voxel.hpp" />
+    <ClInclude Include="src\VoxelChunk.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

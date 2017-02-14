@@ -1,6 +1,6 @@
-#include "widget.h"
-#include "game.h"
-#include "menu.h"
+#include "widget.hpp"
+#include "game.hpp"
+#include "menu.hpp"
 /**
 * a constructor
 * empty constructor

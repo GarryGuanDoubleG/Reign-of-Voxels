@@ -1,7 +1,7 @@
 #include <iostream>
-#include "client.h"
-#include "packet.h"
-#include "game.h"
+#include "client.hpp"
+#include "packet.hpp"
+#include "game.hpp"
 #include "simple_logger.h"
 /**
 * constructor

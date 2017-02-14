@@ -1,9 +1,9 @@
-#include "Menu.h"
-#include "scene.h"
-#include "layout.h"
-#include "game.h"
-#include "label.h"
-#include "button.h"`
+#include "Menu.hpp"
+#include "scene.hpp"
+#include "layout.hpp"
+#include "game.hpp"
+#include "label.hpp"
+#include "button.hpp"`
 #include "simple_logger.h"
 /**
 * A constructor.

@@ -1,10 +1,10 @@
 #include <iostream>
 #include <fstream>
-#include "game.h"
-#include "Layout.h"
-#include "textbox.h"
-#include "button.h"
-#include "label.h"
+#include "game.hpp"
+#include "Layout.hpp"
+#include "textbox.hpp"
+#include "button.hpp"
+#include "label.hpp"
 #include "Json.hpp"
 #include "simple_logger.h"
 

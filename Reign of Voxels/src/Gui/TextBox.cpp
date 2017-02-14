@@ -1,6 +1,6 @@
 #include <GL\glew.h>
-#include "Gui\Textbox.h"
-#include "game.h"
+#include "Gui\Textbox.hpp"
+#include "game.hpp"
 #include "simple_logger.h"
 #define CURSORPERIOD .75f /**<The time period to display cursor before blinking*/
 //! A constructor.

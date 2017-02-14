@@ -1,6 +1,6 @@
 #pragma once
-#include "game.h"
-#include "glm.h"
+#include "game.hpp"
+#include "glm.hpp"
 /**
 * Manages frustum by managing projection and view matrice. Sets up what the player can see.
 * Currently creates a perspective projection but will eventually change to orthographic projection

@@ -4,13 +4,13 @@
 #include <GL/glew.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-#include "EventSystem.h"
-#include "glm.h"
-#include "shader.h"
-#include "model.h"
-#include "sceneManager.h"
-#include "Gui\Menu.h"
-#include "client.h"
+#include "EventSystem.hpp"
+#include "glm.hpp"
+#include "shader.hpp"
+#include "model.hpp"
+#include "sceneManager.hpp"
+#include "Gui\Menu.hpp"
+#include "client.hpp"
 /**
 * Singleton Game class
 * Handles game loops and stores all managers & systems

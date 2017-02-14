@@ -1,8 +1,8 @@
 #pragma once
-#include "game.h"
+#include "game.hpp"
 #include "Json.hpp"
-#include "widget.h"
-#include "scene.h"
+#include "widget.hpp"
+#include "scene.hpp"
 
 using Json = nlohmann::json; /**< convenience specified by nlohmann himself */  
 enum MenuLayouts

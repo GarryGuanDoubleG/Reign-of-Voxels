@@ -1,5 +1,5 @@
 #pragma once
-#include "widget.h"
+#include "widget.hpp"
 /**
 *  A test class. A more elaborate class description.
 */

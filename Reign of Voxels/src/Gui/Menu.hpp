@@ -1,8 +1,8 @@
 #pragma once
 #include "SFML\Graphics.hpp"
-#include "layout.h"
-#include "textbox.h"
-#include "scene.h"
+#include "layout.hpp"
+#include "textbox.hpp"
+#include "scene.hpp"
 #include "json.hpp"
 
 using Json = nlohmann::json; /**< convenience specified by nlohmann himself */  

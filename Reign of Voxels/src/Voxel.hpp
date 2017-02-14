@@ -2,7 +2,7 @@
 #include <GL/glew.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-#include "model.h"
+#include "model.hpp"
 
 enum VoxelType
 {

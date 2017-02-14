@@ -1,10 +1,10 @@
 #pragma once
 #include "SFML\Graphics.hpp"
-#include "scene.h"
-#include "model.h"
-#include "camera.h"
-#include "game.h"
-#include "Voxel.h"
+#include "scene.hpp"
+#include "model.hpp"
+#include "camera.hpp"
+#include "game.hpp"
+#include "Voxel.hpp"
 /**
 * GameScene class that manages rendering the voxel world. Inherits from abstract class Scene
 */

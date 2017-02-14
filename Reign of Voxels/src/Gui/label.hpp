@@ -1,5 +1,5 @@
 #pragma once
-#include "widget.h"
+#include "widget.hpp"
 /**
 * Displays text and color box at specified window position
 */

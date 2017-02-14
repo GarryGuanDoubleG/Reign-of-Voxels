@@ -1,4 +1,4 @@
-#include "Voxel.h"
+#include "Voxel.hpp"
 /**
 * Constructor
 * sets active flag to false and type to default

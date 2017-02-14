@@ -3,7 +3,7 @@
 #include <enet\enet.h>
 #include <SFML\Graphics.hpp>
 #include <SFML/System.hpp>
-#include "EventSystem.h"
+#include "EventSystem.hpp"
 /**
 * server static ip address
 */

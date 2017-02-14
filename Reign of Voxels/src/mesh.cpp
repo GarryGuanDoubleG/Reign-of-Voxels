@@ -1,4 +1,4 @@
-#include "mesh.h"
+#include "mesh.hpp"
 /**
 * Constructor
 * stores a reference to vertex, index, and texture containers

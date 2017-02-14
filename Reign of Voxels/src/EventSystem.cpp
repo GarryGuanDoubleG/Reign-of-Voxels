@@ -1,4 +1,4 @@
-#include "EventSystem.h"
+#include "EventSystem.hpp"
 /**
 * @brief add observer to linked list
 * @param observer to subscribe to event system

@@ -1,4 +1,4 @@
-#include "GameScene.h"
+#include "GameScene.hpp"
 /**
 * constructor
 * Subscribes to event system and sets up a camera and loads models
@@ -50,14 +50,14 @@ void GameScene::Render()
 	glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(m_camera->GetViewMat()));
 	glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(m_camera->GetProj()));
 */
-	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+	/*glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);*/
 	if (m_model)
 	{
 		for (float x = 0; x < 4; x++)
 		{
 			for (float y = 0; y < 4; y++)
 			{
-				for (float z = 0; z < 4; z++)
+				for (float z = 0; z < 8; z++)
 				{
 					Mat4 model_mat4 = Mat4(1.0f);
 					model_mat4 = glm::scale(model_mat4, glm::vec3(0.05f, 0.05f, 0.05f));	// It's a bit too big for our scene, so scale it down
@@ -72,7 +72,7 @@ void GameScene::Render()
 			}
 		}
 	}
-	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	Game::instance().getWindow()->display();
 }
 /**

@@ -1,6 +1,6 @@
 #include <stdio.h>
 #include <stdlib.h>
-#include "shader.h"
+#include "shader.hpp"
 
 #define MAX_STR_LEN 4096
 

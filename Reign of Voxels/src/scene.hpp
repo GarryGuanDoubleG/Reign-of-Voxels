@@ -1,5 +1,5 @@
 #pragma once
-#include "EventSystem.h"
+#include "EventSystem.hpp"
 
 #define MAX_SCENES 10
 #define MAX_PENDING_EVENTS 100
