@@ -5,7 +5,10 @@
 #include "simple_logger.h"
 
 
-
+/**
+* constructor
+* initializes enet and creates enet host and subscribes to global event system
+*/
 Client::Client(void) :	m_thread(&Client::ConnectionEvent, this),
 						m_game_started(false),
 						m_connected(false)
@@ -21,14 +24,21 @@ Client::Client(void) :	m_thread(&Client::ConnectionEvent, this),
 
 	Game::instance().getEventSystem().addObserver(this);
 }
-
+/**
+* Destructor
+* unsubscribes from event system and deinitializes enet
+*/
 Client::~Client()
 {
 	Game::instance().getEventSystem().removeObserver(this);
 	enet_deinitialize();
 	enet_host_destroy(m_client);
 }
-
+/**
+* @brief callback function when game event occurs
+* @param event type of event
+* @param obj data associated with event. Can be null
+*/
 void Client::onNotify(Event event, Json &obj)
 {
 	switch (event)
@@ -57,7 +67,11 @@ void Client::onNotify(Event event, Json &obj)
 		break;
 	}
 }
-
+/**
+* @brief callback function when user inputs
+* @param event type of event
+* @param input the user input
+*/
 void Client::onNotify(Event event, sf::Event &input)
 {
 	switch (event)
@@ -68,7 +82,9 @@ void Client::onNotify(Event event, sf::Event &input)
 		break;
 	}
 }
-
+/**
+* @brief Connects to server with user and room #
+*/
 void Client::ConnectHost()
 {
 	ENetAddress address;
@@ -114,7 +130,9 @@ void Client::ConnectHost()
 		m_thread.launch();		
 	}
 }
-
+/**
+* @brief Thread launched when logged in. Runs a loop that checks for server packets
+*/
 void Client::ConnectionEvent()
 {
 	ENetEvent event;
@@ -143,9 +161,11 @@ void Client::ConnectionEvent()
 			break;
 		}
 	}
-
 }
-
+/**
+* @brief manages the data send from the server
+* @param event the enet container for packet and packet information
+*/
 void Client::onReceiveData(ENetEvent event)
 {
 	char ctype = event.packet->data[0];
@@ -183,7 +203,10 @@ void Client::onReceiveData(ENetEvent event)
 		Game::instance().getEventSystem().Notify(Event::ServerInput, input.event);
 	}
 }
-
+/**
+* @brief sends a json object to the server
+* @param obj the json object to send
+*/
 void Client::SendData(Json &data)
 {
 	char type = PacketJson;//rip type safety
@@ -193,7 +216,10 @@ void Client::SendData(Json &data)
 	ENetPacket *packet = enet_packet_create(pack.c_str(), pack.length() + 1, ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(m_server, 0, packet);
 }
-
+/**
+* @brief sends user input to the server
+* @param event the user input to send
+*/
 void Client::SendInput(sf::Event event)
 {
 	RoVInput my_input;

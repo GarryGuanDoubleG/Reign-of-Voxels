@@ -73,7 +73,12 @@ std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 
 	return widget_list;
 }
-
+/*
+* @brief Loads widget position, size, textcolor, boxcolor, textsize, box size, trigger event, and id
+into newly allocated widget.
+* @param data the json container of the specific widget being loaded
+* @param widget the newly allocated widget.
+*/
 void Layout::LoadWidgetData(Json &data, Widget *widget)
 {
 	int posx, posy;
@@ -160,12 +165,18 @@ void Layout::LoadWidgetData(Json &data, Widget *widget)
 	widget->setTextColor(text_color);
 	widget->setBoxColor(box_color);
 }
-
+/*
+* @brief Returns the font being used by this layout
+* @return the font this layout is using
+*/
 sf::Font & Layout::getFont()
 {
 	return *m_font;
 }
-
+/*
+* @brief Returns the padding being used by this layout
+* @return the padding this layout is using
+*/
 sf::Vector2f Layout::getPadding()
 {
 	return sf::Vector2f(10.0f, 10.0f);

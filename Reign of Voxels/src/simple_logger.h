@@ -21,8 +21,6 @@
 *    SOFTWARE.
 */
 #include <GL/glew.h>
-
-
 /**
 @brief initializes the simple logger.  Will automatically cleanup at program exit.
 @param log_file_path the file to log to
@@ -36,19 +34,30 @@ void init_logger(const char *log_file_path);
 */
 #define slog(...) _slog(__FILE__,__LINE__,__VA_ARGS__)
 void _slog(char *f, int l, char *msg, ...);
-
 /*
-*	author Garry Guan
+* author Garry Guan
+* @brief Takes a Gl error and prints out respective error
+* @param err the error type
 */
-
-//call back function in case glfw spots an error
-void ErrorCallback(int error, const char* description);
 const char * GetGLErrorStr(GLenum err);
+/*
+* author Garry Guan
+* @brief polls errors from open gl and prints them out
+*/
 void CheckGLError();
+/*
+* author Garry Guan
+* @brief defined term that takes filename and line of caller
+*/
+#define SlogCheckGLError(...) _SlogCheckGLError(__FILE__,__LINE__)
+/*
+* author Garry Guan
+* @brief polls errors from open gl and prints error, filename and line that causes the error
+* @param f filename of caller
+* @param l line number called from
+*/
+void _SlogCheckGLError(char *f, int l);
 /*
 * end/Garry Guan
 */
-#define SlogCheckGLError(...) _SlogCheckGLError(__FILE__,__LINE__)
-void _SlogCheckGLError(char *f, int l);
-
 #endif

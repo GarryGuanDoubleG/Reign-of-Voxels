@@ -13,13 +13,6 @@ public:
 	*/
 	Label();
 	const sf::String& getText() const;
-
-	/*
-	* @brief Checks if button is clicked and triggers GUI callbacks. Inherited from widget base class.
-	* @param x the x coordinate of the mouse click
-	* @param y the y coordinate of the mouse click
-	*/
-	void Label::setSubLabel();//set it to small text below assigned widget
 protected:
 	/*
 	* @brief Draws the label box and text into the sfml frame buffer. Inherited from SFML drawables base class.

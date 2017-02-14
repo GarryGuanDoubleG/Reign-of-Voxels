@@ -104,14 +104,12 @@ public:
 	* @brief Sets the box color
 	* @param color of the box to set to
 	*/
-	virtual void setBoxColor(sf::Color color);
-	
+	virtual void setBoxColor(sf::Color color);	
 	/**
 	* @brief Sets the string of this widget
 	* @param color of the text to set to
 	*/
 	void setString(std::string str);
-
 	/**
 	* @brief Sets the max string length of sfml text class
 	* @param len the max string length
@@ -158,7 +156,7 @@ public:
 	*/
 	virtual void triggerCallBack();
 	/*
-	* @brief Draws the button box and text into the sfml frame buffer. Inherited from SFML drawables base class.
+	* @brief Abstract method. Draws the button box and text into the sfml frame buffer. Inherited from SFML drawables base class.
 	* @param target the rendering target, usually window, to draw button on
 	* @param states the rendering state to draw with. Usually default rendering states are sent.
 	*/

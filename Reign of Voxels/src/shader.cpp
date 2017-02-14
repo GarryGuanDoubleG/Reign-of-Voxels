@@ -6,8 +6,10 @@
 
 GLuint g_shader_prog;
 
-//checks for errors while compiling shader and prints it out
-//and returns GL_TRUE if error was found
+/**
+*@brief prints out any errors with compiling a particular shader
+*@param shader the compiled shader to check
+*/
 GLuint check_shader_err(GLuint shader)
 {
 	GLchar infoLog[512];
@@ -30,8 +32,13 @@ GLuint check_shader_err(GLuint shader)
 	return GL_TRUE;
 }
 
-//compiles shader and attaches it to program
-//returns false if error occurs
+/**
+* @brief takes the filename of a shader, compiles it and attaches it to a given program
+* @param filename the path and filename of the shader source
+* @param type the type of the shader
+* @param program the program to attach the shader to
+* @return GL_TRUE if shader compiles without error, false if not
+*/
 int compile_attach_shader(char *filename, GLuint type, GLuint program)
 {
 	GLuint shader;
@@ -74,7 +81,10 @@ int compile_attach_shader(char *filename, GLuint type, GLuint program)
 
 	return GL_TRUE;
 }
-
+/**
+* @brief compiles a vertex and fragment shader and attaches it into a program
+* @return id of compiled program
+*/
 GLuint compile_shaders(void)
 {
 	GLuint program;

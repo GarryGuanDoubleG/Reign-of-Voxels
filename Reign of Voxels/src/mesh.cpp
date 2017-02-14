@@ -1,6 +1,8 @@
-
 #include "mesh.h"
-
+/**
+* Constructor
+* stores a reference to vertex, index, and texture containers
+*/
 Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<GLuint> &indices, std::vector<Texture> &textures)
 {
 	this->vertices = vertices;
@@ -9,8 +11,10 @@ Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<GLuint> &indices, std::vec
 
 	this->MeshInit();
 }
-
-// Render the mesh
+/**
+* @brief draws all the vertices and textures stored in this mesh
+* @param the shader to use for drawing
+*/
 void Mesh::Draw(GLuint shader) const
 {
 	// Bind appropriate textures
@@ -50,6 +54,9 @@ void Mesh::Draw(GLuint shader) const
 		glBindTexture(GL_TEXTURE_2D, 0);
 	}
 }
+/**
+* @brief binds all the vertex data to a vertex array object
+*/
 void Mesh::MeshInit()
 {
 	glGenVertexArrays(1, &this->vao);

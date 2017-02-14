@@ -1,5 +1,8 @@
 #include "EventSystem.h"
-
+/**
+* @brief add observer to linked list
+* @param observer to subscribe to event system
+*/
 void EventSystem::addObserver(Observer * observer)
 {
 	observer->m_prev = nullptr;
@@ -11,7 +14,10 @@ void EventSystem::addObserver(Observer * observer)
 	}
 	m_head = observer;	
 }
-
+/**
+* @brief remove observer from linked list
+* @param observer to unsubscribe to event system
+*/
 void EventSystem::removeObserver(Observer * observer)
 {
 	if (m_head == observer)
@@ -23,7 +29,11 @@ void EventSystem::removeObserver(Observer * observer)
 		observer->m_prev->m_next = observer->m_next;
 	}
 }
-
+/**
+* @brief notifies all observers that an event has happened and passes reference to data of the event
+* @param event the event that happened
+* @param obj the json data from the event
+*/
 void EventSystem::Notify(Event event, Json &json_obj)
 {
 	Observer * current = m_head;
@@ -34,7 +44,11 @@ void EventSystem::Notify(Event event, Json &json_obj)
 		current = current->m_next;
 	}
 }
-
+/**
+* @brief notifies all observers that a user input has happened and passes reference to input
+* @param event the event that happened
+* @param input player input
+*/
 void EventSystem::Notify(Event event, sf::Event &input)
 {
 	Observer * current = m_head;

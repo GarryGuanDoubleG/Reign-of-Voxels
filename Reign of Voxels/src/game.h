@@ -8,7 +8,7 @@
 #include "glm.h"
 #include "shader.h"
 #include "model.h"
-#include "scene.h"
+#include "sceneManager.h"
 #include "Gui\Menu.h"
 #include "client.h"
 /**

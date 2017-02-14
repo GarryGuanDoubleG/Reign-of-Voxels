@@ -2,10 +2,13 @@
 #include <GL\glew.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-
 #include "texture.hpp"
 #include "simple_logger.h"
-
+/**
+* @brief loads texture and sets it to use linear interpolation and generate mipmaps
+* @param path to texture
+* @return id of new generated texture
+*/
 GLuint LoadTexture(const char *filepath)
 {
 	sf::Image *img_data = new sf::Image();
@@ -40,7 +43,11 @@ GLuint LoadTexture(const char *filepath)
 
 	return textureID;
 }
-
+/*
+* @brief helper function that appends filepath to filenaem
+* @param filename name of texture to load
+* @param filepath path to the texture directory
+*/
 GLuint LoadTexture(const char *filename, const char * filepath)
 {
 	std::string name = filepath;

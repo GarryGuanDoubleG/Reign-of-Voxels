@@ -59,7 +59,7 @@ public:
 	*/
 	virtual void onNotify(Event event, Json &data);
 	/**.
-	* @brief callback function from global event system. Updates widget information (new player names from joining lobby)
+	* @brief callback function from user input event. forwards the input to HandleInput method
 	* @param event tells us it's from server or client
 	* @param input the user input
 	*/

@@ -28,7 +28,7 @@ public:
 	/**
 	*@brief Handles drawing the game scene 
 	*/
-	virtual void Render() ;
+	virtual void Render();
 	/**
 	*@brief Listens to user input events and handles it
 	*@param event type of user input event

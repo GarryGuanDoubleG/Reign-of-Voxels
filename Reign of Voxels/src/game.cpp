@@ -9,13 +9,19 @@ Game Game::m_instance;
 #define SCREEN_WIDTH 1280
 #define SCREEN_HEIGHT 720
 
-//event system needs to be initialized first
+/**
+* Constructor
+* initializes event system
+*/
 Game::Game()
 	: m_eventSystem(new EventSystem()),
 	  m_initialized(false)
 {	
 }
-
+/**
+* Destrutor
+* cleans up member classes
+*/
 Game::~Game()
 {
 	delete m_sceneManager;
@@ -24,7 +30,9 @@ Game::~Game()
 
 	
 }
-
+/*
+* @brief Initializes sfml window and glew
+*/
 void Game::GraphicsInit()
 {
 	int err;
@@ -42,8 +50,6 @@ void Game::GraphicsInit()
 	/*Game::instance().getWindow()->setMouseCursorVisible(false);*/
 	m_window->setVerticalSyncEnabled(true);
 
-
-
 	if ((err = glewInit()) != GLEW_OK)
 	{
 		printf("Error: %s\n", glewGetErrorString(err));
@@ -54,7 +60,9 @@ void Game::GraphicsInit()
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 }
-
+/*
+* @brief initializes the game from graphics to loading scene and managing client connection
+*/
 void Game::Initialize()
 {
 	if (m_initialized) return;
@@ -67,7 +75,9 @@ void Game::Initialize()
 
 	m_initialized = true;
 }
-
+/*
+* @brief throws a close game event to start clean up process
+*/
 void Game::GameClose()
 {
 	Json event;
@@ -76,22 +86,32 @@ void Game::GameClose()
 	m_running = false;
 	m_instance.getEventSystem().Notify(Event::Close, event);
 }
-
+/*
+* @brief returns a reference to the global game class
+* @return reference to game class
+*/
 Game& Game::instance()
 { 
 	return m_instance; 
 }
-
+/*
+* @brief returns a reference to the global event system
+* @return reference to the global event system
+*/
 EventSystem& Game::getEventSystem() 
 { 
 	return *m_eventSystem; 
 }
+/*
+* @brief returns a pointer to the game window
+* @return pointer to RenderWindow
+*/
 sf::RenderWindow*	Game::getWindow() 
 { 
 	return m_window; 
 }
 /*
- *
+* @brief Game loop that handles what happens every frame
 */
 void Game::GameLoop()
 {

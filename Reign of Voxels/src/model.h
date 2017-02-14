@@ -42,7 +42,6 @@ private:
 	* @oaram scene root assimp node
 	*/
 	Mesh ProcessMesh(aiMesh * mesh, const aiScene* scene);
-
 	/**
 	* @brief loads texture data from file
 	* @param mat assimp material type with texture data

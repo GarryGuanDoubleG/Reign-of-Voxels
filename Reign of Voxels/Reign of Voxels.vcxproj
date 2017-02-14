@@ -170,6 +170,7 @@
     <ClInclude Include="src\observer.h" />
     <ClInclude Include="src\packet.h" />
     <ClInclude Include="src\scene.h" />
+    <ClInclude Include="src\sceneManager.h" />
     <ClInclude Include="src\shader.h" />
     <ClInclude Include="src\simple_logger.h" />
     <ClInclude Include="src\texture.hpp" />
@@ -190,7 +191,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mesh.cpp" />
     <ClCompile Include="src\model.cpp" />
-    <ClCompile Include="src\scene.cpp" />
+    <ClCompile Include="src\sceneManager.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\simple_logger.cpp" />
     <ClCompile Include="src\texture.cpp" />

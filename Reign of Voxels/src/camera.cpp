@@ -1,6 +1,9 @@
 #include "camera.h"
 #include "simple_logger.h"
-
+/**
+* A constructor
+* Sets up projection and view matrices. Starts at position 0,0,3 and looks towards origin
+*/
 Camera::Camera()
 {
 	m_pos = Vec3(0.0, 0.0f, 3.0f);
@@ -20,22 +23,34 @@ Camera::Camera()
 	
 	m_last_mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
 }
-
+/**
+* Empty Destructor
+*/
 Camera::~Camera()
 {
 
 }
+/**
+* @brief returns the projection matrix
+* @return the projection matrix
+*/
 Mat4 Camera::GetProj()
 {
 	return m_proj_mat;
 }
-
+/**
+* @brief returns the view matrix
+* @return the view matrix
+*/
 Mat4 Camera::GetViewMat()
 {
 	return m_view_mat;
 }
 
-
+/**
+* @brief adjusts camera on user input
+* @param event the user input
+*/
 void Camera::HandleInput(sf::Event event)
 {
 	sf::Time time = Game::g_delta_clock.getElapsedTime();

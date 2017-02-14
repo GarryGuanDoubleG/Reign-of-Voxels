@@ -61,14 +61,11 @@ void _slog(char *f, int l, char *msg, ...)
 		va_end(ap);
 	}
 }
-
-
-//call back function in case glfw spots an error
-void ErrorCallback(int error, const char* description)
-{
-	printf("Error: %s\n", description);
-}
-
+/*
+* author Garry Guan
+* @brief Takes a Gl error and prints out respective error
+* @param err the error type
+*/
 const char * GetGLErrorStr(GLenum err)
 {
 	switch (err)
@@ -83,7 +80,10 @@ const char * GetGLErrorStr(GLenum err)
 	default:                   return "Unknown error";
 	}
 }
-
+/*
+* author Garry Guan
+* @brief polls errors from open gl and prints them out
+*/
 void CheckGLError()
 {
 	static int err_count = 0;
@@ -95,7 +95,12 @@ void CheckGLError()
 		printf("GL ERROR %i: %s\n", ++err_count, GetGLErrorStr(err));
 	}
 }
-
+/*
+* author Garry Guan
+* @brief polls errors from open gl and prints error, filename and line that causes the error
+* @param f filename of caller
+* @param l line number called from
+*/
 void _SlogCheckGLError(char *f, int l)
 {
 	static int err_count = 0;

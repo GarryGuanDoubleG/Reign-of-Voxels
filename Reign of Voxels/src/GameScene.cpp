@@ -1,6 +1,8 @@
 #include "GameScene.h"
-
-
+/**
+* constructor
+* Subscribes to event system and sets up a camera and loads models
+*/
 GameScene::GameScene()
 {
 	m_camera = new Camera();	
@@ -10,17 +12,24 @@ GameScene::GameScene()
 	//subscribe to global events
 	Game::instance().getEventSystem().addObserver(this);
 }
-
+/**
+* destructor
+* unSubscribes from event system
+*/
 GameScene::~GameScene()
 {
 	Game::instance().getEventSystem().removeObserver(this);
 }
-
+/**
+*@brief code to run every frame of game loop
+*/
 void GameScene::SceneFrame()
 {
 	Render();
 }
-
+/**
+*@brief Handles drawing the game scene
+*/
 void GameScene::Render()
 {
 	GLuint model_loc, view_loc, proj_loc;
@@ -66,13 +75,20 @@ void GameScene::Render()
 	glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	Game::instance().getWindow()->display();
 }
-
+/**
+*@brief Listens to user input events and handles it
+*@param event type of user input event
+*@param input the input from client or server
+*/
 void GameScene::onNotify(Event event, sf::Event &input)
 {
 	if (event == ServerInput)
 		HandleInput(input); 
 }
-
+/**
+*@brief Handles user input
+*@param event the user input
+*/
 void GameScene::HandleInput(sf::Event event)
 {
 	m_camera->HandleInput(event);

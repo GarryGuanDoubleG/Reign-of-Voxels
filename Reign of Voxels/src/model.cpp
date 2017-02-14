@@ -1,14 +1,23 @@
 #include "model.h"
 #include "simple_logger.h"
-
+/** Constructor
+* Loads model data using Assimp
+*/
 Model::Model(GLchar * filepath)
 {
 	this->LoadModel(filepath);
 }
+/** Destructor
+*
+*/
 Model::~Model()
 {
 
 }
+/**
+*@brief Reads model file using assimp to get root node of model.
+*@param filepath of model
+*/
 void Model::LoadModel(std::string path)
 {
 	Assimp::Importer importer;
@@ -22,14 +31,21 @@ void Model::LoadModel(std::string path)
 	this->directory = path.substr(0, path.find_last_of('\\') + 1);
 	this->ProcessNode(scene->mRootNode, scene);
 }
-
-
+/**
+* @brief renders all the meshes of this model
+* @param shader compiled shader id to use to render
+*/
 void Model::Draw(GLuint shader)
 {
 	for (GLuint i = 0; i < this->meshes.size(); i++)
 		this->meshes[i].Draw(shader);
 }
-
+/**
+* @brief loads texture data from file
+* @param mat assimp material type with texture data
+* @param type assimp texture type (diffuse / specular)
+* @param type_name string name of texture type
+*/
 std::vector<Texture> Model::LoadMaterials(aiMaterial *mat, aiTextureType type, std::string type_name)
 {
 	std::vector<Texture> textures;
@@ -61,7 +77,11 @@ std::vector<Texture> Model::LoadMaterials(aiMaterial *mat, aiTextureType type, s
 	}
 	return textures;
 }
-
+/**
+* @brief recursively traverses assimp nodes and loads meshes attached to each node
+* @param node node to traverse and load meshes
+* @oaram scene root assimp node
+*/
 void Model::ProcessNode(aiNode *node, const aiScene *scene)
 {
 	for (GLuint i = 0; i < node->mNumMeshes; i++)
@@ -74,9 +94,12 @@ void Model::ProcessNode(aiNode *node, const aiScene *scene)
 	{
 		ProcessNode(node->mChildren[i], scene);
 	}
-
 }
-
+/**
+* @brief initializes new mesh and stores textures in model class
+* @param mesh assimp class that stores mesh verts, normals, textures, and uv coordinates
+* @oaram scene root assimp node
+*/
 Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 {
 	std::vector<Vertex> vertices;
@@ -111,7 +134,6 @@ Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 
 		vertices.push_back(vertex);
 	}
-
 	//store the indices which define the order we draw the triangles
 	for (GLuint i = 0; i < mesh->mNumFaces; i++)
 	{
@@ -121,7 +143,6 @@ Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 			indices.push_back(face.mIndices[j]);
 		}
 	}
-
 	if (mesh->mMaterialIndex >= 0)
 	{
 		aiMaterial *material = scene->mMaterials[mesh->mMaterialIndex];
@@ -132,6 +153,5 @@ Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 		std::vector<Texture> specular_maps = this->LoadMaterials(material, aiTextureType_SPECULAR, "texture_specular");
 		textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
 	}
-
 	return Mesh(vertices, indices, textures);
 }
