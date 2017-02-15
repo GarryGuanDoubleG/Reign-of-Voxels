@@ -2,44 +2,53 @@
 #include <map>
 #include <iostream>
 #include "packet.h"
-//set up list of used ports for game instances
-//set up map of client id and client ip addr
-ENetAddress g_address;
-ENetHost * g_server;
 
-#define SERVER_IP "rov.garryguan.com"
-#define LOGIN_PORT 5000
+ENetAddress g_address; /**< enet address of server to create*/
+ENetHost * g_server; /**< enet host for clients to connect to*/
 
-#define MAX_CLIENTS 400
-#define MAX_INSTANCES 100
-#define MAX_PLAYERS_PER_INSTANCE 4
+#define SERVER_IP "rov.garryguan.com" /**<server host address to connect to */
+#define LOGIN_PORT 5000 /**<port to send packets through over UDP */
 
-//Struct containg all the players in a game instance
+#define MAX_CLIENTS 400 /**<max players sending packets to server at the same time*/
+#define MAX_INSTANCES 100 /**<max instances server can handle */
+#define MAX_PLAYERS_PER_INSTANCE 4 /**<max number of clients per instance*/
+
+/**
+* Game instance struct that stores information about each game instance
+*/
 typedef struct
 {
-	bool is_running; // false =  lobby, true =  game instance
-	ENetPeer		**players;
-	Json			data[MAX_PLAYERS_PER_INSTANCE];
+	bool is_running; /**< flag for game instance initiated*/
+	ENetPeer		**players;/**< array of pointers to players in instance  */
+	Json			data[MAX_PLAYERS_PER_INSTANCE];/**<stores information about each player in instance*/
 }GameInstance;
 
+/**
+* \Remarks This is tightly coupled with client events. Anytime events in client side is updated, this should update to exactly match it
+*/
 enum Event
 {
-	Error,
-	Login,
-	JoinLobby,
-	JoinPlayer,
-	LeavePlayer,
-	ClientInput,
-	ServerInput,
-	Chat,
-	Start,
-	InitGame,
-	Close
+	Error, /**< Server has encountered an error */
+	Login, /**< Player starts to login */
+	JoinLobby, /**< Login succeeds and joins a lobby */
+	JoinPlayer, /**< Another player joins same lobby  */
+	LeavePlayer, /**< Someone in lobby left */
+	ClientInput, /**< Player input locally */
+	ServerInput,/**<  Player input sent from server*/
+	Chat, /**<  Player typed something in chat*/
+	Start, /**< Player starts the game*/
+	InitGame, /**< Server response to inform all players to initiate game*/
+	Close /**< Close the game and start cleaning up*/
 };
 
-std::map<ENetPeer *, GameInstance *> g_player_instance_map;
-GameInstance *g_instances; // indexed by port #
-
+std::map<ENetPeer *, GameInstance *> g_player_instance_map; /**<map of game instances with client as the key*/
+GameInstance *g_instances; /**<list of game instances*/
+/**
+* @brief Overloaded function. Sets first byte of packet to appropriate packet type.
+* Creates packet and sends it to player
+* @param player to send packet to
+* @param data the json data to send
+*/
 void SendData(ENetPeer *player, Json &data)
 {
 	std::cout << "player port is " << player->address.port << std::endl;
@@ -53,6 +62,13 @@ void SendData(ENetPeer *player, Json &data)
 	enet_peer_send(player, 1, enet_packet);
 	//enet_packet_destroy(packet);
 }
+
+/**
+* @brief Overloaded function. Sets first byte of packet to appropriate packet type. 
+* Creates packet and sends it to player
+* @param player to send packet to
+* @param data the user input to send
+*/
 void SendData(ENetPeer *player, RoVInput &data)
 {
 	char buffer[sizeof(RoVInput) + 1];
@@ -61,9 +77,13 @@ void SendData(ENetPeer *player, RoVInput &data)
 
 	ENetPacket *enet_packet = enet_packet_create(buffer, sizeof(buffer), ENET_PACKET_FLAG_RELIABLE);
 	enet_peer_send(player, 1, enet_packet);
-	//enet_packet_destroy(packet);
 }
-
+/**
+* @brief Sends a packet with an event and message to a player
+* @param player the player to send the message to
+* @param message the message to send
+* @param event the event associated with message
+*/
 void SendMessage(ENetPeer *player, std::string message, Event event)
 {
 	Json response;
@@ -72,7 +92,12 @@ void SendMessage(ENetPeer *player, std::string message, Event event)
 
 	SendData(player, response);
 }
-
+/**
+* @brief Sends json data to everyone in an instance except the client that triggered event to send data
+* @param instance the instance to send data to
+* @param sender the client in instance not to send to
+* @param data the packet data to send
+*/
 void UpdateOthers(GameInstance *instance, ENetPeer *sender, Json &data)
 {
 	//update players already in lobby
@@ -84,6 +109,11 @@ void UpdateOthers(GameInstance *instance, ENetPeer *sender, Json &data)
 		}
 	}
 }
+/**
+* @brief Overloaded function. Sends a json data to all connected players in that instance
+* @param instance the instance to send input to
+* @param data the json data to send
+*/
 void UpdateInstance(GameInstance *instance, Json &data)
 {
 	//update players already in lobby
@@ -95,7 +125,11 @@ void UpdateInstance(GameInstance *instance, Json &data)
 		}
 	}
 }
-
+/**
+* @brief Overloaded function. Sends a client's input to all connected players in that instance
+* @param instance the instance to send input to
+* @param data the user input to send
+*/
 void UpdateInstance(GameInstance *instance, RoVInput &data)
 {
 	//update players already in lobby
@@ -107,8 +141,12 @@ void UpdateInstance(GameInstance *instance, RoVInput &data)
 		}
 	}
 }
-
-void onClientLogin(ENetEvent event, Json &data)
+/**
+* @brief Handles client login. Sends error to client if room is full or that instance already started the game
+* @param event stores the client and packet data
+* @param data the json data with client data - username / instance number
+*/
+void onClientLogin(ENetEvent &event, Json &data)
 {
 	enet_uint32		port = (((int)data["port"]) % 100) + 1; //ports are 1 too 100. Whatever number ppl put will just use the first 3 digits
 	GameInstance	*instance = &g_instances[port];
@@ -173,7 +211,9 @@ void onClientLogin(ENetEvent event, Json &data)
 		}
 	}
 }
-
+/**
+* @brief Process json data. Used mainly to handle login and lobby menu input
+*/
 void onReceiveJson(ENetEvent &event)
 {
 	Json data = Json::parse(&event.packet->data[1]);
@@ -194,6 +234,11 @@ void onReceiveJson(ENetEvent &event)
 	}
 	}
 }
+/**
+* @brief Takes a sf::event and sends it to all players in a game instance
+* Created for testing. Will be removed later.
+* @param event the sf::event user input from a client
+*/
 void onReceiveSfEvent(ENetEvent &event)
 {
 	RoVInput input = *(RoVInput*)event.packet->data;
@@ -204,7 +249,10 @@ void onReceiveSfEvent(ENetEvent &event)
 	UpdateInstance(instance, input);
 }
 
-
+/**
+* @brief Callback for when packet is received. 
+* Checks the first byte for packet type then calls method to process data
+*/
 void onReceiveData(ENetEvent &event)
 {
 	//first byte of info is the type
@@ -223,10 +271,22 @@ void onReceiveData(ENetEvent &event)
 		break;
 	}
 }
-
-//set server ip and config
-void InitServer()
+/**
+* @brief initializses enet and allocates memory for game instances. Sets up enet server host.
+*/
+void Init()
 {
+	if (enet_initialize() != 0)
+	{
+		fprintf(stderr, "An error occurred while initializing ENet.\n");
+		exit(1);
+	}
+	atexit(enet_deinitialize);
+
+	//clear game instances 
+	g_instances = (GameInstance *)malloc(sizeof(GameInstance) * MAX_INSTANCES);
+	memset(g_instances, 0, sizeof(GameInstance) * MAX_INSTANCES);
+
 	g_address.host = ENET_HOST_ANY;//localhost for testing
 	g_address.port = LOGIN_PORT;
 
@@ -242,27 +302,17 @@ void InitServer()
 	}
 }
 
-void Init()
-{
-	if (enet_initialize() != 0)
-	{
-		fprintf(stderr, "An error occurred while initializing ENet.\n");
-		exit(1);
-	}
-	atexit(enet_deinitialize);
-
-	//clear game instances 
-	g_instances = (GameInstance *)malloc(sizeof(GameInstance) * MAX_INSTANCES);
-	memset(g_instances, 0, sizeof(GameInstance) * MAX_INSTANCES);
-
-	InitServer();
-}
-
+/**
+* @brief closes enet
+*/
 void CloseServer()
 {
 	enet_host_destroy(g_server);
 }
 
+/**
+* @brief infinite while loop listening for packets to process. Handles connection, receiving packets, and client disconnections
+*/
 void ServerLoop()
 {
 	ENetEvent event;
@@ -325,6 +375,11 @@ void ServerLoop()
 		}
 	}
 }
+
+/**
+* @brief main entry point. Initializes server, runs loop, then closes server
+* @return 0 after closing
+*/
 
 int main()
 {

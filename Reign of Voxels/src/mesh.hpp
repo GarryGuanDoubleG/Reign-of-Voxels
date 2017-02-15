@@ -45,9 +45,16 @@ public:
 	/**
 	* @brief binds all the vertex data to a vertex array object
 	*/
-	void MeshInit();
-private:
-	GLuint vao, /**< vertex array object, stores gpu state for drawing this mesh */ 
-		vbo, /**<vertex buffer object, stores the vertex data of this mesh */ 
-		ebo;/**<element buffer object, stores the order to draw the triangles  */ 
+	 void MeshInit();
+	 /**
+	 * @brief additional buffer for instance rendering 
+	 */
+	 void MeshSetInstance(GLuint instanceBuffer, GLuint amount);
+protected:
+	GLuint m_vao, /**< vertex array object, stores gpu state for drawing this mesh */ 
+		m_vbo, /**<vertex buffer object, stores the vertex data of this mesh */ 
+		m_ebo;/**<element buffer object, stores the order to draw the triangles  */ 
+
+	GLboolean m_instanced;
+	GLuint	m_amount;
 };

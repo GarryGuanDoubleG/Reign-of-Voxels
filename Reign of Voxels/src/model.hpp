@@ -15,6 +15,14 @@ public:
 	*
 	*/
 	~Model();
+
+	/**
+	* @brief goes through meshes and updates them to use instanced rendering
+	* @param buffer the buffer with model matrix data
+	* @param amount number of times to instance
+	*/
+	void SetInstanceRendering(GLuint buffer, GLuint amount);
+
 	/**
 	* @brief renders all the meshes of this model
 	* @param shader compiled shader id to use to render

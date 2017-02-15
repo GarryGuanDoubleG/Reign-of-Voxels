@@ -33,6 +33,9 @@
     <None Include="Resources\gui\menu.json">
       <Filter>json</Filter>
     </None>
+    <None Include="shader\voxel_shader.glsl">
+      <Filter>Shader</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\shader.cpp">

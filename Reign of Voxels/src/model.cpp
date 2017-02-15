@@ -7,12 +7,23 @@ Model::Model(GLchar * filepath)
 {
 	this->LoadModel(filepath);
 }
+
 /** Destructor
 *
 */
 Model::~Model()
 {
 
+}
+/**
+* @brief goes through meshes and updates them to use instanced rendering
+* @param buffer the buffer with model matrix data
+* @param amount number of times to instance
+*/
+void Model::SetInstanceRendering(GLuint buffer, GLuint amount)
+{
+	for (GLuint i = 0; i < this->meshes.size(); i++)
+		this->meshes[i].MeshSetInstance(buffer, amount);
 }
 /**
 *@brief Reads model file using assimp to get root node of model.
@@ -153,5 +164,6 @@ Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 		std::vector<Texture> specular_maps = this->LoadMaterials(material, aiTextureType_SPECULAR, "texture_specular");
 		textures.insert(textures.end(), specular_maps.begin(), specular_maps.end());
 	}
+
 	return Mesh(vertices, indices, textures);
 }

@@ -95,7 +95,7 @@ GLuint compile_shaders(void)
 	//Create program, attach shaders to it, and link it
 	program = glCreateProgram();
 
-	compile_attach_shader("shader/vs_shader.glsl", GL_VERTEX_SHADER, program);
+	compile_attach_shader("shader/voxel_shader.glsl", GL_VERTEX_SHADER, program);
 	compile_attach_shader("shader/fs_shader.glsl", GL_FRAGMENT_SHADER, program);
 
 	glLinkProgram(program);

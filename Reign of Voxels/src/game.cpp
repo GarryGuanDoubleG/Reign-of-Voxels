@@ -9,6 +9,8 @@ Game Game::m_instance; /**<singleton instance of game */
 #define SCREEN_WIDTH 1280 /**<width of the window */ 
 #define SCREEN_HEIGHT 720 /**<height of the window */ 
 
+#define FPS_TIME 0.01666666666f /**<total time per frame in seconds. 60 dps */ 
+
 /**
 * Constructor
 * initializes event system
@@ -59,6 +61,9 @@ void Game::GraphicsInit()
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
+
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 }
 /*
 * @brief initializes the game from graphics to loading scene and managing client connection
@@ -133,6 +138,11 @@ void Game::GameLoop()
 				m_eventSystem->Notify(ClientInput, event);
 		}
 		m_sceneManager->SceneFrame();
+		//keeps loop running at 60 fps
+		while (g_delta_clock.getElapsedTime().asSeconds() < FPS_TIME)
+		{
+			slog(" Faster than 60 dps");
+		}
 	}
 	m_window->close();
 }

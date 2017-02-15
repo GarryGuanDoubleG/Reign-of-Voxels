@@ -2,26 +2,19 @@
 #include <enet\enet.h>
 #include <SFML\Graphics.hpp>
 #include "json.hpp"
-
-using Json = nlohmann::json; /**< convenience specified by nlohmann himself */  
-//first byte of the packet used for intepretting value
+using Json = nlohmann::json; /**< convenience specified by nlohmann himself */
+							 //first byte of the packet used for intepretting value
 enum PacketEnum
 {
-	PacketJson = 1,
-	PacketSfEvent, //useless to send sf events but will do it just for testing
+	PacketJson = 1, /**<enum Packet contains json data */
+	PacketSfEvent, /**<enum packet contains sf event  */
 };
-
+/**
+* This was created to establish multi frustum control between clients for prototyping.
+* This will be removed later once command inputs are established
+*/
 typedef struct RoVInput
 {
-	enet_uint8 type; // how to decode packet
-	sf::Event event;
+	enet_uint8 type; /**<single byte to indicate how to interpret packet */
+	sf::Event event; /**<user input*/
 };
-
-#pragma pack(push, 1)
-typedef struct RoVJson
-{
-	enet_uint8 type; // how to decode packet
-	unsigned int length;
-	std::string data;
-};
-#pragma pack(pop)

@@ -6,5 +6,5 @@ class VoxelChunk
 public:
 
 private:
-
+	int radius;/**< */
 };

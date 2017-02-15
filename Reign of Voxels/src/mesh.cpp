@@ -43,8 +43,15 @@ void Mesh::Draw(GLuint shader) const
 	glUniform1f(glGetUniformLocation(shader, "material.shininess"), 16.0f);
 
 	// Draw mesh
-	glBindVertexArray(this->vao);
-	glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(this->m_vao);
+	if (m_instanced)
+	{
+		glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, m_amount);
+	}
+	else
+	{
+		glDrawElements(GL_TRIANGLES, this->indices.size(), GL_UNSIGNED_INT, 0);
+	}
 	glBindVertexArray(0);
 
 	// Unbind the textures after drawing
@@ -59,17 +66,17 @@ void Mesh::Draw(GLuint shader) const
 */
 void Mesh::MeshInit()
 {
-	glGenVertexArrays(1, &this->vao);
-	glGenBuffers(1, &this->vbo);
-	glGenBuffers(1, &this->ebo);
+	glGenVertexArrays(1, &this->m_vao);
+	glGenBuffers(1, &this->m_vbo);
+	glGenBuffers(1, &this->m_ebo);
 
-	glBindVertexArray(this->vao);
+	glBindVertexArray(this->m_vao);
 
-	glBindBuffer(GL_ARRAY_BUFFER, this->vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(Vertex), &this->vertices[0], GL_STATIC_DRAW);
 
 	//setup for indices drawing
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(GLuint), &this->indices[0], GL_STATIC_DRAW);
 
 	//location 0 should be verts
@@ -83,4 +90,36 @@ void Mesh::MeshInit()
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
 
 	glBindVertexArray(0);
+}
+/**
+* @brief additional buffer for instance rendering
+* @param intstanceBuffer bind buffer with instance world position data
+* @param amount number of times to instance render this mesh
+*/
+void Mesh::MeshSetInstance(GLuint instanceBuffer, GLuint amount)
+{
+	m_amount = amount;
+	m_instanced = GL_TRUE;
+
+	glBindVertexArray(m_vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
+
+	GLsizei vec4Size = sizeof(Vec4);
+	glEnableVertexAttribArray(3);
+	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (GLvoid*)0);
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (GLvoid*)(vec4Size));
+	glEnableVertexAttribArray(5);
+	glVertexAttribPointer(5, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (GLvoid*)(2 * vec4Size));
+	glEnableVertexAttribArray(6);
+	glVertexAttribPointer(6, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (GLvoid*)(3 * vec4Size));
+
+	glVertexAttribDivisor(3, 1);
+	glVertexAttribDivisor(4, 1);
+	glVertexAttribDivisor(5, 1);
+	glVertexAttribDivisor(6, 1);
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }

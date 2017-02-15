@@ -148,6 +148,7 @@
     <None Include="packages.config" />
     <None Include="Resources\gui\menu.json" />
     <None Include="shader\fs_shader.glsl" />
+    <None Include="shader\voxel_shader.glsl" />
     <None Include="shader\vs_shader.glsl" />
   </ItemGroup>
   <ItemGroup>
