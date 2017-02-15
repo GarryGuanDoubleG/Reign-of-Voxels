@@ -16,7 +16,7 @@ GameScene::GameScene()
 	if (m_model)
 	{
 		m_modelMatrices = new Mat4[voxel_amount];
-
+		unsigned int count = 0;
 		for (GLfloat x = 0; x < m_size; x++)
 		{
 			for (GLfloat y = 0; y < m_size; y++)
@@ -27,11 +27,7 @@ GameScene::GameScene()
 					model = glm::scale(model, Vec3(.05f, .05f, .05f));
 					model = glm::translate(model, Vec3(x, y, z));
 
-					int i = x,
-						j = y,
-						k = z;
-
-					m_modelMatrices[i + j + k] = model;
+					m_modelMatrices[count++] = model;
 				}
 			}
 		}
@@ -77,12 +73,12 @@ void GameScene::Render()
 	glClearBufferfv(GL_COLOR, 0, bg_color);
 	glUseProgram(g_shader_prog);
 
-	model_loc = glGetUniformLocation(g_shader_prog, "model");
 	view_loc = glGetUniformLocation(g_shader_prog, "view");
 	proj_loc = glGetUniformLocation(g_shader_prog, "projection");
 
 	glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(m_camera->GetViewMat()));
 	glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(m_camera->GetProj()));
+
 	glPolygonMode(GL_FRONT, GL_LINE);
 
 	m_model->Draw(g_shader_prog);
