@@ -190,6 +190,9 @@ void Client::onReceiveData(ENetEvent event)
 				sf::Event new_input = *(sf::Event*)(*(void*)temp.c_str());*/
 			break;
 		}
+		case InitGame:
+			Game::instance().getEventSystem().Notify(game_event, data);
+			break;
 		default:
 			Game::instance().getEventSystem().Notify(game_event, data);
 			break;

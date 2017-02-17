@@ -138,11 +138,6 @@ void Game::GameLoop()
 				m_eventSystem->Notify(ClientInput, event);
 		}
 		m_sceneManager->SceneFrame();
-		//keeps loop running at 60 fps
-		while (g_delta_clock.getElapsedTime().asSeconds() < FPS_TIME)
-		{
-			slog(" Faster than 60 dps");
-		}
 	}
 	m_window->close();
 }
