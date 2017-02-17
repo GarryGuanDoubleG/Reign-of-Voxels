@@ -171,6 +171,9 @@
     <ClCompile Include="src\simple_logger.cpp" />
     <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\Voxel.cpp" />
+    <ClCompile Include="src\VoxelChunk.cpp" />
+    <ClCompile Include="src\VoxelManager.cpp" />
+    <ClCompile Include="src\VoxelOctree.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actor.hpp" />
@@ -198,6 +201,8 @@
     <ClInclude Include="src\texture.hpp" />
     <ClInclude Include="src\Voxel.hpp" />
     <ClInclude Include="src\VoxelChunk.hpp" />
+    <ClInclude Include="src\VoxelManager.hpp" />
+    <ClInclude Include="src\VoxelOctree.hpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

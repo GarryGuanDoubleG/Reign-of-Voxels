@@ -2,6 +2,7 @@
 #include "Gui\menu.hpp"
 #include "GameScene.hpp"
 #include "game.hpp"
+#include "simple_logger.h"
 /** Constructor
 * @brief initalizes members to 0 and pushes a new scene onto the stack
 * @param scene the scene to push onto scene stack
@@ -62,9 +63,11 @@ void SceneManager::HandleEvents()
 		switch (game_event)
 		{
 		case JoinLobby:
+			slog("Join Lobby");
 			pushScene(new Menu(LobbyMenu, m_pending_events[m_event_head]));
 			break;
 		case InitGame:
+			slog("Init Game");
 			popScene();
 			pushScene(new GameScene());
 		default:

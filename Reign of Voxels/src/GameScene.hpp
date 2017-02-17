@@ -4,7 +4,7 @@
 #include "model.hpp"
 #include "camera.hpp"
 #include "game.hpp"
-#include "Voxel.hpp"
+#include "VoxelManager.hpp"
 /**
 * GameScene class that manages rendering the voxel world. Inherits from abstract class Scene
 */
@@ -43,8 +43,7 @@ public:
 private:
 	static Voxel *m_Voxels[32][32][32]; /**<3d container of voxels for rendering */  
 	int m_size; /**<size of the voxel world. This is to test instance rendering */
-	Mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
 
-	Model *m_model; /**<pointer to model loaded */  
+	VoxelManager * m_voxelManager;
 	Camera *m_camera; /**<player camera*/  
 };

@@ -1,10 +1,20 @@
 #pragma once
 #include "Voxel.hpp"
+#include "glm.hpp"
 
 class VoxelChunk
 {
 public:
+	VoxelChunk(int index, int mooreRadius, Vec3 position);
+	~VoxelChunk();
+
+	Vec3 getPosition();
+	Vec3 getCenterPos();
 
 private:
-	int radius;/**< */
+	int m_index; /**<index into model matrix*/
+	int m_radius;
+
+	Vec3 m_centerVoxel; /**<Voxel in the center */
+	Vec3 m_gridCoordinate;
 };

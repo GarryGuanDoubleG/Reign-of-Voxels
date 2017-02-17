@@ -7,7 +7,6 @@ Model::Model(GLchar * filepath)
 {
 	this->LoadModel(filepath);
 }
-
 /** Destructor
 *
 */
