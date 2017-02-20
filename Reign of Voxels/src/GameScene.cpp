@@ -7,8 +7,39 @@ GameScene::GameScene()
 {
 	m_camera = new Camera();	
 
-	m_voxelManager = new VoxelManager();
+	//m_voxelManager = new VoxelManager();
 	//subscribe to global events
+	m_size = 512;
+	int voxel_amount = m_size * m_size * m_size / 16 / 16 / 16;
+	m_model = new Model("Resources\\models\\cube.obj");
+
+	if (m_model)
+	{
+		float chunk_size = 16;
+		m_modelMatrices = new Mat4[voxel_amount];
+		unsigned int count = 0;
+		for (GLfloat x = 0; x < m_size ; x+=chunk_size)
+		{
+			for (GLfloat y = 0; y < m_size; y+=chunk_size)
+			{
+				for (GLfloat z = 0; z < m_size; z+=chunk_size)
+				{
+					Mat4 model;
+					model = glm::scale(model, Vec3(chunk_size));
+					model = glm::translate(model, Vec3(x/ chunk_size, y/ chunk_size, z/ chunk_size));
+
+					m_modelMatrices[count++] = model;
+				}
+			}
+		}
+	}
+	GLuint buffer;
+	glGenBuffers(1, &buffer);
+	glBindBuffer(GL_ARRAY_BUFFER, buffer);
+	glBufferData(GL_ARRAY_BUFFER, voxel_amount * sizeof(glm::mat4), &m_modelMatrices[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	m_model->SetInstanceRendering(buffer, voxel_amount);
 	Game::instance().getEventSystem().addObserver(this);
 }
 /**
@@ -31,11 +62,8 @@ void GameScene::SceneFrame()
 */
 void GameScene::Render()
 {
-	GLuint model_loc, view_loc, proj_loc;
+	GLuint view_loc, proj_loc;
 	GLfloat bg_color[] = { 0.1f, 0.1f, 0.1f, 0.2f };
-
-	Mat4 model_mat4 = Mat4(1.0f);
-	model_mat4 = glm::scale(model_mat4, glm::vec3(0.05f, 0.05f, 0.05f));	// It's a bit too big for our scene, so scale it down
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearBufferfv(GL_COLOR, 0, bg_color);
@@ -48,8 +76,7 @@ void GameScene::Render()
 	glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(m_camera->GetProj()));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	m_voxelManager->RenderVoxels();
-	//PolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	m_model->Draw(g_shader_prog);
 
 	Game::instance().getWindow()->display();
 }
@@ -60,7 +87,7 @@ void GameScene::Render()
 */
 void GameScene::onNotify(Event event, sf::Event &input)
 {
-	if (event == ServerInput)
+	/*if (event == ServerInput)*/
 		HandleInput(input); 
 }
 /**

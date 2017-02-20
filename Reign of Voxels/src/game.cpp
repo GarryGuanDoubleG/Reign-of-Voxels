@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "GameScene.hpp"
 #include "simple_logger.h"
 
 sf::Clock Game::g_delta_clock; /**<timer that tracks time since last iteration of game loop*/
@@ -75,7 +76,7 @@ void Game::Initialize()
 	GraphicsInit();
 	compile_shaders();
 
-	m_instance.m_sceneManager = new SceneManager(new Menu(LoginMenu)); // first scene will be menu
+	m_instance.m_sceneManager = new SceneManager(new GameScene()); // first scene will be menu
 	m_instance.m_client = new Client();//managers communication with the server
 
 	m_initialized = true;
@@ -126,7 +127,6 @@ void Game::GameLoop()
 	while (m_running)
 	{
 		sf::Event event;
-		g_delta_clock.restart();
 
 		m_window->clear(sf::Color::Black);
 		
@@ -137,6 +137,7 @@ void Game::GameLoop()
 			else*/
 				m_eventSystem->Notify(ClientInput, event);
 		}
+		g_delta_clock.restart();
 		m_sceneManager->SceneFrame();
 	}
 	m_window->close();

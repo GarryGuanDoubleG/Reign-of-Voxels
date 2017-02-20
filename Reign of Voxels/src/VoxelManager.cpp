@@ -23,7 +23,7 @@ void VoxelManager::GenerateVoxels()
 	int voxel_amount = 512 * 512 * 512 / chunk_size;
 	int chunk_dimen = m_worldSize / chunk_size;
 
-	LoadTexture(GeneratePerlin());
+	//LoadTexture(GeneratePerlin());
 }
 
 void VoxelManager::RenderVoxels()

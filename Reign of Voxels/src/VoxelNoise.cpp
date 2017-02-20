@@ -1,8 +1,12 @@
 #include "VoxelNoise.hpp"
+#include <noise/noise.h>
+#include "noiseutils.h"
+using namespace noise;
+utils::NoiseMap heightMap;
 
-const char * GeneratePerlin(int resolution)
+std::string  GeneratePerlin(int resolution)
 {
-	const char * filename = "Resources/heightmap/terrain_generator.bmp";
+	std::string filename = "Resources/heightmap/terrain_generator.bmp";
 
 	module::Perlin perlin_mod;
 
