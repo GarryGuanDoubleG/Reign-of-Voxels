@@ -16,6 +16,16 @@ VoxelManager::~VoxelManager()
 {
 
 }
+
+void VoxelManager::GenerateVoxelChunks(sf::Image *heightmap)
+{
+	int chunk_size = 16;
+	int scale = 10;
+	int max_height = 512;
+	int world_size = heightmap->getSize().x;
+	int chunk_count = 0;
+
+}
 void VoxelManager::GenerateVoxels()
 {
 	m_worldSize = 512;
@@ -23,7 +33,16 @@ void VoxelManager::GenerateVoxels()
 	int voxel_amount = 512 * 512 * 512 / chunk_size;
 	int chunk_dimen = m_worldSize / chunk_size;
 
-	LoadTexture(GeneratePerlin());
+	sf::Image *heightmap = new sf::Image();
+	if (!heightmap->loadFromFile(GenerateTerrainMap(m_worldSize)))
+		slog("Failed to Load or Generate HeightMap");
+	else
+	{
+		//GenerateVoxelChunks(heightmap);
+		m_octree = new VoxelOctree();
+		m_octree->InitializeOctree(heightmap, m_worldSize);
+	}
+	delete heightmap;
 }
 
 void VoxelManager::RenderVoxels()

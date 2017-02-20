@@ -8,7 +8,7 @@ Camera::Camera()
 	m_forward = Vec3(0.0f, 0.0f, -1.0f);//get forward direction
 	m_up = Vec3(0.0f, 1.0f, 0.0f); //set default up vector to positive y
 	m_right = glmNormalize(glmCross(m_forward, m_up));
-	
+
 	m_view_mat = glmLookAt(m_pos, m_target, m_up);//set view matrix
 
 	sf::Vector2u win_size = Game::instance().getWindow()->getSize();
@@ -17,7 +17,7 @@ Camera::Camera()
 	m_pitch = 0.0f;
 	m_yaw = -90.0f;
 	m_roll = 0.0f;
-	
+
 	m_last_mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
 }
 
@@ -63,12 +63,13 @@ void Camera::HandleInput(sf::Event event)
 	}
 
 	else if (event.type == sf::Event::MouseMoved)
-	{	
+	{
 		GLfloat sensitivity = 0.05f; // mouse sensitivity
 
-		sf::Vector2i mouse_pos = sf::Mouse::getPosition();	
-		sf::Vector2i offset = mouse_pos - m_last_mouse_pos;
-		m_last_mouse_pos = mouse_pos;
+		sf::Vector2i mouse_pos = sf::Mouse::getPosition();
+		sf::Vector2i center = sf::Vector2i(1280 / 2, 720 / 2);
+		sf::Vector2i offset = mouse_pos - center;
+	/*	m_last_mouse_pos = mouse_pos;*/
 
 		float xoffset = (float)offset.x * sensitivity;
 		float yoffset = (float)offset.y * sensitivity;

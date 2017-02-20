@@ -9,6 +9,25 @@
 		"widgets":
 		[
 			{
+				"img_path": "Resources\\textures\\bg.jpg",
+				"type": "image",
+				"id" : "bg",
+				"position": "tr",
+				"offset": [-280, -450],
+				"width":4,
+				"height": 4
+			},
+				{
+				"type": "label",
+				"id": "label_name",
+				"text_size": 144,
+				"string": "Reign of Voxels",
+				"position": "center",
+				"offset": [-500, -280],
+				"text_color": [255,0,0,255],
+				"box_color": [255,255,255,0]
+			},
+			{
 				"type": "label",
 				"id": "label_name",
 				"text_size": 48,

@@ -104,6 +104,15 @@
     <ClCompile Include="src\VoxelOctree.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\VoxelNoise.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gui\image.cpp">
+      <Filter>Source Files\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\..\libnoise\include\noiseutils.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actor.hpp">
@@ -186,6 +195,12 @@
     </ClInclude>
     <ClInclude Include="src\VoxelOctree.hpp">
       <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VoxelNoise.hpp">
+      <Filter>Header Files</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gui\image.hpp">
+      <Filter>Header Files\Gui</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

@@ -1,4 +1,5 @@
 #include "game.hpp"
+#include "GameScene.hpp"
 #include "simple_logger.h"
 
 sf::Clock Game::g_delta_clock; /**<timer that tracks time since last iteration of game loop*/
@@ -49,7 +50,7 @@ void Game::GraphicsInit()
 	//Create context
 	m_window = new sf::RenderWindow(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Reign of Voxels", sf::Style::Default, settings);
 	Game::instance().getWindow()->setMouseCursorGrabbed(true);
-	/*Game::instance().getWindow()->setMouseCursorVisible(false);*/
+	Game::instance().getWindow()->setMouseCursorVisible(false);
 	m_window->setVerticalSyncEnabled(true);
 
 	if ((err = glewInit()) != GLEW_OK)
@@ -75,7 +76,7 @@ void Game::Initialize()
 	GraphicsInit();
 	compile_shaders();
 
-	m_instance.m_sceneManager = new SceneManager(new Menu(LoginMenu)); // first scene will be menu
+	m_instance.m_sceneManager = new SceneManager(new GameScene()); // first scene will be menu
 	m_instance.m_client = new Client();//managers communication with the server
 
 	m_initialized = true;
@@ -138,6 +139,8 @@ void Game::GameLoop()
 				m_eventSystem->Notify(ClientInput, event);
 		}
 		m_sceneManager->SceneFrame();
+		sf::Vector2i center = sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+		sf::Mouse::setPosition(center);
 	}
 	m_window->close();
 }
