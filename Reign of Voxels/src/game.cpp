@@ -50,7 +50,7 @@ void Game::GraphicsInit()
 	//Create context
 	m_window = new sf::RenderWindow(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Reign of Voxels", sf::Style::Default, settings);
 	Game::instance().getWindow()->setMouseCursorGrabbed(true);
-	/*Game::instance().getWindow()->setMouseCursorVisible(false);*/
+	Game::instance().getWindow()->setMouseCursorVisible(false);
 	m_window->setVerticalSyncEnabled(true);
 
 	if ((err = glewInit()) != GLEW_OK)
@@ -139,6 +139,8 @@ void Game::GameLoop()
 		}
 		g_delta_clock.restart();
 		m_sceneManager->SceneFrame();
+		sf::Vector2i center = sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+		sf::Mouse::setPosition(center);
 	}
 	m_window->close();
 }

@@ -7,7 +7,7 @@ GameScene::GameScene()
 {
 	m_camera = new Camera();	
 
-	//m_voxelManager = new VoxelManager();
+
 	//subscribe to global events
 	m_size = 512;
 	int voxel_amount = m_size * m_size * m_size / 16 / 16 / 16;

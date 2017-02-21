@@ -6,6 +6,7 @@
 #include "button.hpp"
 #include "label.hpp"
 #include "Json.hpp"
+#include "image.hpp"
 #include "simple_logger.h"
 
 /*
@@ -63,7 +64,11 @@ std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 			widget = new Label();
 		if (type == "button")
 			widget = new Button();
-		
+		if (type == "image")
+		{
+			std::string filename = data["img_path"];
+			widget = new ImageWidget(filename.c_str());
+		}
 		if (widget)
 		{
 			LoadWidgetData(data, widget);
@@ -104,6 +109,16 @@ void Layout::LoadWidgetData(Json &data, Widget *widget)
 			posx = Game::instance().getWindow()->getSize().x / 2;
 			posy = Game::instance().getWindow()->getSize().y / 2;
 		}
+		else if (data["position"] == "tl")
+		{
+			posx = 0;
+			posy = 0;
+		}
+		else if (data["position"] == "tr")
+		{
+			posx = Game::instance().getWindow()->getSize().x - width;
+			posy = 0;
+		}
 		else if (data["position"] == "br")//bottom right
 		{
 			posx = Game::instance().getWindow()->getSize().x - width;
@@ -134,14 +149,21 @@ void Layout::LoadWidgetData(Json &data, Widget *widget)
 		widget->setTextSize(data["text_size"]);
 	}
 	//get text color rgb
-	sf::Color text_color;
-	Json color = data["text_color"];
-	text_color = sf::Color(color[0], color[1], color[2], color[3]);
+	if (data.find("text_color") != data.end())
+	{
+		sf::Color text_color;
+		Json color = data["text_color"];
+		text_color = sf::Color(color[0], color[1], color[2], color[3]);
 
-	//set box color
-	sf::Color box_color;
-	color = data["box_color"];
-	box_color = sf::Color(color[0], color[1], color[2], color[3]);
+		//set box color
+		sf::Color box_color;
+		color = data["box_color"];
+		box_color = sf::Color(color[0], color[1], color[2], color[3]);
+
+		widget->setTextColor(text_color);
+		widget->setBoxColor(box_color);
+	}
+	
 	
 	//set widget text
 	if (data.find("string") != data.end())
@@ -162,8 +184,6 @@ void Layout::LoadWidgetData(Json &data, Widget *widget)
 
 	widget->setPadding(m_padding);
 	widget->setPosition(sf::Vector2f(posx, posy));
-	widget->setTextColor(text_color);
-	widget->setBoxColor(box_color);
 }
 /*
 * @brief Returns the font being used by this layout

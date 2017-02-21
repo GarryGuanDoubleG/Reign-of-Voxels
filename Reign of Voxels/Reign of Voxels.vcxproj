@@ -18,6 +18,66 @@
       <Platform>x64</Platform>
     </ProjectConfiguration>
   </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\..\libnoise\include\noiseutils.cpp" />
+    <ClCompile Include="src\camera.cpp" />
+    <ClCompile Include="src\client.cpp" />
+    <ClCompile Include="src\EventSystem.cpp" />
+    <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\GameScene.cpp" />
+    <ClCompile Include="src\Gui\button.cpp" />
+    <ClCompile Include="src\Gui\image.cpp" />
+    <ClCompile Include="src\Gui\label.cpp" />
+    <ClCompile Include="src\Gui\layout.cpp" />
+    <ClCompile Include="src\Gui\Menu.cpp" />
+    <ClCompile Include="src\Gui\TextBox.cpp" />
+    <ClCompile Include="src\Gui\widget.cpp" />
+    <ClCompile Include="src\LightSource.cpp" />
+    <ClCompile Include="src\main.cpp" />
+    <ClCompile Include="src\mesh.cpp" />
+    <ClCompile Include="src\model.cpp" />
+    <ClCompile Include="src\sceneManager.cpp" />
+    <ClCompile Include="src\shader.cpp" />
+    <ClCompile Include="src\simple_logger.cpp" />
+    <ClCompile Include="src\texture.cpp" />
+    <ClCompile Include="src\VoxelBlock.cpp" />
+    <ClCompile Include="src\VoxelChunk.cpp" />
+    <ClCompile Include="src\VoxelManager.cpp" />
+    <ClCompile Include="src\VoxelNoise.cpp" />
+    <ClCompile Include="src\VoxelOctree.cpp" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\..\libnoise\include\noiseutils.h" />
+    <ClInclude Include="src\Actor.hpp" />
+    <ClInclude Include="src\camera.hpp" />
+    <ClInclude Include="src\client.hpp" />
+    <ClInclude Include="src\events.hpp" />
+    <ClInclude Include="src\eventSystem.hpp" />
+    <ClInclude Include="src\game.hpp" />
+    <ClInclude Include="src\GameScene.hpp" />
+    <ClInclude Include="src\glm.hpp" />
+    <ClInclude Include="src\Gui\button.hpp" />
+    <ClInclude Include="src\Gui\image.hpp" />
+    <ClInclude Include="src\Gui\label.hpp" />
+    <ClInclude Include="src\Gui\layout.hpp" />
+    <ClInclude Include="src\Gui\Menu.hpp" />
+    <ClInclude Include="src\Gui\textbox.hpp" />
+    <ClInclude Include="src\Gui\widget.hpp" />
+    <ClInclude Include="src\LightSource.hpp" />
+    <ClInclude Include="src\mesh.hpp" />
+    <ClInclude Include="src\model.hpp" />
+    <ClInclude Include="src\observer.hpp" />
+    <ClInclude Include="src\packet.hpp" />
+    <ClInclude Include="src\scene.hpp" />
+    <ClInclude Include="src\sceneManager.hpp" />
+    <ClInclude Include="src\shader.hpp" />
+    <ClInclude Include="src\texture.hpp" />
+    <ClInclude Include="src\VoxelBlock.hpp" />
+    <ClInclude Include="src\VoxelChunk.hpp" />
+    <ClInclude Include="src\VoxelManager.hpp" />
+    <ClInclude Include="src\VoxelNoise.hpp" />
+    <ClInclude Include="src\VoxelOctree.hpp" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B9458FBC-D18D-4A29-A3EB-46770D004C78}</ProjectGuid>
     <RootNamespace>ReignofVoxels</RootNamespace>
@@ -70,31 +130,31 @@
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\include;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(assimp)\;$ENET)\;$(LIBNOISE)\bin\;$(SFML)\lib;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\build\code\Debug;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(assimp)\;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\build\code\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(assimp)\;$ENET)\;$(LIBNOISE)\bin\;$(SFML)\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(assimp)\;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(assimp)\;$ENET)\;$(LIBNOISE)\bin\;$(SFML)\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(assimp)\;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(assimp)\;$ENET)\;$(LIBNOISE)\bin\;$(SFML)\lib;$(LibraryPath)</LibraryPath>
+    <LibraryPath>$(assimp)\;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm;#(LIBNOSIE)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SFML_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;winmm.lib;gdi32.lib;freetype.lib;jpeg.lib;OpenGL32.lib;enet.lib;libnoise.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;$(ENET)\%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;$(LIBNOISE)\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
@@ -102,12 +162,12 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm;#(LIBNOSIE)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SFML_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <AdditionalDependencies>sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;winmm.lib;gdi32.lib;freetype.lib;jpeg.lib;OpenGL32.lib;enet.lib;libnoise.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;$(ENET)\%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;$(LIBNOISE)\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -117,14 +177,14 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm;#(LIBNOSIE)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SFML_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;winmm.lib;gdi32.lib;freetype.lib;jpeg.lib;OpenGL32.lib;enet.lib;libnoise.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;$(ENET)\%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;$(LIBNOISE)\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
@@ -134,82 +194,16 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm;#(LIBNOSIE)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SFML_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
       <AdditionalDependencies>sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;winmm.lib;gdi32.lib;freetype.lib;jpeg.lib;OpenGL32.lib;enet.lib;libnoise.lib;%(AdditionalDependencies)</AdditionalDependencies>
-      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;$(ENET)\%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;$(LIBNOISE)\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
     </Link>
   </ItemDefinitionGroup>
-  <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="Resources\gui\menu.json" />
-    <None Include="shader\fs_shader.glsl" />
-    <None Include="shader\voxel_shader.glsl" />
-    <None Include="shader\vs_shader.glsl" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="..\..\..\libnoise\include\noiseutils.cpp" />
-    <ClCompile Include="src\camera.cpp" />
-    <ClCompile Include="src\client.cpp" />
-    <ClCompile Include="src\eventSystem.cpp" />
-    <ClCompile Include="src\game.cpp" />
-    <ClCompile Include="src\GameScene.cpp" />
-    <ClCompile Include="src\Gui\button.cpp" />
-    <ClCompile Include="src\Gui\label.cpp" />
-    <ClCompile Include="src\Gui\layout.cpp" />
-    <ClCompile Include="src\Gui\menu.cpp" />
-    <ClCompile Include="src\Gui\textbox.cpp" />
-    <ClCompile Include="src\Gui\widget.cpp" />
-    <ClCompile Include="src\LightSource.cpp" />
-    <ClCompile Include="src\main.cpp" />
-    <ClCompile Include="src\mesh.cpp" />
-    <ClCompile Include="src\model.cpp" />
-    <ClCompile Include="src\sceneManager.cpp" />
-    <ClCompile Include="src\shader.cpp" />
-    <ClCompile Include="src\simple_logger.cpp" />
-    <ClCompile Include="src\texture.cpp" />
-    <ClCompile Include="src\Voxel.cpp" />
-    <ClCompile Include="src\VoxelChunk.cpp" />
-    <ClCompile Include="src\VoxelManager.cpp" />
-    <ClCompile Include="src\VoxelNoise.cpp" />
-    <ClCompile Include="src\VoxelOctree.cpp" />
-  </ItemGroup>
-  <ItemGroup>
-    <ClInclude Include="..\..\..\libnoise\include\noiseutils.h" />
-    <ClInclude Include="src\Actor.hpp" />
-    <ClInclude Include="src\camera.hpp" />
-    <ClInclude Include="src\client.hpp" />
-    <ClInclude Include="src\events.hpp" />
-    <ClInclude Include="src\eventSystem.hpp" />
-    <ClInclude Include="src\game.hpp" />
-    <ClInclude Include="src\GameScene.hpp" />
-    <ClInclude Include="src\glm.hpp" />
-    <ClInclude Include="src\Gui\button.hpp" />
-    <ClInclude Include="src\Gui\label.hpp" />
-    <ClInclude Include="src\Gui\layout.hpp" />
-    <ClInclude Include="src\Gui\Menu.hpp" />
-    <ClInclude Include="src\Gui\textbox.hpp" />
-    <ClInclude Include="src\Gui\widget.hpp" />
-    <ClInclude Include="src\LightSource.hpp" />
-    <ClInclude Include="src\mesh.hpp" />
-    <ClInclude Include="src\model.hpp" />
-    <ClInclude Include="src\observer.hpp" />
-    <ClInclude Include="src\packet.hpp" />
-    <ClInclude Include="src\scene.hpp" />
-    <ClInclude Include="src\sceneManager.hpp" />
-    <ClInclude Include="src\shader.hpp" />
-    <ClInclude Include="src\simple_logger.h" />
-    <ClInclude Include="src\texture.hpp" />
-    <ClInclude Include="src\Voxel.hpp" />
-    <ClInclude Include="src\VoxelChunk.hpp" />
-    <ClInclude Include="src\VoxelManager.hpp" />
-    <ClInclude Include="src\VoxelNoise.hpp" />
-    <ClInclude Include="src\VoxelOctree.hpp" />
-  </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
     <Import Project="..\packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets" Condition="Exists('..\packages\nupengl.core.redist.0.1.0.1\build\native\nupengl.core.redist.targets')" />

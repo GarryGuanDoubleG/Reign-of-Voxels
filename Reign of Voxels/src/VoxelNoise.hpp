@@ -1,3 +1,2 @@
 #pragma once
-#include <string>
-std::string GeneratePerlin(int resolution);
+std::string GenerateTerrainMap(int resolution);

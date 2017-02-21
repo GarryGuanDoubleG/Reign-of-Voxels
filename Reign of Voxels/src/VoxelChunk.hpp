@@ -1,20 +1,26 @@
 #pragma once
-#include "Voxel.hpp"
+#include "VoxelBlock.hpp"
 #include "glm.hpp"
 
 class VoxelChunk
 {
 public:
-	VoxelChunk(int index, int mooreRadius, Vec3 position);
+	VoxelChunk(int index, Vec3 position);
 	~VoxelChunk();
 
 	Vec3 getPosition();
-	Vec3 getCenterPos();
 
+	int getSize();
+	bool isActive();
+	void InsertVoxelAtPos(int x, int y, int z);
 private:
-	int m_index; /**<index into model matrix*/
-	int m_side;
+	bool m_active;
 
-	Vec3 m_centerVoxel; /**<Voxel in the center */
-	Vec3 m_gridCoordinate;
+	int m_index; /**<index into model matrix*/
+	Vec3 m_size;
+
+	static const int chunkSize = 16;//size of each side of the chunk
+
+	Vec3 m_position;
+	Voxel m_voxels[chunkSize*chunkSize*chunkSize];
 };
