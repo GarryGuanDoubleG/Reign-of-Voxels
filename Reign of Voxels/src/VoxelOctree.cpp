@@ -32,15 +32,16 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, int world_side)
 	std::cout << "Childnode calls is " << vox_count << std::endl;
 }
 
-void VoxelOctree::BuildNode()
+bool VoxelOctree::BuildNode()
 {
 	int size = m_boundingRegion->getRadius();
 	Vec3 pos = m_boundingRegion->getPosition();
+	bool active = false;
 
 	int child_radius = m_boundingRegion->getRadius() / 2;
 	int i = 0;
 	vox_count++;
-
+	
 	if (size <= MIN_CHUNK)
 	{
 		for (int x = 0; x < size; x++)
@@ -48,10 +49,12 @@ void VoxelOctree::BuildNode()
 			for (int z = 0; z < size; z++)
 			{
 				float height = g_heightMap->getPixel(x, z).r;
-				for (int y = pos.y; y < size + pos.y; y++)
+				if (height >= pos.y)
 				{
-					m_boundingRegion->InsertVoxelAtPos(pos.x + x, y, pos.z + z);
+					active = true;
+					m_leaf = true;
 				}
+				m_boundingRegion->InsertVoxelAtPos(pos.x + x, height, pos.z + z);
 			}
 		}
 	}

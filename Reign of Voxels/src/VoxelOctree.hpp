@@ -16,11 +16,12 @@ public:
 
 	//static const int MIN_CHUNK;
 
-	void BuildNode();
+	bool BuildNode();
 	void UpdateTree();
 	void InitializeOctree(sf::Image *heightmap, int world_side); // length of each side of the world
 private:
-	bool is_leaf;
+	bool m_leaf;
+	sf::Uint8 m_childMask;
 
 	std::vector<VoxelChunk *> render_list;//list of leaf nodes
 	 bool m_pendingInsertions;
