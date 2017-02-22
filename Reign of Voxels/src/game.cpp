@@ -127,7 +127,6 @@ void Game::GameLoop()
 	while (m_running)
 	{
 		sf::Event event;
-		g_delta_clock.restart();
 
 		m_window->clear(sf::Color::Black);
 		
@@ -138,9 +137,10 @@ void Game::GameLoop()
 			else*/
 				m_eventSystem->Notify(ClientInput, event);
 		}
+		g_delta_clock.restart();
 		m_sceneManager->SceneFrame();
-		sf::Vector2i center = sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-		sf::Mouse::setPosition(center);
+		/*sf::Vector2i center = sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+		sf::Mouse::setPosition(center);*/
 	}
 	m_window->close();
 }

@@ -1,44 +1,50 @@
 #include "VoxelChunk.hpp"
 
-VoxelChunk::VoxelChunk(int index, int size, Vec3 position)
-{
-	m_active = false;
-	m_index = index;
+//const int VoxelChunk::chunkSize = 16;
 
-	m_mooreRadius = size;
-	m_size = Vec3(size, size, size);
-	m_gridCoordinate = position;
-	m_voxels = NULL;
+VoxelChunk::VoxelChunk(Vec3 position)
+{
+	m_active = false;	
+	m_position = position;
 }
 
 VoxelChunk::~VoxelChunk()
 {
-	if (m_voxels)
-		delete m_voxels;
+
 }
 
-Vec3 VoxelChunk::getSize()
+int VoxelChunk::getSize()
 {
-	return m_size;
+	return chunkSize;
 }
-int VoxelChunk::getRadius()
-{
-	return m_mooreRadius;
-}
+
 bool VoxelChunk::isActive()
 {
 	return m_active;
 }
 
+void VoxelChunk::GenerateMesh()
+{
+
+}
+
 void VoxelChunk::InsertVoxelAtPos(int x, int y, int z)
 {
-	for (int i = 0; i < y - m_gridCoordinate.y; i++)
+	for (int i = 0; i < chunkSize; i++)
 	{
-
+		if (i <= y - (int)m_position.y)
+		{
+			m_voxels[x - (int)m_position.x][i][z - (int)m_position.z].SetActive(true);//convert world coor to local
+		}
 	}
 }
 
 Vec3 VoxelChunk::getPosition()
 {
-	return m_gridCoordinate;
+	return m_position;
+}
+
+void VoxelChunk::Render()
+{
+
 }

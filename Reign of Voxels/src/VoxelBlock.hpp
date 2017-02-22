@@ -16,18 +16,18 @@ enum VoxelType
 /**
 * Lightweight voxel container class that stores type and active flag
 */
-class Voxel
+class VoxelBlock
 {
 public:
 	/**
 	* Constructor
 	* sets active flag to false and type to default
 	*/
-	Voxel();
+	VoxelBlock();
 	/**
 	* Destructor
 	*/
-	~Voxel();
+	~VoxelBlock();
 	/**
 	* @brief returns active flag
 	* @return active flag

@@ -1,8 +1,10 @@
 #include <noise/noise.h>
 #include "noiseutils.h"
 #include "VoxelNoise.hpp"
-
+#include <noise/noise.h>
+#include "noiseutils.h"
 using namespace noise;
+utils::NoiseMap heightMap;
 
 std::string GenerateTerrainMap(int resolution)
 {

@@ -1,15 +1,15 @@
-#include "Voxel.hpp"
+#include "VoxelBlock.hpp"
 /**
 * Constructor
 * sets active flag to false and type to default
 */
-Voxel::Voxel()
+VoxelBlock::VoxelBlock()
 {
 	m_active = false;
 	m_voxelType = Default;
 }
 
-Voxel::~Voxel()
+VoxelBlock::~VoxelBlock()
 {
 
 }
@@ -17,7 +17,7 @@ Voxel::~Voxel()
 * @brief returns active flag
 * @return active flag
 */
-bool Voxel::IsActive()
+bool VoxelBlock::IsActive()
 {
 	return m_active;
 }
@@ -25,7 +25,7 @@ bool Voxel::IsActive()
 * @brief sets the active flag
 * @param active flag to set to
 */
-void Voxel::SetActive(bool active)
+void VoxelBlock::SetActive(bool active)
 {
 	m_active = active;
 }

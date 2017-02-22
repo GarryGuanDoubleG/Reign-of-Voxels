@@ -1,6 +1,5 @@
 #pragma once
 #include "VoxelChunk.hpp"
-#include "Voxel.hpp"
 #include "VoxelOctree.hpp"
 #include "model.hpp"
 

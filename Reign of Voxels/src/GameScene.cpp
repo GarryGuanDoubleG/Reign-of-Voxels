@@ -5,40 +5,12 @@
 */
 GameScene::GameScene()
 {
+	std::cout << "Init Game \n";
+
 	m_camera = new Camera();	
 
-	m_model = new Model("Resources\\models\\cube.obj");
-
-	//testing instance rendering. This code will be refactored
-	m_size = 64;
-	int voxel_amount = m_size * m_size * m_size;
-
-	if (m_model)
-	{
-		m_modelMatrices = new Mat4[voxel_amount];
-		unsigned int count = 0;
-		for (GLfloat x = 0; x < m_size; x++)
-		{
-			for (GLfloat y = 0; y < m_size; y++)
-			{
-				for (GLfloat z = 0; z < m_size; z++)
-				{
-					Mat4 model;
-					model = glm::translate(model, Vec3(x, y, z));
-
-					m_modelMatrices[count++] = model;
-				}
-			}
-		}
-	}
-	GLuint buffer;
-	glGenBuffers(1, &buffer);
-	glBindBuffer(GL_ARRAY_BUFFER, buffer);
-	glBufferData(GL_ARRAY_BUFFER, voxel_amount * sizeof(glm::mat4), &m_modelMatrices[0], GL_STATIC_DRAW);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	m_model->SetInstanceRendering(buffer, voxel_amount);
-	//subscribe to global events
+	m_voxelManager = new VoxelManager();
+	m_voxelManager->GenerateVoxels();
 	Game::instance().getEventSystem().addObserver(this);
 }
 /**
@@ -54,18 +26,15 @@ GameScene::~GameScene()
 */
 void GameScene::SceneFrame()
 {
-	Render();
+	//Render();
 }
 /**
 *@brief Handles drawing the game scene
 */
 void GameScene::Render()
 {
-	GLuint model_loc, view_loc, proj_loc;
+	GLuint view_loc, proj_loc;
 	GLfloat bg_color[] = { 0.1f, 0.1f, 0.1f, 0.2f };
-
-	Mat4 model_mat4 = Mat4(1.0f);
-	model_mat4 = glm::scale(model_mat4, glm::vec3(0.05f, 0.05f, 0.05f));	// It's a bit too big for our scene, so scale it down
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 	glClearBufferfv(GL_COLOR, 0, bg_color);
@@ -78,9 +47,8 @@ void GameScene::Render()
 	glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(m_camera->GetProj()));
 
 	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
-	m_model->Draw(g_shader_prog);
-	//PolygonMode(GL_FRONT_AND_BACK, GL_FILL);
-	//glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+	//m_model->Draw(g_shader_prog);
+
 	Game::instance().getWindow()->display();
 }
 /**
@@ -90,7 +58,7 @@ void GameScene::Render()
 */
 void GameScene::onNotify(Event event, sf::Event &input)
 {
-	//if (event == ServerInput)
+	/*if (event == ServerInput)*/
 		HandleInput(input); 
 }
 /**

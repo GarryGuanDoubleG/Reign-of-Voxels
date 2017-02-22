@@ -4,27 +4,34 @@
 #include "SFML\Graphics.hpp"
 #define MAX_QUEUED_INSERTIONS 10000
 
+typedef struct CubeRegion
+{
+	Vec3 position;
+	int size;
+};
+
 class VoxelOctree
 {
 public:
-	VoxelOctree();
+	VoxelOctree(VoxelOctree * parent);
 	~VoxelOctree();
 
-	VoxelChunk *m_boundingRegion;	
+
+	VoxelChunk *m_chunk;
 	VoxelOctree *m_childNodes[8];
-	sf::Int8 m_activeNodes; //bitmask calculation
 
-	//static const int MIN_CHUNK;
-
+	void Render();
 	bool BuildNode();
 	void UpdateTree();
-	void InitializeOctree(sf::Image *heightmap, int world_side); // length of each side of the world
+	void InitializeOctree(sf::Image *heightmap, int worldSize); // length of each side of the world
 private:
+	static std::vector<VoxelOctree *> render_list;//list of leaf nodes
+	static unsigned int m_chunkCount;
+
+	bool m_active;
 	bool m_leaf;
 	sf::Uint8 m_childMask;
 
-	std::vector<VoxelChunk *> render_list;//list of leaf nodes
-	 bool m_pendingInsertions;
-	 bool m_treeBuilt;
-	 static unsigned int m_chunkCount;
+	VoxelOctree * m_parent;
+	CubeRegion m_boundingRegion;
 };

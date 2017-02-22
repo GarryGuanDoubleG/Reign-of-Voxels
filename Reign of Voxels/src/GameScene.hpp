@@ -41,7 +41,6 @@ public:
 	*/
 	virtual void HandleInput(sf::Event event) ;
 private:
-	static Voxel *m_Voxels[32][32][32]; /**<3d container of voxels for rendering */  
 	int m_size; /**<size of the voxel world. This is to test instance rendering */
 	Mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
 

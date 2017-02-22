@@ -7,43 +7,53 @@ static const sf::Uint8 *g_heightarray;//array of pixel values
 static unsigned int vox_count = 0;
 unsigned int VoxelOctree::m_chunkCount = 0;
 static const int MIN_CHUNK = 16;
+std::vector<VoxelOctree *> VoxelOctree::render_list; //list of leaf nodes
 
-VoxelOctree::VoxelOctree()
+int leaf_count = 0;
+
+VoxelOctree::VoxelOctree(VoxelOctree * parent)
 {
+	m_parent = parent;
+	m_childMask = 0;
 	m_chunkCount = 0;
 }
 
 VoxelOctree::~VoxelOctree()
 {
-
+	if(m_chunk)
+		delete m_chunk;
 }
 
-void VoxelOctree::InitializeOctree(sf::Image *heightmap, int world_side)
+void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize)
 {
 	g_heightMap = heightmap;
 	g_heightarray = g_heightMap->getPixelsPtr();
-	//const sf::Uint8 *color_array = g_heightMap->getPixelsPtr();
-	m_boundingRegion = new VoxelChunk(m_chunkCount++, world_side, Vec3(0.0f, 0.0f, 0.0f));
+
+	m_boundingRegion.position = Vec3(0, 0, 0);
+	m_boundingRegion.size = worldSize;
 	
 	sf::Clock build_time;
 	BuildNode();
 
 	std::cout << "Build time is " << build_time.getElapsedTime().asSeconds() << std::endl;
 	std::cout << "Childnode calls is " << vox_count << std::endl;
+	std::cout << "leaf nodes " << leaf_count << std::endl;
 }
 
 bool VoxelOctree::BuildNode()
 {
-	int size = m_boundingRegion->getRadius();
-	Vec3 pos = m_boundingRegion->getPosition();
+	int size = m_boundingRegion.size;
+	Vec3 pos = m_boundingRegion.position;
 	bool active = false;
 
-	int child_radius = m_boundingRegion->getRadius() / 2;
 	int i = 0;
 	vox_count++;
 	
 	if (size <= MIN_CHUNK)
 	{
+		if(!m_chunk)
+			m_chunk = new VoxelChunk(m_boundingRegion.position);
+
 		for (int x = 0; x < size; x++)
 		{
 			for (int z = 0; z < size; z++)
@@ -54,9 +64,12 @@ bool VoxelOctree::BuildNode()
 					active = true;
 					m_leaf = true;
 				}
-				m_boundingRegion->InsertVoxelAtPos(pos.x + x, height, pos.z + z);
+				int y = height - pos.y;
+				m_chunk->InsertVoxelAtPos(pos.x + x, pos.y + y, pos.z + z);
 			}
 		}
+		if(active) leaf_count++;
+		return active;
 	}
 
 	for (float x = 0; x < 2; x++)
@@ -65,18 +78,34 @@ bool VoxelOctree::BuildNode()
 		{
 			for (float z = 0; z < 2; z++)
 			{
-				Vec3 chunk_pos = Vec3(x * child_radius, y * child_radius, z * child_radius);
+				int childSize = m_boundingRegion.size / 2;
 
-				m_childNodes[i] = new VoxelOctree();
-				m_childNodes[i]->m_boundingRegion = new VoxelChunk(m_chunkCount++, child_radius, chunk_pos);
-				m_childNodes[i]->BuildNode();
+				m_childNodes[i] = new VoxelOctree(this);
+				m_childNodes[i]->m_boundingRegion.position = m_boundingRegion.position + Vec3(x * childSize, y * childSize, z * childSize);
+				m_childNodes[i]->m_boundingRegion.size = childSize;
+
+				if (m_childNodes[i]->BuildNode())
+				{
+					m_childMask |= 1 << i;
+					m_active = true;
+				}
+				else
+				{
+					m_childMask &= ~(1 << i);
+					delete m_childNodes[i];
+				}
 			}
 		}
 	}
-
+	return m_childMask;
 }
 
 void VoxelOctree::UpdateTree()
 {
 
+}
+
+void VoxelOctree::Render()
+{
+	m_chunk->Render();
 }

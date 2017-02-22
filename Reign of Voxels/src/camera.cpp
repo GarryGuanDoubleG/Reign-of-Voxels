@@ -39,7 +39,7 @@ Mat4 Camera::GetViewMat()
 void Camera::HandleInput(sf::Event event)
 {
 	sf::Time time = Game::g_delta_clock.getElapsedTime();
-	GLfloat cam_speed = 100.0f * time.asSeconds();
+	GLfloat cam_speed = 1000.0f * time.asSeconds();
 
 	if (event.type == sf::Event::KeyPressed)
 	{

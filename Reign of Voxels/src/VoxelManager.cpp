@@ -7,10 +7,6 @@
 VoxelManager::VoxelManager()
 {
 	m_voxelModel = new Model("Resources\\models\\cube.obj");
-	if (m_voxelModel)
-	{
-		GenerateVoxels();
-	}
 }
 VoxelManager::~VoxelManager()
 {
@@ -39,7 +35,7 @@ void VoxelManager::GenerateVoxels()
 	else
 	{
 		//GenerateVoxelChunks(heightmap);
-		m_octree = new VoxelOctree();
+		m_octree = new VoxelOctree(NULL);
 		m_octree->InitializeOctree(heightmap, m_worldSize);
 	}
 	delete heightmap;

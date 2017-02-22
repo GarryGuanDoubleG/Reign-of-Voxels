@@ -1,206 +1,192 @@
 ﻿<?xml version="1.0" encoding="utf-8"?>
 <Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
   <ItemGroup>
-    <Filter Include="Source Files">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    <Filter Include="Headers">
+      <UniqueIdentifier>{aad02c42-e38e-4d06-b8a4-0598d1bb3097}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files">
-      <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
-      <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{ca0efe23-79b3-4209-b183-f557aafa637c}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shader">
-      <UniqueIdentifier>{875eadf3-b4b2-439c-ba6d-8809cb12975f}</UniqueIdentifier>
+    <Filter Include="Source">
+      <UniqueIdentifier>{459ab808-5af5-4355-b8a1-bc022eb180a0}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Header Files\Gui">
-      <UniqueIdentifier>{d60b0497-7486-44c4-b9f2-28897b18079d}</UniqueIdentifier>
+    <Filter Include="Headers\Gui">
+      <UniqueIdentifier>{a5fe51f3-5965-48c7-9579-5431168547f7}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Gui">
-      <UniqueIdentifier>{11f21522-ca88-4e8e-933f-0ca211d9b179}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="json">
-      <UniqueIdentifier>{0ae89267-fb73-4e80-9ac5-4f7fa86ee825}</UniqueIdentifier>
+    <Filter Include="Source\Gui">
+      <UniqueIdentifier>{5bd3669a-4fb0-42e2-b976-d9ab4f9a38f3}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <None Include="packages.config" />
-    <None Include="shader\vs_shader.glsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="shader\fs_shader.glsl">
-      <Filter>Shader</Filter>
-    </None>
-    <None Include="Resources\gui\menu.json">
-      <Filter>json</Filter>
-    </None>
-    <None Include="shader\voxel_shader.glsl">
-      <Filter>Shader</Filter>
-    </None>
-  </ItemGroup>
-  <ItemGroup>
-    <ClCompile Include="src\shader.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\main.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\game.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\camera.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\client.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="src\texture.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\EventSystem.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="src\simple_logger.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\camera.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\model.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Gui\widget.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Gui\textbox.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Gui\menu.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Gui\label.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Gui\button.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\Gui\layout.cpp">
-      <Filter>Source Files\Gui</Filter>
-    </ClCompile>
-    <ClCompile Include="src\eventSystem.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\game.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\GameScene.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\LightSource.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\main.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\mesh.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="src\Voxel.cpp">
-      <Filter>Source Files</Filter>
+    <ClCompile Include="src\model.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\sceneManager.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\shader.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\simple_logger.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\texture.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\VoxelChunk.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\VoxelManager.cpp">
-      <Filter>Source Files</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VoxelOctree.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\VoxelNoise.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VoxelOctree.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gui\button.cpp">
+      <Filter>Source\Gui</Filter>
     </ClCompile>
     <ClCompile Include="src\Gui\image.cpp">
-      <Filter>Source Files\Gui</Filter>
+      <Filter>Source\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gui\label.cpp">
+      <Filter>Source\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gui\layout.cpp">
+      <Filter>Source\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gui\Menu.cpp">
+      <Filter>Source\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gui\TextBox.cpp">
+      <Filter>Source\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Gui\widget.cpp">
+      <Filter>Source\Gui</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VoxelBlock.cpp">
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="..\..\..\libnoise\include\noiseutils.cpp">
-      <Filter>Source Files</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actor.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\camera.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\client.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\events.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\eventSystem.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\game.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\GameScene.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\glm.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\LightSource.hpp">
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\mesh.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\model.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\observer.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\packet.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\scene.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\sceneManager.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\shader.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\simple_logger.h">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\texture.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Voxel.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\VoxelChunk.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Gui\button.hpp">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Gui\label.hpp">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Gui\layout.hpp">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Gui\Menu.hpp">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Gui\textbox.hpp">
-      <Filter>Header Files\Gui</Filter>
-    </ClInclude>
-    <ClInclude Include="src\Gui\widget.hpp">
-      <Filter>Header Files\Gui</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\VoxelManager.hpp">
-      <Filter>Header Files</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VoxelOctree.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\VoxelNoise.hpp">
-      <Filter>Header Files</Filter>
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VoxelOctree.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gui\button.hpp">
+      <Filter>Headers\Gui</Filter>
     </ClInclude>
     <ClInclude Include="src\Gui\image.hpp">
-      <Filter>Header Files\Gui</Filter>
+      <Filter>Headers\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gui\label.hpp">
+      <Filter>Headers\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gui\layout.hpp">
+      <Filter>Headers\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gui\Menu.hpp">
+      <Filter>Headers\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gui\textbox.hpp">
+      <Filter>Headers\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Gui\widget.hpp">
+      <Filter>Headers\Gui</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VoxelBlock.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\..\libnoise\include\noiseutils.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>
