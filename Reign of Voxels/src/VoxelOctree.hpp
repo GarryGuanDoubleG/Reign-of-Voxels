@@ -24,6 +24,7 @@ public:
 	bool BuildNode();
 	void UpdateTree();
 	void InitializeOctree(sf::Image *heightmap, int worldSize); // length of each side of the world
+	void InsertVoxelAtHeight(int x, int y, int z);
 private:
 	static std::vector<VoxelOctree *> render_list;//list of leaf nodes
 	static unsigned int m_chunkCount;

@@ -28,15 +28,9 @@ void VoxelChunk::GenerateMesh()
 
 }
 
-void VoxelChunk::InsertVoxelAtPos(int x, int y, int z)
+void VoxelChunk::SetVoxelActive(int x, int y, int z)
 {
-	for (int i = 0; i < chunkSize; i++)
-	{
-		if (i <= y - (int)m_position.y)
-		{
-			m_voxels[x - (int)m_position.x][i][z - (int)m_position.z].SetActive(true);//convert world coor to local
-		}
-	}
+	m_voxels[x - (int)m_position.x][y - (int)m_position.y][z - (int)m_position.z].SetActive(true);//convert world coor to local
 }
 
 Vec3 VoxelChunk::getPosition()

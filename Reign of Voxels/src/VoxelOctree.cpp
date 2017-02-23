@@ -8,7 +8,6 @@ static unsigned int vox_count = 0;
 unsigned int VoxelOctree::m_chunkCount = 0;
 static const int MIN_CHUNK = 16;
 std::vector<VoxelOctree *> VoxelOctree::render_list; //list of leaf nodes
-
 int leaf_count = 0;
 
 VoxelOctree::VoxelOctree(VoxelOctree * parent)
@@ -33,7 +32,15 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize)
 	m_boundingRegion.size = worldSize;
 	
 	sf::Clock build_time;
-	BuildNode();
+
+	for (int x = 0; x < worldSize; x++)
+	{
+		for (int z = 0; z < worldSize; z++)
+		{
+			int height = g_heightMap->getPixel(x, z).r;
+			InsertVoxelAtHeight(x, height, z);
+		}
+	}
 
 	std::cout << "Build time is " << build_time.getElapsedTime().asSeconds() << std::endl;
 	std::cout << "Childnode calls is " << vox_count << std::endl;
@@ -42,7 +49,7 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize)
 
 bool VoxelOctree::BuildNode()
 {
-	int size = m_boundingRegion.size;
+	/*int size = m_boundingRegion.size;
 	Vec3 pos = m_boundingRegion.position;
 	bool active = false;
 
@@ -97,7 +104,55 @@ bool VoxelOctree::BuildNode()
 			}
 		}
 	}
-	return m_childMask;
+	return m_childMask;*/
+	return false;
+}
+
+void VoxelOctree::InsertVoxelAtHeight(int x, int height, int z)
+{
+	for (int y = 0; y <= height; y++)
+	{
+		Vec3 position = Vec3(x, y, z);
+		bool is_leaf = false;
+		VoxelOctree * node = (VoxelOctree *)this;
+
+		while (!is_leaf)
+		{
+			int size = node->m_boundingRegion.size;
+			if (size <= MIN_CHUNK)
+			{
+				is_leaf = true;
+				break;
+			}
+			int local_x = (position.x - node->m_boundingRegion.position.x) / size;
+			int local_y = (position.y - node->m_boundingRegion.position.y) / size;
+			int local_z = (position.z - node->m_boundingRegion.position.z) / size;
+			Vec3 local_octant_pos = Vec3(local_x, local_y, local_z);
+			local_octant_pos += node->m_boundingRegion.position;
+			local_octant_pos *= size;
+
+			int child_index = local_octant_pos.x / size 
+								+ 2 * (local_octant_pos.y / size) 
+								+ 4 * (local_octant_pos.z / size);
+
+			if (!node->m_childNodes[child_index])
+			{
+				node->m_childNodes[child_index] = new VoxelOctree(node);
+				node->m_childNodes[child_index]->m_boundingRegion.size = node->m_boundingRegion.size / 2;
+				node->m_childNodes[child_index]->m_boundingRegion.position = local_octant_pos;
+			}
+			node = node->m_childNodes[child_index];
+		}
+
+		node->m_leaf = is_leaf;
+		if (!node->m_chunk)
+		{
+			leaf_count++;
+			node->m_chunk = new VoxelChunk(node->m_boundingRegion.position);
+		}
+		node->m_chunk->SetVoxelActive(x, y, z);
+		vox_count++;
+	}
 }
 
 void VoxelOctree::UpdateTree()

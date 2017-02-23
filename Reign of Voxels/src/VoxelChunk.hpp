@@ -14,7 +14,7 @@ public:
 	bool isActive();
 
 	void GenerateMesh();
-	void InsertVoxelAtPos(int x, int y, int z);
+	void SetVoxelActive(int x, int y, int z);
 
 	void Render();
 private:
