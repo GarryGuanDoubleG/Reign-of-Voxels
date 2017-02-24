@@ -10,7 +10,7 @@ public:
 	~VoxelManager();
 
 	void GenerateVoxels();
-	void RenderVoxels();
+	void RenderVoxels(GLuint shader);
 
 private:
 	std::vector<VoxelChunk*> m_voxelChunks;

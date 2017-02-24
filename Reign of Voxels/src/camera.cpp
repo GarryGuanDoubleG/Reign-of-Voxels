@@ -3,7 +3,7 @@
 
 Camera::Camera()
 {
-	m_pos = Vec3(0.0, 0.0f, 600.0f);
+	m_pos = Vec3(0.0, 0.0f, 3.0f);
 	m_target = Vec3(0.0f, 0.0f, 0.0f);
 	m_forward = Vec3(0.0f, 0.0f, -1.0f);//get forward direction
 	m_up = Vec3(0.0f, 1.0f, 0.0f); //set default up vector to positive y
@@ -39,10 +39,11 @@ Mat4 Camera::GetViewMat()
 void Camera::HandleInput(sf::Event event)
 {
 	sf::Time time = Game::g_delta_clock.getElapsedTime();
-	GLfloat cam_speed = 1000.0f * time.asSeconds();
+	GLfloat cam_speed = 5.0f * time.asSeconds();
 
 	if (event.type == sf::Event::KeyPressed)
 	{
+		slog("key press ");
 		switch (event.key.code)
 		{
 		case sf::Keyboard::W:
@@ -65,11 +66,13 @@ void Camera::HandleInput(sf::Event event)
 	else if (event.type == sf::Event::MouseMoved)
 	{
 		GLfloat sensitivity = 0.05f; // mouse sensitivity
-
-		sf::Vector2i mouse_pos = sf::Mouse::getPosition();
-		sf::Vector2i center = sf::Vector2i(1280 / 2, 720 / 2);
+		sf::Vector2i mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
+		sf::Vector2i center(640, 360);
+		if (mouse_pos == center)
+			return;
 		sf::Vector2i offset = mouse_pos - center;
-	/*	m_last_mouse_pos = mouse_pos;*/
+		//sf::Vector2i offset = mouse_pos - m_last_mouse_pos;
+		m_last_mouse_pos = mouse_pos;
 
 		float xoffset = (float)offset.x * sensitivity;
 		float yoffset = (float)offset.y * sensitivity;

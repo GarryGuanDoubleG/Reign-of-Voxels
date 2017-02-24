@@ -1,11 +1,6 @@
 #version 400 core
-
 in vec2 UV;
 out vec4 color;
-
-uniform sampler2D texture_diffuse1;
-uniform sampler2D texture_specular1;
-uniform sampler2D texture_specular2;
 
 void main(void)
 {

@@ -78,6 +78,14 @@
     <ClInclude Include="src\VoxelNoise.hpp" />
     <ClInclude Include="src\VoxelOctree.hpp" />
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\lighting_fs.glsl" />
+    <None Include="shader\lighting_vs.glsl" />
+    <None Include="shader\model_fs.glsl" />
+    <None Include="shader\model_vs.glsl" />
+    <None Include="shader\voxel_fs.glsl" />
+    <None Include="shader\voxel_vs.glsl" />
+  </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B9458FBC-D18D-4A29-A3EB-46770D004C78}</ProjectGuid>
     <RootNamespace>ReignofVoxels</RootNamespace>

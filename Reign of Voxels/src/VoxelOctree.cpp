@@ -6,9 +6,9 @@ static sf::Image *g_heightMap;
 static const sf::Uint8 *g_heightarray;//array of pixel values
 static unsigned int vox_count = 0;
 unsigned int VoxelOctree::m_chunkCount = 0;
-static const int MIN_CHUNK = 16;
-std::vector<VoxelOctree *> VoxelOctree::render_list; //list of leaf nodes
+std::vector<VoxelChunk *> VoxelOctree::render_list; //list of leaf nodes
 int leaf_count = 0;
+unsigned long long iterations = 0;
 
 VoxelOctree::VoxelOctree(VoxelOctree * parent)
 {
@@ -29,34 +29,45 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize)
 	g_heightarray = g_heightMap->getPixelsPtr();
 
 	m_boundingRegion.position = Vec3(0, 0, 0);
-	m_boundingRegion.size = worldSize;
+	m_boundingRegion.size = 256;
 	
 	sf::Clock build_time;
+	BuildNode();
 
-	for (int x = 0; x < worldSize; x++)
-	{
-		for (int z = 0; z < worldSize; z++)
-		{
-			int height = g_heightMap->getPixel(x, z).r;
-			InsertVoxelAtHeight(x, height, z);
-		}
-	}
+	//for (int x = 0; x < worldSize; x++)
+	//{
+	//	for (int z = 0; z < worldSize; z++)
+	//	{
+	//		int height = g_heightMap->getPixel(x, z).r;
+	//		InsertVoxelAtHeight(x, height, z);
+	//	}
+	//}
 
 	std::cout << "Build time is " << build_time.getElapsedTime().asSeconds() << std::endl;
 	std::cout << "Childnode calls is " << vox_count << std::endl;
 	std::cout << "leaf nodes " << leaf_count << std::endl;
+	std::cout << "Iterations " << iterations << std::endl;
+	
+	build_time.restart();
+
+	for (int i = 0; i < render_list.size(); i++)
+	{
+		render_list[i]->GenerateMesh();
+	}
+
+	std::cout << "Generate Mesh time is " << build_time.getElapsedTime().asSeconds() << std::endl;
 }
 
 bool VoxelOctree::BuildNode()
 {
-	/*int size = m_boundingRegion.size;
+	int size = m_boundingRegion.size;
 	Vec3 pos = m_boundingRegion.position;
 	bool active = false;
 
 	int i = 0;
 	vox_count++;
 	
-	if (size <= MIN_CHUNK)
+	if (size <= VoxelChunk::chunkSize)
 	{
 		if(!m_chunk)
 			m_chunk = new VoxelChunk(m_boundingRegion.position);
@@ -75,7 +86,12 @@ bool VoxelOctree::BuildNode()
 				m_chunk->InsertVoxelAtPos(pos.x + x, pos.y + y, pos.z + z);
 			}
 		}
-		if(active) leaf_count++;
+		if (active)
+		{
+			m_chunk->SetActive(active);
+			leaf_count++;
+			render_list.push_back(m_chunk);
+		}
 		return active;
 	}
 
@@ -104,7 +120,19 @@ bool VoxelOctree::BuildNode()
 			}
 		}
 	}
-	return m_childMask;*/
+	return m_childMask;
+	//return false;
+}
+
+bool inline RegionContains(Vec3 region_pos, int region_size, Vec3 object_pos)
+{
+	if ((object_pos.x >= region_pos.x && object_pos.x < region_pos.x + region_size)
+		&& (object_pos.y >= region_pos.y && object_pos.y < region_pos.y + region_size)
+		&& (object_pos.z >= region_pos.z && object_pos.z < region_pos.z + region_size))
+	{
+		return true;
+	}
+
 	return false;
 }
 
@@ -112,45 +140,64 @@ void VoxelOctree::InsertVoxelAtHeight(int x, int height, int z)
 {
 	for (int y = 0; y <= height; y++)
 	{
+		VoxelOctree * node = (VoxelOctree *)this;
 		Vec3 position = Vec3(x, y, z);
 		bool is_leaf = false;
-		VoxelOctree * node = (VoxelOctree *)this;
-
 		while (!is_leaf)
 		{
-			int size = node->m_boundingRegion.size;
-			if (size <= MIN_CHUNK)
+			iterations++;
+			if (node->m_boundingRegion.size <= VoxelChunk::chunkSize)
 			{
 				is_leaf = true;
 				break;
 			}
-			int local_x = (position.x - node->m_boundingRegion.position.x) / size;
-			int local_y = (position.y - node->m_boundingRegion.position.y) / size;
-			int local_z = (position.z - node->m_boundingRegion.position.z) / size;
-			Vec3 local_octant_pos = Vec3(local_x, local_y, local_z);
-			local_octant_pos += node->m_boundingRegion.position;
-			local_octant_pos *= size;
-
-			int child_index = local_octant_pos.x / size 
-								+ 2 * (local_octant_pos.y / size) 
-								+ 4 * (local_octant_pos.z / size);
-
-			if (!node->m_childNodes[child_index])
+			int child_index = 0;
+			bool found_child = false;
+			
+			VoxelOctree * new_node = NULL;
+			for (int i = 0; i < 2 && !found_child; i++)
 			{
-				node->m_childNodes[child_index] = new VoxelOctree(node);
-				node->m_childNodes[child_index]->m_boundingRegion.size = node->m_boundingRegion.size / 2;
-				node->m_childNodes[child_index]->m_boundingRegion.position = local_octant_pos;
+				for (int j = 0; j < 2 && !found_child; j++)
+				{
+					for (int k = 0; k < 2 && !found_child; k++)
+					{						
+						VoxelOctree *child = node->m_childNodes[child_index];
+						if (!child)
+						{
+							child = new VoxelOctree(node);							
+							int size = node->m_boundingRegion.size / 2;
+
+							Vec3 child_pos = node->m_boundingRegion.position;
+							child_pos.x += i * size;
+							child_pos.y += j * size;
+							child_pos.z += k * size;
+
+							child->m_boundingRegion.position = child_pos;
+							child->m_boundingRegion.size = size;
+
+							node->m_childNodes[child_index] = child;
+						}
+
+						if (RegionContains(child->m_boundingRegion.position, child->m_boundingRegion.size, position))
+						{							
+							node = node->m_childNodes[child_index];
+							found_child = true;
+						}
+
+						child_index++;
+					}
+				}
 			}
-			node = node->m_childNodes[child_index];
 		}
 
-		node->m_leaf = is_leaf;
+		node->m_leaf = true;
 		if (!node->m_chunk)
 		{
 			leaf_count++;
 			node->m_chunk = new VoxelChunk(node->m_boundingRegion.position);
 		}
 		node->m_chunk->SetVoxelActive(x, y, z);
+
 		vox_count++;
 	}
 }

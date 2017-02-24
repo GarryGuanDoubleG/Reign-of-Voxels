@@ -10,6 +10,8 @@ Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<GLuint> &indices, std::vec
 	this->textures = textures;
 
 	this->MeshInit();
+	
+	this->m_instanced = GL_FALSE;
 }
 /**
 * @brief draws all the vertices and textures stored in this mesh

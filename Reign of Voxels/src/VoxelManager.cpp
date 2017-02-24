@@ -25,9 +25,6 @@ void VoxelManager::GenerateVoxelChunks(sf::Image *heightmap)
 void VoxelManager::GenerateVoxels()
 {
 	m_worldSize = 512;
-	int chunk_size = 16;
-	int voxel_amount = 512 * 512 * 512 / chunk_size;
-	int chunk_dimen = m_worldSize / chunk_size;
 
 	sf::Image *heightmap = new sf::Image();
 	if (!heightmap->loadFromFile(GenerateTerrainMap(m_worldSize)))
@@ -41,9 +38,19 @@ void VoxelManager::GenerateVoxels()
 	delete heightmap;
 }
 
-void VoxelManager::RenderVoxels()
+void VoxelManager::RenderVoxels(GLuint shader)
 {
-	glPolygonMode(GL_FRONT, GL_LINE);
-	m_voxelModel->Draw(g_shader_prog);
-	glPolygonMode(GL_FRONT, GL_FILL);
+	GLuint model_loc;
+	//glUseProgram(g_shader_prog);
+	model_loc = glGetUniformLocation(shader, "model");
+	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
+	{
+		Mat4 model = Mat4(1.0f);
+		model = glm::translate(model, VoxelOctree::render_list[i]->getPosition());
+		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+
+		VoxelOctree::render_list[i]->Render();
+	}
+	//m_voxelModel->Draw(g_shader_prog);
+	//glPolygonMode(GL_FRONT, GL_FILL);
 }

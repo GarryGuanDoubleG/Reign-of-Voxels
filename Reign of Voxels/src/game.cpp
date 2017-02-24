@@ -63,8 +63,8 @@ void Game::GraphicsInit()
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
 
-	glEnable(GL_CULL_FACE);
-	glCullFace(GL_BACK);
+	//glEnable(GL_CULL_FACE);
+	//glCullFace(GL_BACK);
 }
 /*
 * @brief initializes the game from graphics to loading scene and managing client connection
@@ -74,12 +74,13 @@ void Game::Initialize()
 	if (m_initialized) return;
 
 	GraphicsInit();
-	compile_shaders();
+	CompileAllShaders();
 
 	m_instance.m_sceneManager = new SceneManager(new GameScene()); // first scene will be menu
 	m_instance.m_client = new Client();//managers communication with the server
 
 	m_initialized = true;
+	m_lock_mouse = true;
 }
 /*
 * @brief throws a close game event to start clean up process
@@ -123,7 +124,7 @@ void Game::GameLoop()
 {
 	m_running = true;
 	g_clock.restart();
-	
+	sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
 	while (m_running)
 	{
 		sf::Event event;
@@ -135,10 +136,16 @@ void Game::GameLoop()
 			/*if (event.key.code == sf::Keyboard::Escape)
 				GameClose();
 			else*/
-				m_eventSystem->Notify(ClientInput, event);
+			m_eventSystem->Notify(ClientInput, event);
+			if (event.key.code == sf::Keyboard::Delete)
+				m_lock_mouse = false;
 		}
-		g_delta_clock.restart();
-		m_sceneManager->SceneFrame();
+		if (m_lock_mouse)
+		{
+			sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
+			g_delta_clock.restart();
+			m_sceneManager->SceneFrame();
+		}
 		/*sf::Vector2i center = sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 		sf::Mouse::setPosition(center);*/
 	}

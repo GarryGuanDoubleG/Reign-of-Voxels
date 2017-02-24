@@ -2,6 +2,7 @@
 #include "SFML\Graphics.hpp"
 #include "scene.hpp"
 #include "model.hpp"
+#include "LightSource.hpp"
 #include "camera.hpp"
 #include "game.hpp"
 #include "VoxelManager.hpp"
@@ -45,6 +46,10 @@ private:
 	Mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
 
 	Model *m_model; /**<pointer to model loaded */
+	LightSource *m_light;
+
 	VoxelManager * m_voxelManager;
 	Camera *m_camera; /**<player camera*/  
+
+	bool wire_frame = false;
 };

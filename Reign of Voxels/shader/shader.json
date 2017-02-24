@@ -1,0 +1,18 @@
+{
+	"model":
+	{
+		"fs": "shader/model_fs.glsl",
+		"vs": "shader/model_vs.glsl"
+	},
+	"voxel":
+	{
+		"vs": "shader/voxel_vs.glsl",
+		"fs": "shader/voxel_fs.glsl"
+	},
+	"lighting":
+	{
+		"vs": "shader/lighting_vs.glsl",
+		"fs": "shader/lighting_fs.glsl"
+	}
+}
+

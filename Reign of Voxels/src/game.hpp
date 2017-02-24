@@ -5,9 +5,7 @@
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
 #include "EventSystem.hpp"
-#include "glm.hpp"
 #include "shader.hpp"
-#include "model.hpp"
 #include "sceneManager.hpp"
 #include "Gui\Menu.hpp"
 #include "client.hpp"
@@ -76,6 +74,7 @@ private:
 	bool					m_in_game; /**<flag if game already initiatd */  
 	bool					m_running; /**<flag for whether or not to run gameloop*/  
 	bool					m_initialized; /**< flag for whether initialized or not*/
+	bool					m_lock_mouse;
 };
 
 #endif

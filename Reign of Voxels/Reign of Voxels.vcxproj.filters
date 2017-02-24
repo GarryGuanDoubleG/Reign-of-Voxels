@@ -189,4 +189,24 @@
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
+  <ItemGroup>
+    <None Include="shader\lighting_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\lighting_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\model_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\model_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\voxel_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\voxel_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+  </ItemGroup>
 </Project>
