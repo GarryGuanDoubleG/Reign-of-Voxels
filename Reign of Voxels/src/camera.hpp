@@ -32,6 +32,8 @@ public:
 	* @param event the user input
 	*/
 	void HandleInput(sf::Event event);
+
+	Vec3 getPosition();
 private:
 	sf::Vector2i m_last_mouse_pos; /**<The last position mouse was tracked. Used to compare to new mouse pos  */
 	Vec3 m_pos; /**< position of camera */  

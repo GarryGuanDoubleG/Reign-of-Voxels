@@ -35,6 +35,10 @@ Mat4 Camera::GetViewMat()
 	return m_view_mat;
 }
 
+Vec3 Camera::getPosition()
+{
+	return m_pos;
+}
 
 void Camera::HandleInput(sf::Event event)
 {
