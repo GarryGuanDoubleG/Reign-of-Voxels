@@ -29,7 +29,7 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize)
 	g_heightarray = g_heightMap->getPixelsPtr();
 
 	m_boundingRegion.position = Vec3(0, 0, 0);
-	m_boundingRegion.size = 256;
+	m_boundingRegion.size = worldSize;
 	
 	sf::Clock build_time;
 	BuildNode();

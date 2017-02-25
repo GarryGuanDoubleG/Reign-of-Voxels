@@ -11,16 +11,6 @@
 #include "glm.hpp"
 #include "texture.hpp"
 
-//should probably move these into a utility file
-/**
-*
-*/
-typedef struct
-{
-	Vec3 position; /**< vertex postion in ndc */  
-	Vec3 normal; /**< normal value of vertex */  
-	Vec2 uv; /**< texture coordinates */  
-}Vertex;
 
 /**
 * Mesh class that contains data on components of a model

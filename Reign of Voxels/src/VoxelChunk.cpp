@@ -65,70 +65,151 @@ void VoxelChunk::GenerateMesh()
 			{
 				if (m_voxels[x][y][z].IsActive() == false)
 					continue;
+				//check if the voxel on the left is active
 				if ((x > 0 && !m_voxels[x - 1][y][z].IsActive()) || x == 0)
 				{
-					m_vertices.push_back(Vec3(x - 0.5f, y - 0.5f, z + 0.5f));
-					m_vertices.push_back(Vec3(x - 0.5f, y + 0.5f, z + 0.5f));
-					m_vertices.push_back(Vec3(x - 0.5f, y + 0.5f, z - 0.5f));
-					m_vertices.push_back(Vec3(x - 0.5f, y - 0.5f, z - 0.5f));
+					Vertex vertex;
+					vertex.position = Vec3(x - 0.5f, y - 0.5f, z + 0.5f);
+					vertex.normal = Vec3(-1.0f, 0, 0);
+					vertex.uv = Vec2(.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x - 0.5f, y + 0.5f, z + 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x - 0.5f, y + 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x - 0.5f, y - 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+
 					AddTrianglesIndices();
 				}
 
 				if ((x < chunkSize - 1 && !m_voxels[x + 1][y][z].IsActive()) || x == chunkSize - 1)
 				{
-					m_vertices.push_back(Vec3(x + 0.5f, y - 0.5f, z - 0.5f));
-					m_vertices.push_back(Vec3(x + 0.5f, y + 0.5f, z - 0.5f));
-					m_vertices.push_back(Vec3(x + 0.5f, y + 0.5f, z + 0.5f));
-					m_vertices.push_back(Vec3(x + 0.5f, y - 0.5f, z + 0.5f));
+					Vertex vertex;
+					vertex.normal = Vec3(1.0f, 0, 0);
+					vertex.uv = Vec2(.5f);
+
+					vertex.position = Vec3(x + 0.5f, y - 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x + 0.5f, y + 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x + 0.5f, y + 0.5f, z + 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x + 0.5f, y - 0.5f, z + 0.5f);
+					m_vertices.push_back(vertex);
 					AddTrianglesIndices();
 				}				
 				if ((y > 0 && !m_voxels[x][y - 1][z].IsActive()) || y == 0)
 				{
-					m_vertices.push_back(Vec3(x - 0.5f, y - 0.5f, z - 0.5f));
-					m_vertices.push_back(Vec3(x + 0.5f, y - 0.5f, z - 0.5f));
-					m_vertices.push_back(Vec3(x + 0.5f, y - 0.5f, z + 0.5f));
-					m_vertices.push_back(Vec3(x - 0.5f, y - 0.5f, z + 0.5f));
+					Vertex vertex;
+					vertex.normal = Vec3(0.0f, -1, 0);
+					vertex.uv = Vec2(.5f);
+
+					vertex.position = Vec3(x - 0.5f, y - 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x + 0.5f, y - 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x + 0.5f, y - 0.5f, z + 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x - 0.5f, y - 0.5f, z + 0.5f);
+					m_vertices.push_back(vertex);
+
 					AddTrianglesIndices();
 				}
 				if ((y < chunkSize - 1 && !m_voxels[x][y + 1][z].IsActive()) || y == chunkSize - 1)
 				{
-					m_vertices.push_back(Vec3(x - 0.5f, y + 0.5f, z + 0.5f));
-					m_vertices.push_back(Vec3(x + 0.5f, y + 0.5f, z + 0.5f));
-					m_vertices.push_back(Vec3(x + 0.5f, y + 0.5f, z - 0.5f));
-					m_vertices.push_back(Vec3(x - 0.5f, y + 0.5f, z - 0.5f));
+					Vertex vertex;
+					vertex.normal = Vec3(0.0f, 1.0f, 0);
+					vertex.uv = Vec2(.5f);
+
+					vertex.position = Vec3(x - 0.5f, y + 0.5f, z + 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x + 0.5f, y + 0.5f, z + 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x + 0.5f, y + 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x - 0.5f, y + 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+
 					AddTrianglesIndices();
 				}
 
 				if ((z > 0 && !m_voxels[x][y][z - 1].IsActive()) || z == 0)
 				{
-					m_vertices.push_back(Vec3(x - 0.5f, y - 0.5f, z - 0.5f));
-					m_vertices.push_back(Vec3(x - 0.5f, y + 0.5f, z - 0.5f));
-					m_vertices.push_back(Vec3(x + 0.5f, y + 0.5f, z - 0.5f));
-					m_vertices.push_back(Vec3(x + 0.5f, y - 0.5f, z - 0.5f));
+					Vertex vertex;
+					vertex.normal = Vec3(0.0f, 0, -1.0f);
+					vertex.uv = Vec2(.5f);
+
+					vertex.position = Vec3(x - 0.5f, y - 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x - 0.5f, y + 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+					vertex.position = Vec3(x + 0.5f, y + 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x + 0.5f, y - 0.5f, z - 0.5f);
+					m_vertices.push_back(vertex);
+
 					AddTrianglesIndices();
 				}
 				if ((z < chunkSize - 1 && !m_voxels[x][y][z + 1].IsActive()) || z == chunkSize - 1)
 				{
-					m_vertices.push_back(Vec3(x + 0.5f, y - 0.5f, z + 0.5f));
-					m_vertices.push_back(Vec3(x + 0.5f, y + 0.5f, z + 0.5f));
-					m_vertices.push_back(Vec3(x - 0.5f, y + 0.5f, z + 0.5f));
-					m_vertices.push_back(Vec3(x - 0.5f, y - 0.5f, z + 0.5f));
+					Vertex vertex;
+					vertex.normal = Vec3(0.0f, 0, 1.0f);
+					vertex.uv = Vec2(.5f);
+
+					vertex.position = Vec3(x + 0.5f, y - 0.5f, z + 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x + 0.5f, y + 0.5f, z + 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x - 0.5f, y + 0.5f, z + 0.5f);
+					m_vertices.push_back(vertex);
+
+					vertex.position = Vec3(x - 0.5f, y - 0.5f, z + 0.5f);
+					m_vertices.push_back(vertex);
 					AddTrianglesIndices();
 				}
 
 			}
 		}
 	}
-
+	for (int i = 0; i < m_vertices.size(); i++)
+	{
+		Vec3 position = m_vertices[i].position;
+		position /= chunkSize;
+		m_vertices[i].position = position;
+	}
 	glBindVertexArray(m_vao);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vec3), &m_vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_tri_indices.size() * sizeof(GLuint), &m_tri_indices[0], GL_STATIC_DRAW);
 
+	//location 0 should be verts
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vec3), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+	//now normals
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+	//now textures
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

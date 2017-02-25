@@ -141,9 +141,9 @@ void Game::GameLoop()
 		if (m_lock_mouse)
 		{
 			sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
+		}
 			g_delta_clock.restart();
 			m_sceneManager->SceneFrame();
-		}
 		/*sf::Vector2i center = sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
 		sf::Mouse::setPosition(center);*/
 	}

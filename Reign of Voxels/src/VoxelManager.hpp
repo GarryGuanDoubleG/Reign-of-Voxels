@@ -1,6 +1,7 @@
 #pragma once
 #include "VoxelChunk.hpp"
 #include "VoxelOctree.hpp"
+#include "camera.hpp"
 #include "model.hpp"
 
 class VoxelManager
@@ -10,7 +11,7 @@ public:
 	~VoxelManager();
 
 	void GenerateVoxels();
-	void RenderVoxels(GLuint shader);
+	void RenderVoxels(Camera * player_cam);
 
 private:
 	std::vector<VoxelChunk*> m_voxelChunks;

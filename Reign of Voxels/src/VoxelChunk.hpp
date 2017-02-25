@@ -20,17 +20,16 @@ public:
 	void GenerateMesh();
 	void InsertVoxelAtPos(int x, int y, int z);
 	void SetVoxelActive(int x, int y, int z);
-	void GenerateVertices(bool leftx, bool rightx, bool upy, bool downy, bool inz, bool outz);
 	void Render();
 
-	static const int chunkSize = 64;//size of each side of the chunk
+	static const int chunkSize = 16;//size of each side of the chunk
 private:
 	void AddTrianglesIndices();
 
 	GLuint m_vao, m_vbo, m_ebo;
 
 	bool m_active;
-	std::vector<Vec3> m_vertices;
+	std::vector<Vertex> m_vertices;
 	std::vector<GLuint> m_tri_indices;
 
 	Vec3 m_position;

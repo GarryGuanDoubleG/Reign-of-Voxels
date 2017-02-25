@@ -5,8 +5,8 @@
 LightSource::LightSource()
 {
 	m_model = new Model("Resources\\models\\sphere.obj");
-	m_pos = Vec3(1.2f, 4.0f, 2.0f);
-	m_color = Vec3(1.0f, 1.0f, 1.0f);
+	m_pos = Vec3(1, 1, 1);
+	m_color = Vec3(1.0f, 0.0f, 0.0f);
 
 	if (!m_model)
 	{

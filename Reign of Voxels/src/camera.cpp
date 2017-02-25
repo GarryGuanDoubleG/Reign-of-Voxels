@@ -3,7 +3,7 @@
 
 Camera::Camera()
 {
-	m_pos = Vec3(0.0, 0.0f, 3.0f);
+	m_pos = Vec3(0.0, 0.0f, 200.0f);
 	m_target = Vec3(0.0f, 0.0f, 0.0f);
 	m_forward = Vec3(0.0f, 0.0f, -1.0f);//get forward direction
 	m_up = Vec3(0.0f, 1.0f, 0.0f); //set default up vector to positive y
@@ -43,7 +43,7 @@ Vec3 Camera::getPosition()
 void Camera::HandleInput(sf::Event event)
 {
 	sf::Time time = Game::g_delta_clock.getElapsedTime();
-	GLfloat cam_speed = 5.0f * time.asSeconds();
+	GLfloat cam_speed = 200.0f * time.asSeconds();
 
 	if (event.type == sf::Event::KeyPressed)
 	{
