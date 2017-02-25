@@ -6,10 +6,6 @@ VoxelChunk::VoxelChunk(Vec3 position)
 {
 	m_active = false;	
 	m_position = position;
-
-	glGenVertexArrays(1, &this->m_vao);
-	glGenBuffers(1, &this->m_vbo);
-	glGenBuffers(1, &this->m_ebo);
 }
 
 VoxelChunk::~VoxelChunk()
@@ -188,13 +184,13 @@ void VoxelChunk::GenerateMesh()
 			}
 		}
 	}
-	for (int i = 0; i < m_vertices.size(); i++)
-	{
-		Vec3 position = m_vertices[i].position;
-		position /= chunkSize;
-		m_vertices[i].position = position;
-	}
+
+	glGenVertexArrays(1, &this->m_vao);
+	glGenBuffers(1, &this->m_vbo);
+	glGenBuffers(1, &this->m_ebo);
+
 	glBindVertexArray(m_vao);
+
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
 	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
 

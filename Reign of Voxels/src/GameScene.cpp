@@ -68,7 +68,7 @@ void GameScene::Render()
 //	glUniform3fv(view_pos_loc, 1, &m_camera->getPosition()[0]);
 ///*
 	/*m_model->Draw(model_shader);*/
-	//m_light->Draw(m_camera->GetViewMat(), m_camera->GetProj());
+	m_light->Draw(m_camera->GetViewMat(), m_camera->GetProj());
 	//slog("hi3");
 	if(wire_frame)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

@@ -22,14 +22,14 @@ public:
 	void SetVoxelActive(int x, int y, int z);
 	void Render();
 
-	static const int chunkSize = 16;//size of each side of the chunk
+	static const int chunkSize = 32;//size of each side of the chunk
+	std::vector<Vertex> m_vertices;
 private:
 	void AddTrianglesIndices();
 
 	GLuint m_vao, m_vbo, m_ebo;
 
 	bool m_active;
-	std::vector<Vertex> m_vertices;
 	std::vector<GLuint> m_tri_indices;
 
 	Vec3 m_position;

@@ -13,18 +13,9 @@ VoxelManager::~VoxelManager()
 
 }
 
-void VoxelManager::GenerateVoxelChunks(sf::Image *heightmap)
-{
-	int chunk_size = 16;
-	int scale = 10;
-	int max_height = 512;
-	int world_size = heightmap->getSize().x;
-	int chunk_count = 0;
-
-}
 void VoxelManager::GenerateVoxels()
 {
-	m_worldSize = 64;
+	m_worldSize = 128;
 
 	sf::Image *heightmap = new sf::Image();
 	if (!heightmap->loadFromFile(GenerateTerrainMap(m_worldSize)))
@@ -40,9 +31,11 @@ void VoxelManager::GenerateVoxels()
 
 void VoxelManager::RenderVoxels(Camera * player_cam)
 {
-	GLuint voxel_shader = GetShader("model");
+	GLuint voxel_shader = GetShader("voxel");
 	GLuint model_loc, view_loc, proj_loc, 
 		light_loc, obj_loc, light_pos_loc, view_pos_loc;
+
+	glUseProgram(voxel_shader);
 
 	model_loc = glGetUniformLocation(voxel_shader, "model");
 	view_loc = glGetUniformLocation(voxel_shader, "view");
@@ -52,13 +45,13 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 	light_pos_loc = glGetUniformLocation(voxel_shader, "lightPos");
 	view_pos_loc = glGetUniformLocation(voxel_shader, "viewPos");
 	//
-	Vec3 light_pos = Vec3(64, 64, 64);
+	Vec3 light_pos = Vec3(64, 128, 64);
 	Vec3 light_color = Vec3(1.0f, 1.0f, 1.0f);
 	Vec3 voxel_color = Vec3(.2f, .6f, .2f);
 	Mat4 view = player_cam->GetViewMat();
 	Mat4 proj = player_cam->GetProj();
-	glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(view));
-	glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(proj));
+	glUniformMatrix4fv(view_loc, 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
+	glUniformMatrix4fv(proj_loc, 1, GL_FALSE, &player_cam->GetProj()[0][0]);
 
 	Vec3 obj_color(0.6f, 1.0f, 0.3f);
 	glUniform3fv(light_pos_loc, 1, &light_pos[0]);

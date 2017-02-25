@@ -49,13 +49,15 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize)
 	std::cout << "Iterations " << iterations << std::endl;
 	
 	build_time.restart();
-
+	int vertices = 0;
 	for (int i = 0; i < render_list.size(); i++)
 	{
 		render_list[i]->GenerateMesh();
+		vertices += render_list[i]->m_vertices.size();
 	}
 
 	std::cout << "Generate Mesh time is " << build_time.getElapsedTime().asSeconds() << std::endl;
+	std::cout << "Vertices: " << vertices << std::endl;
 }
 
 bool VoxelOctree::BuildNode()
@@ -72,9 +74,9 @@ bool VoxelOctree::BuildNode()
 		if(!m_chunk)
 			m_chunk = new VoxelChunk(m_boundingRegion.position);
 
-		for (int x = 0; x < size; x++)
+		for (int x = m_boundingRegion.position.x; x < m_boundingRegion.position.x + size; x++)
 		{
-			for (int z = 0; z < size; z++)
+			for (int z = m_boundingRegion.position.z; z < m_boundingRegion.position.z + size; z++)
 			{
 				float height = g_heightMap->getPixel(x, z).r;
 				if (height >= pos.y)
@@ -82,8 +84,7 @@ bool VoxelOctree::BuildNode()
 					active = true;
 					m_leaf = true;
 				}
-				int y = height - pos.y;
-				m_chunk->InsertVoxelAtPos(pos.x + x, pos.y + y, pos.z + z);
+				m_chunk->InsertVoxelAtPos(x, height,z);
 			}
 		}
 		if (active)
@@ -121,7 +122,6 @@ bool VoxelOctree::BuildNode()
 		}
 	}
 	return m_childMask;
-	//return false;
 }
 
 bool inline RegionContains(Vec3 region_pos, int region_size, Vec3 object_pos)

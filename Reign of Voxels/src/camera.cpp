@@ -47,7 +47,6 @@ void Camera::HandleInput(sf::Event event)
 
 	if (event.type == sf::Event::KeyPressed)
 	{
-		slog("key press ");
 		switch (event.key.code)
 		{
 		case sf::Keyboard::W:
