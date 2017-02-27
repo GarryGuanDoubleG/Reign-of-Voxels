@@ -6,6 +6,10 @@ VoxelChunk::VoxelChunk(Vec3 position)
 {
 	m_active = false;	
 	m_position = position;
+
+	glGenVertexArrays(1, &this->m_vao);
+	glGenBuffers(1, &this->m_vbo);
+	glGenBuffers(1, &this->m_ebo);
 }
 
 VoxelChunk::~VoxelChunk()
@@ -49,10 +53,38 @@ void VoxelChunk::AddTrianglesIndices()
 	m_tri_indices.push_back(m_vertices.size() - 1);
 }
 
+void VoxelChunk::BindMesh()
+{
+	if ((m_vertices.size() == 0) || m_tri_indices.size() == 0)
+		return;
+	glBindVertexArray(m_vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_tri_indices.size() * sizeof(GLuint), &m_tri_indices[0], GL_STATIC_DRAW);
+
+	//location 0 should be verts
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+	//now normals
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+	//now textures
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
 void VoxelChunk::GenerateMesh()
 {
 	if (!m_active)
 		return;
+	sf::Clock timer;
+	int checks = 0;
 	for (int x = 0; x < chunkSize; x++)
 	{
 		for (int y = 0; y < chunkSize; y++)
@@ -62,6 +94,7 @@ void VoxelChunk::GenerateMesh()
 				if (m_voxels[x][y][z].IsActive() == false)
 					continue;
 				//check if the voxel on the left is active
+				checks += 18;
 				if ((x > 0 && !m_voxels[x - 1][y][z].IsActive()) || x == 0)
 				{
 					Vertex vertex;
@@ -184,32 +217,8 @@ void VoxelChunk::GenerateMesh()
 			}
 		}
 	}
-
-	glGenVertexArrays(1, &this->m_vao);
-	glGenBuffers(1, &this->m_vbo);
-	glGenBuffers(1, &this->m_ebo);
-
-	glBindVertexArray(m_vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_tri_indices.size() * sizeof(GLuint), &m_tri_indices[0], GL_STATIC_DRAW);
-
-	//location 0 should be verts
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
-	//now normals
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-	//now textures
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	//std::cout << "Time to generate is " << timer.getElapsedTime().asMilliseconds() << std::endl;
+	//std::cout << "comparisons " << checks << std::endl;
 }
 
 void VoxelChunk::SetVoxelActive(int x, int y, int z)
@@ -224,6 +233,8 @@ Vec3 VoxelChunk::getPosition()
 
 void VoxelChunk::Render()
 {
+	if ((m_vertices.size() == 0) || m_tri_indices.size() == 0)
+		return;
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_TRIANGLES, m_tri_indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

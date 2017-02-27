@@ -15,7 +15,7 @@ VoxelManager::~VoxelManager()
 
 void VoxelManager::GenerateVoxels()
 {
-	m_worldSize = 128;
+	m_worldSize = 512;
 
 	sf::Image *heightmap = new sf::Image();
 	if (!heightmap->loadFromFile(GenerateTerrainMap(m_worldSize)))
@@ -45,7 +45,7 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 	light_pos_loc = glGetUniformLocation(voxel_shader, "lightPos");
 	view_pos_loc = glGetUniformLocation(voxel_shader, "viewPos");
 	//
-	Vec3 light_pos = Vec3(64, 128, 64);
+	Vec3 light_pos = Vec3(64, 256, 64);
 	Vec3 light_color = Vec3(1.0f, 1.0f, 1.0f);
 	Vec3 voxel_color = Vec3(.2f, .6f, .2f);
 	Mat4 view = player_cam->GetViewMat();

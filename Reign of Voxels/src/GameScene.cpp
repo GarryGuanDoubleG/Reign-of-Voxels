@@ -70,10 +70,11 @@ void GameScene::Render()
 	/*m_model->Draw(model_shader);*/
 	m_light->Draw(m_camera->GetViewMat(), m_camera->GetProj());
 	//slog("hi3");
+
 	if(wire_frame)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
-		glPolygonMode(GL_FRONT, GL_FILL);
+		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 	m_voxelManager->RenderVoxels(m_camera);
 	
 	Game::instance().getWindow()->display();

@@ -21,6 +21,7 @@ public:
 	void InsertVoxelAtPos(int x, int y, int z);
 	void SetVoxelActive(int x, int y, int z);
 	void Render();
+	void BindMesh();
 
 	static const int chunkSize = 32;//size of each side of the chunk
 	std::vector<Vertex> m_vertices;

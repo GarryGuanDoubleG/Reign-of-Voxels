@@ -1,3 +1,4 @@
+#include <thread>
 #include "VoxelOctree.hpp"
 #include "glm.hpp"
 #include "simple_logger.h"
@@ -21,6 +22,18 @@ VoxelOctree::~VoxelOctree()
 {
 	if(m_chunk)
 		delete m_chunk;
+}
+
+void VoxelOctree::GenerateMesh(int i, int length)
+{
+	sf::Clock timer;
+	std::cout << "i is " << i << " len is " << length << std::endl;
+
+	for (int j = i * length; j < i * length + length; j++)
+	{
+		render_list[j]->GenerateMesh();
+	}
+	std::cout << "Time for i: " << i << " is " << timer.getElapsedTime().asSeconds() << std::endl;
 }
 
 void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize)
@@ -49,11 +62,27 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize)
 	std::cout << "Iterations " << iterations << std::endl;
 	
 	build_time.restart();
-	int vertices = 0;
+	long long vertices = 0;
+	int thread_count = 16;
+	int length = render_list.size() / thread_count;
+	std::vector<std::thread> threads;
+	for (int i = 0; i < thread_count; i++)
+	{
+		threads.push_back(std::thread(&VoxelOctree::GenerateMesh, this, i, length));
+		/*render_list[i]->GenerateMesh();
+		vertices += render_list[i]->m_vertices.size();*/
+	}
+	std::cout << "waiting on threads" << std::endl;
+	for (auto& t : threads)
+	{
+		t.join();
+	}
+
 	for (int i = 0; i < render_list.size(); i++)
 	{
-		render_list[i]->GenerateMesh();
-		vertices += render_list[i]->m_vertices.size();
+		sf::Clock timer2;
+		render_list[i]->BindMesh();
+		std::cout << "Bind mesh time is " << timer2.getElapsedTime().asMilliseconds() << std::endl;
 	}
 
 	std::cout << "Generate Mesh time is " << build_time.getElapsedTime().asSeconds() << std::endl;

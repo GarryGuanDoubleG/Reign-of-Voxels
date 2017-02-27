@@ -25,6 +25,7 @@ public:
 	void UpdateTree();
 	void InitializeOctree(sf::Image *heightmap, int worldSize); // length of each side of the world
 	void InsertVoxelAtHeight(int x, int y, int z);
+	void GenerateMesh(int i, int length);
 private:
 	static unsigned int m_chunkCount;
 
