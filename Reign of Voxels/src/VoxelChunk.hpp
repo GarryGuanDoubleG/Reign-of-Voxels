@@ -2,6 +2,8 @@
 #include <vector>
 #include <GL\glew.h>
 #include <SFML\OpenGL.hpp>
+
+#include "model.hpp"
 #include "VoxelBlock.hpp"
 #include "glm.hpp"
 
@@ -14,7 +16,8 @@ public:
 	std::vector<Vertex> m_vertices;
 
 	//dimensions of chunk
-	static Vec3 CHUNK_SIZE;
+	static const int CHUNK_SIZE = 16;
+	static const int CHUNK_SIZE_CUBED = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
 
 	Vec3 getPosition();
 	Vec3 getSize();
@@ -22,7 +25,7 @@ public:
 	bool isActive();
 	void SetActive(bool active);
 
-	void GenerateMesh();
+	void GenerateMesh(Model *cube);
 	void BindMesh();
 
 	void InsertVoxelAtPos(int x, int y, int z);
@@ -32,15 +35,20 @@ public:
 	void Render();
 
 private:
-	int GetVoxelIndex(int x, int y, int z);
 	void AddTrianglesIndices();
 
+
 	std::vector<GLuint> m_tri_indices;
-	GLuint m_vao, m_vbo, m_ebo;
+
+	GLuint	m_vao, 
+			m_vbo, 
+			m_ebo;
 
 	bool m_active;
 
 	Vec3 m_position;
 
-	VoxelBlock m_voxels[16][16][16];
+	int m_voxel_count;
+
+	VoxelBlock m_voxels[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
 };

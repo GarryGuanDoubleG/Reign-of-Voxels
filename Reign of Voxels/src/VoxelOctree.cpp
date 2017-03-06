@@ -30,20 +30,20 @@ VoxelOctree::~VoxelOctree()
 		delete m_chunk;
 }
 
-void VoxelOctree::GenerateMesh(int portion, int portion_len)
+void VoxelOctree::GenerateMesh(Model *cube, int portion, int portion_len)
 {
 	sf::Clock timer;
 
 	for (int j = portion * portion_len; j < portion * portion_len + portion_len; j++)
 	{
-		render_list[j]->GenerateMesh();
+		render_list[j]->GenerateMesh(cube);
 	}
 	std::cout << "Time for i: " << portion << " is " << timer.getElapsedTime().asSeconds() << std::endl;
 }
 
 void VoxelOctree::InitializeOctree(sf::Image *heightmap, Vec3 worldSize)
 {
-	int thread_count = 8;
+	int thread_count = 16;
 	std::vector<std::thread> threads;
 
 	g_heightMap = heightmap;
@@ -70,7 +70,7 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, Vec3 worldSize)
 	}
 
 	sf::Clock build_time;
-	for (int j = 0; j < thread_count; j++)
+	for (int j = 0; j < 8; j++)
 	{
 		threads.push_back(std::thread(&VoxelOctree::BuildNode, this->m_childNodes[j]));
 	}
@@ -87,10 +87,12 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, Vec3 worldSize)
 
 	build_time.restart();
 
+	Model * cube = new Model("Resources\\models\\cube.obj");
+
 	int length = render_list.size() / thread_count;
 	for (int j = 0; j < thread_count; j++)
 	{
-		threads.push_back(std::thread(&VoxelOctree::GenerateMesh, this, j, length));
+		threads.push_back(std::thread(&VoxelOctree::GenerateMesh, this, cube, j, length));
 	}
 
 	std::cout << "waiting on threads" << std::endl;
@@ -121,7 +123,7 @@ bool VoxelOctree::BuildNode()
 	int i = 0;
 	vox_count++;
 
-	if (size <= VoxelChunk::CHUNK_SIZE.x)
+	if (size <= VoxelChunk::CHUNK_SIZE)
 	{
 		if (!m_chunk)
 			m_chunk = new VoxelChunk(m_region.position);
@@ -143,6 +145,8 @@ bool VoxelOctree::BuildNode()
 				m_chunk->InsertVoxelAtPos(x, height, z);
 			}
 		}
+
+
 		if (active)
 		{
 			m_chunk->SetActive(active);
@@ -151,6 +155,8 @@ bool VoxelOctree::BuildNode()
 			render_list.push_back(m_chunk);
 			g_render_list_mutex.unlock();
 		}
+
+
 		return active;
 	}
 

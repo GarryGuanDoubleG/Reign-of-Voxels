@@ -1,22 +1,34 @@
 #include "VoxelChunk.hpp"
-
-Vec3 VoxelChunk::CHUNK_SIZE = Vec3(16, 16, 16);
-//const int VoxelChunk::16 = 16;
+#include "model.hpp"
 
 VoxelChunk::VoxelChunk(Vec3 position)
 {
 	m_active = false;
+	
 	m_position = position;
+	
+	m_voxel_count = 0;
+
+	m_vao = 0;
+	m_vbo = 0;
+	m_ebo = 0;
 }
 
 VoxelChunk::~VoxelChunk()
 {
+	if (m_vao)
+		glDeleteVertexArrays(1, &m_vao);
 
+	if (m_vbo)
+		glDeleteBuffers(1, &m_vbo);
+
+	if(m_ebo)
+		glDeleteBuffers(1, &m_ebo);
 }
 
 Vec3 VoxelChunk::getSize()
 {
-	return Vec3(16);
+	return Vec3(CHUNK_SIZE);
 }
 
 bool VoxelChunk::isActive()
@@ -31,11 +43,12 @@ void VoxelChunk::SetActive(bool active)
 
 void VoxelChunk::InsertVoxelAtPos(int x, int y, int z)
 {
-	for (int i = 0; i < 16; i++)
+	for (int i = 0; i < CHUNK_SIZE; i++)
 	{
 		if (i <= y - (int)m_position.y)
 		{
 			m_voxels[x - (int)m_position.x][i][z - (int)m_position.z].SetActive(true);//convert world coor to local
+			++m_voxel_count;
 		}
 	}
 }
@@ -81,17 +94,38 @@ void VoxelChunk::BindMesh()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
-void VoxelChunk::GenerateMesh()
+
+void VoxelChunk::GenerateMesh(Model *cube)
 {
 	if (!m_active)
 		return;
-	sf::Clock timer;
 	int checks = 0;
-	for (int x = 0; x < 16; x++)
+
+	if (m_voxel_count >= CHUNK_SIZE_CUBED)
 	{
-		for (int y = 0; y < 16; y++)
+		sf::Clock timer;
+
+		Mesh cube_mesh = (*cube->GetMesh())[0];
+		
+		m_vertices = cube_mesh.vertices;
+		m_tri_indices = cube_mesh.indices;
+
+		for (int i = 0; i < m_vertices.size(); i++)
 		{
-			for (int z = 0; z < 16; z++)
+			m_vertices[i].position *= CHUNK_SIZE;
+		}
+
+		std::cout << "Cube Mesh " << timer.getElapsedTime().asMicroseconds() << std::endl;
+		timer.restart();
+		return;
+	}
+
+	sf::Clock timer;
+	for (int x = 0; x < CHUNK_SIZE; x++)
+	{
+		for (int y = 0; y < CHUNK_SIZE; y++)
+		{
+			for (int z = 0; z < CHUNK_SIZE; z++)
 			{
 				if (m_voxels[x][y][z].IsActive() == false)
 					continue;
@@ -100,39 +134,39 @@ void VoxelChunk::GenerateMesh()
 				if ((x > 0 && !m_voxels[x - 1][y][z].IsActive()) || x == 0)
 				{
 					Vertex vertex;
-					vertex.position = Vec3(x - 0.5f, y - 0.5f, z + 0.5f);
+					vertex.position = Vec3(x, y, z + 1.0f);
 					vertex.normal = Vec3(-1.0f, 0, 0);
 					vertex.uv = Vec2(.5f);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x - 0.5f, y + 0.5f, z + 0.5f);
+					vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x - 0.5f, y + 0.5f, z - 0.5f);
+					vertex.position = Vec3(x, y + 1.0f, z);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x - 0.5f, y - 0.5f, z - 0.5f);
+					vertex.position = Vec3(x, y, z);
 					m_vertices.push_back(vertex);
 
 					AddTrianglesIndices();
 				}
 
-				if ((x < 16 - 1 && !m_voxels[x + 1][y][z].IsActive()) || x == 16 - 1)
+				if ((x < CHUNK_SIZE - 1 && !m_voxels[x + 1][y][z].IsActive()) || x == CHUNK_SIZE - 1)
 				{
 					Vertex vertex;
 					vertex.normal = Vec3(1.0f, 0, 0);
 					vertex.uv = Vec2(.5f);
 
-					vertex.position = Vec3(x + 0.5f, y - 0.5f, z - 0.5f);
+					vertex.position = Vec3(x + 1.0f, y, z);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 0.5f, y + 0.5f, z - 0.5f);
+					vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 0.5f, y + 0.5f, z + 0.5f);
+					vertex.position = Vec3(x + 1.0f, y + 1.0f, z + 1.0f);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 0.5f, y - 0.5f, z + 0.5f);
+					vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
 					m_vertices.push_back(vertex);
 					AddTrianglesIndices();
 				}
@@ -142,36 +176,36 @@ void VoxelChunk::GenerateMesh()
 					vertex.normal = Vec3(0.0f, -1, 0);
 					vertex.uv = Vec2(.5f);
 
-					vertex.position = Vec3(x - 0.5f, y - 0.5f, z - 0.5f);
+					vertex.position = Vec3(x, y, z);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 0.5f, y - 0.5f, z - 0.5f);
+					vertex.position = Vec3(x + 1.0f, y, z);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 0.5f, y - 0.5f, z + 0.5f);
+					vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x - 0.5f, y - 0.5f, z + 0.5f);
+					vertex.position = Vec3(x, y, z + 1.0f);
 					m_vertices.push_back(vertex);
 
 					AddTrianglesIndices();
 				}
-				if ((y < 16 - 1 && !m_voxels[x][y + 1][z].IsActive()) || y == 16 - 1)
+				if ((y < CHUNK_SIZE - 1 && !m_voxels[x][y + 1][z].IsActive()) || y == CHUNK_SIZE - 1)
 				{
 					Vertex vertex;
 					vertex.normal = Vec3(0.0f, 1.0f, 0);
 					vertex.uv = Vec2(.5f);
 
-					vertex.position = Vec3(x - 0.5f, y + 0.5f, z + 0.5f);
+					vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 0.5f, y + 0.5f, z + 0.5f);
+					vertex.position = Vec3(x + 1.0f, y + 1.0f, z + 1.0f);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 0.5f, y + 0.5f, z - 0.5f);
+					vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x - 0.5f, y + 0.5f, z - 0.5f);
+					vertex.position = Vec3(x, y + 1.0f, z);
 					m_vertices.push_back(vertex);
 
 					AddTrianglesIndices();
@@ -183,35 +217,35 @@ void VoxelChunk::GenerateMesh()
 					vertex.normal = Vec3(0.0f, 0, -1.0f);
 					vertex.uv = Vec2(.5f);
 
-					vertex.position = Vec3(x - 0.5f, y - 0.5f, z - 0.5f);
+					vertex.position = Vec3(x, y, z);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x - 0.5f, y + 0.5f, z - 0.5f);
+					vertex.position = Vec3(x, y + 1.0f, z);
 					m_vertices.push_back(vertex);
-					vertex.position = Vec3(x + 0.5f, y + 0.5f, z - 0.5f);
+					vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 0.5f, y - 0.5f, z - 0.5f);
+					vertex.position = Vec3(x + 1.0f, y, z);
 					m_vertices.push_back(vertex);
 
 					AddTrianglesIndices();
 				}
-				if ((z < 16 - 1 && !m_voxels[x][y][z + 1].IsActive()) || z == 16 - 1)
+				if ((z < CHUNK_SIZE - 1 && !m_voxels[x][y][z + 1].IsActive()) || z == CHUNK_SIZE - 1)
 				{
 					Vertex vertex;
 					vertex.normal = Vec3(0.0f, 0, 1.0f);
 					vertex.uv = Vec2(.5f);
 
-					vertex.position = Vec3(x + 0.5f, y - 0.5f, z + 0.5f);
+					vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 0.5f, y + 0.5f, z + 0.5f);
+					vertex.position = Vec3(x + 1.0f, y + 1.0f, z + 1.0f);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x - 0.5f, y + 0.5f, z + 0.5f);
+					vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x - 0.5f, y - 0.5f, z + 0.5f);
+					vertex.position = Vec3(x, y, z + 1.0f);
 					m_vertices.push_back(vertex);
 					AddTrianglesIndices();
 				}
@@ -219,7 +253,7 @@ void VoxelChunk::GenerateMesh()
 			}
 		}
 	}
-	//std::cout << "Time to generate is " << timer.getElapsedTime().asMilliseconds() << std::endl;
+	std::cout << "Time to generate is " << timer.getElapsedTime().asMicroseconds() << std::endl;
 	//std::cout << "comparisons " << checks << std::endl;
 }
 

@@ -119,6 +119,16 @@ GLuint compile_shaders(std::string &vs_shader, std::string &fs_shader)
 	return program;
 }
 
+
+void DeleteAllShaders()
+{
+	for (auto &program : g_shader_map)
+	{
+		glDeleteProgram(program.second);
+	}
+	g_shader_map.clear();
+}
+
 void CompileAllShaders()
 {
 	std::ifstream in("shader/shader.json");
@@ -139,6 +149,8 @@ void CompileAllShaders()
 
 		g_shader_map.insert(std::pair<std::string, GLuint>(key, compile_shaders(vs_filename, fs_filename)));
 	}
+
+	atexit(DeleteAllShaders);
 }
 
 GLuint GetShader(std::string name)

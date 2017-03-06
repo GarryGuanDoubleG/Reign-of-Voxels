@@ -33,7 +33,7 @@ public:
 	void InsertVoxelAtHeight(int x, int y, int z);
 
 	//create vertices for world
-	void GenerateMesh(int i, int length);
+	void GenerateMesh(Model *cube, int i, int length);
 private:
 	static unsigned int m_chunkCount;
 

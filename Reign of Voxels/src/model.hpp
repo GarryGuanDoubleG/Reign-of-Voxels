@@ -24,6 +24,12 @@ public:
 	void SetInstanceRendering(GLuint buffer, GLuint amount);
 
 	/**
+	* @brief returns the meshes that this model contains
+	* @return vector container of this model's meshes
+	*/
+	std::vector<Mesh> *GetMesh();
+
+	/**
 	* @brief renders all the meshes of this model
 	* @param shader compiled shader id to use to render
 	*/

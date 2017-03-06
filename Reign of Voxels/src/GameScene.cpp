@@ -12,10 +12,16 @@ GameScene::GameScene()
 	
 	//m_model = new Model("Resources\\models\\nanosuit\\nanosuit.obj");
 	m_model = new Model("Resources\\models\\sphere.obj");
+	
+	
 	m_light = new LightSource(); 
 	m_light->m_model = m_model;// use the same model for the lighitng for now
+
+
 	m_voxelManager = new VoxelManager();
 	m_voxelManager->GenerateVoxels();
+
+
 	Game::instance().getEventSystem().addObserver(this);
 }
 /**

@@ -24,6 +24,12 @@ void Model::SetInstanceRendering(GLuint buffer, GLuint amount)
 	for (GLuint i = 0; i < this->meshes.size(); i++)
 		this->meshes[i].MeshSetInstance(buffer, amount);
 }
+
+std::vector<Mesh> *Model::GetMesh()
+{
+	return &this->meshes;
+}
+
 /**
 *@brief Reads model file using assimp to get root node of model.
 *@param filepath of model
