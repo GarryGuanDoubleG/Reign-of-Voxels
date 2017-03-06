@@ -19,7 +19,6 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="..\..\..\libnoise\include\noiseutils.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\EventSystem.cpp" />
@@ -45,9 +44,9 @@
     <ClCompile Include="src\VoxelManager.cpp" />
     <ClCompile Include="src\VoxelNoise.cpp" />
     <ClCompile Include="src\VoxelOctree.cpp" />
+    <ClCompile Include="Utility\noiseutils.cpp" />
   </ItemGroup>
   <ItemGroup>
-    <ClInclude Include="..\..\..\libnoise\include\noiseutils.h" />
     <ClInclude Include="src\Actor.hpp" />
     <ClInclude Include="src\camera.hpp" />
     <ClInclude Include="src\client.hpp" />
@@ -77,8 +76,10 @@
     <ClInclude Include="src\VoxelManager.hpp" />
     <ClInclude Include="src\VoxelNoise.hpp" />
     <ClInclude Include="src\VoxelOctree.hpp" />
+    <ClInclude Include="Utility\noiseutils.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
     <None Include="shader\lighting_fs.glsl" />
     <None Include="shader\lighting_vs.glsl" />
     <None Include="shader\model_fs.glsl" />
@@ -137,7 +138,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\include;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\assimp\assimp\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(assimp)\;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\build\code\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
@@ -145,8 +146,8 @@
     <LibraryPath>$(assimp)\;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(assimp)\;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\assimp\assimp\include;C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\libnoise\include;$(IncludePath)</IncludePath>
+    <LibraryPath>$(assimp)\;$(ENET)\;$(LIBNOISE)\bin\;$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
@@ -170,7 +171,7 @@
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm;#(LIBNOSIE)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm;$(LIBNOSIE)\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SFML_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>

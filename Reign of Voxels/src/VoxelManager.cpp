@@ -15,10 +15,11 @@ VoxelManager::~VoxelManager()
 
 void VoxelManager::GenerateVoxels()
 {
-	m_worldSize = 512;
+	Vec3 m_worldSize = Vec3(512, 512, 512);
+	int noiseResolution = 512;
 
 	sf::Image *heightmap = new sf::Image();
-	if (!heightmap->loadFromFile(GenerateTerrainMap(m_worldSize)))
+	if (!heightmap->loadFromFile(GenerateTerrainMap(noiseResolution)))
 		slog("Failed to Load or Generate HeightMap");
 	else
 	{

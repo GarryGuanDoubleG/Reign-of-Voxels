@@ -1,15 +1,12 @@
 #include "VoxelChunk.hpp"
 
-//const int VoxelChunk::chunkSize = 16;
+Vec3 VoxelChunk::CHUNK_SIZE = Vec3(16, 16, 16);
+//const int VoxelChunk::16 = 16;
 
 VoxelChunk::VoxelChunk(Vec3 position)
 {
-	m_active = false;	
+	m_active = false;
 	m_position = position;
-
-	glGenVertexArrays(1, &this->m_vao);
-	glGenBuffers(1, &this->m_vbo);
-	glGenBuffers(1, &this->m_ebo);
 }
 
 VoxelChunk::~VoxelChunk()
@@ -17,9 +14,9 @@ VoxelChunk::~VoxelChunk()
 
 }
 
-int VoxelChunk::getSize()
+Vec3 VoxelChunk::getSize()
 {
-	return chunkSize;
+	return Vec3(16);
 }
 
 bool VoxelChunk::isActive()
@@ -34,7 +31,7 @@ void VoxelChunk::SetActive(bool active)
 
 void VoxelChunk::InsertVoxelAtPos(int x, int y, int z)
 {
-	for (int i = 0; i < chunkSize; i++)
+	for (int i = 0; i < 16; i++)
 	{
 		if (i <= y - (int)m_position.y)
 		{
@@ -57,6 +54,11 @@ void VoxelChunk::BindMesh()
 {
 	if ((m_vertices.size() == 0) || m_tri_indices.size() == 0)
 		return;
+
+	glGenVertexArrays(1, &this->m_vao);
+	glGenBuffers(1, &this->m_vbo);
+	glGenBuffers(1, &this->m_ebo);
+
 	glBindVertexArray(m_vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -85,11 +87,11 @@ void VoxelChunk::GenerateMesh()
 		return;
 	sf::Clock timer;
 	int checks = 0;
-	for (int x = 0; x < chunkSize; x++)
+	for (int x = 0; x < 16; x++)
 	{
-		for (int y = 0; y < chunkSize; y++)
+		for (int y = 0; y < 16; y++)
 		{
-			for (int z = 0; z < chunkSize; z++)
+			for (int z = 0; z < 16; z++)
 			{
 				if (m_voxels[x][y][z].IsActive() == false)
 					continue;
@@ -115,7 +117,7 @@ void VoxelChunk::GenerateMesh()
 					AddTrianglesIndices();
 				}
 
-				if ((x < chunkSize - 1 && !m_voxels[x + 1][y][z].IsActive()) || x == chunkSize - 1)
+				if ((x < 16 - 1 && !m_voxels[x + 1][y][z].IsActive()) || x == 16 - 1)
 				{
 					Vertex vertex;
 					vertex.normal = Vec3(1.0f, 0, 0);
@@ -133,7 +135,7 @@ void VoxelChunk::GenerateMesh()
 					vertex.position = Vec3(x + 0.5f, y - 0.5f, z + 0.5f);
 					m_vertices.push_back(vertex);
 					AddTrianglesIndices();
-				}				
+				}
 				if ((y > 0 && !m_voxels[x][y - 1][z].IsActive()) || y == 0)
 				{
 					Vertex vertex;
@@ -154,7 +156,7 @@ void VoxelChunk::GenerateMesh()
 
 					AddTrianglesIndices();
 				}
-				if ((y < chunkSize - 1 && !m_voxels[x][y + 1][z].IsActive()) || y == chunkSize - 1)
+				if ((y < 16 - 1 && !m_voxels[x][y + 1][z].IsActive()) || y == 16 - 1)
 				{
 					Vertex vertex;
 					vertex.normal = Vec3(0.0f, 1.0f, 0);
@@ -194,7 +196,7 @@ void VoxelChunk::GenerateMesh()
 
 					AddTrianglesIndices();
 				}
-				if ((z < chunkSize - 1 && !m_voxels[x][y][z + 1].IsActive()) || z == chunkSize - 1)
+				if ((z < 16 - 1 && !m_voxels[x][y][z + 1].IsActive()) || z == 16 - 1)
 				{
 					Vertex vertex;
 					vertex.normal = Vec3(0.0f, 0, 1.0f);

@@ -20,7 +20,7 @@ private:
 	Mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
 	VoxelOctree *m_octree;
 
-	int m_worldSize;
+	Vec3 m_worldSize;
 
 	void GenerateVoxelChunks(sf::Image *heightmap);
 };

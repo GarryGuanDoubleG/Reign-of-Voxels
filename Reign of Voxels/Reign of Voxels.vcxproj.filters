@@ -93,7 +93,7 @@
     <ClCompile Include="src\VoxelBlock.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\..\libnoise\include\noiseutils.cpp">
+    <ClCompile Include="Utility\noiseutils.cpp">
       <Filter>Source</Filter>
     </ClCompile>
   </ItemGroup>
@@ -185,7 +185,7 @@
     <ClInclude Include="src\VoxelBlock.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\..\libnoise\include\noiseutils.h">
+    <ClInclude Include="Utility\noiseutils.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -208,5 +208,6 @@
     <None Include="shader\voxel_vs.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="packages.config" />
   </ItemGroup>
 </Project>
