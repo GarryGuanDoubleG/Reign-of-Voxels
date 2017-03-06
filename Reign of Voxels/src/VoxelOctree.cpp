@@ -1,5 +1,7 @@
 #include <thread>
 #include <mutex>
+#include <math.h>
+
 #include "VoxelOctree.hpp"
 #include "glm.hpp"
 #include "simple_logger.h"
@@ -15,7 +17,7 @@ unsigned int VoxelOctree::m_chunkCount = 0;
 std::vector<VoxelChunk *> VoxelOctree::render_list; //list of leaf nodes
 std::mutex g_render_list_mutex;
 
-static float g_max_voxel_height = 32;
+static float g_max_voxel_height = 16;
 
 VoxelOctree::VoxelOctree(VoxelOctree * parent)
 {
@@ -36,22 +38,24 @@ void VoxelOctree::GenerateMesh(Model *cube, int portion, int portion_len)
 
 	for (int j = portion * portion_len; j < portion * portion_len + portion_len; j++)
 	{
-		render_list[j]->GenerateMesh(cube);
+		if(j < render_list.size())
+			render_list[j]->GenerateMesh(cube);
 	}
 	std::cout << "Time for i: " << portion << " is " << timer.getElapsedTime().asSeconds() << std::endl;
 }
 
-void VoxelOctree::InitializeOctree(sf::Image *heightmap, Vec3 worldSize)
+void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize)
 {
-	int thread_count = 16;
+	int thread_count = 32;
 	std::vector<std::thread> threads;
 
 	g_heightMap = heightmap;
 	g_heightarray = g_heightMap->getPixelsPtr();
 
 	m_region.position = Vec3(0, 0, 0);
-	m_region.size = 512;
-
+	m_region.size = worldSize;
+		
+	sf::Clock build_time;
 	int i = 0;
 	for (float x = 0; x < 2; x++)
 	{
@@ -64,16 +68,13 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, Vec3 worldSize)
 				m_childNodes[i] = new VoxelOctree(this);
 				m_childNodes[i]->m_region.position = m_region.position + Vec3(x * childSize, y * childSize, z * childSize);
 				m_childNodes[i]->m_region.size = childSize;
+				threads.push_back(std::thread(&VoxelOctree::BuildNode, this->m_childNodes[i]));
 				i++;
 			}
 		}
 	}
 
-	sf::Clock build_time;
-	for (int j = 0; j < 8; j++)
-	{
-		threads.push_back(std::thread(&VoxelOctree::BuildNode, this->m_childNodes[j]));
-	}
+
 	for (auto& t : threads)
 	{
 		t.join();
@@ -88,11 +89,14 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, Vec3 worldSize)
 	build_time.restart();
 
 	Model * cube = new Model("Resources\\models\\cube.obj");
+	//thread_count = log2(render_list.size());
 
+	int j = 0;
 	int length = render_list.size() / thread_count;
-	for (int j = 0; j < thread_count; j++)
+	while(j * length < render_list.size())
 	{
 		threads.push_back(std::thread(&VoxelOctree::GenerateMesh, this, cube, j, length));
+		++j;
 	}
 
 	std::cout << "waiting on threads" << std::endl;
@@ -104,6 +108,7 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, Vec3 worldSize)
 
 	build_time.restart();
 	unsigned int vertices = 0;
+	
 	for (int i = 0; i < render_list.size(); i++)
 	{
 		render_list[i]->BindMesh();

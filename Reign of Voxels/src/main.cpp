@@ -3,22 +3,19 @@
 *
 * Implements the main class.
 */
-#ifndef _DEBUG
-#include <windows.hpp>
-#endif
+
+#include <windows.h>
 #include "game.hpp"
 /**
 * Main entry-point for this application.
 *
 * @author Garry Guan
 */
-#ifdef _DEBUG
+
 /**
 * @param argc The number of command - line arguments provided.
 * @param argv An array of command - line argument strings.
 */
-int main(int argc, char *argv[])
-#else
 
 int APIENTRY WinMain(
 	HINSTANCE   hInstance,
@@ -26,7 +23,6 @@ int APIENTRY WinMain(
 	LPSTR       lpCmdLine,
 	int         nCmdShow
 )
-#endif
 {
 	srand(0);
 

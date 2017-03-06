@@ -103,8 +103,6 @@ void VoxelChunk::GenerateMesh(Model *cube)
 
 	if (m_voxel_count >= CHUNK_SIZE_CUBED)
 	{
-		sf::Clock timer;
-
 		Mesh cube_mesh = (*cube->GetMesh())[0];
 		
 		m_vertices = cube_mesh.vertices;
@@ -115,8 +113,6 @@ void VoxelChunk::GenerateMesh(Model *cube)
 			m_vertices[i].position *= CHUNK_SIZE;
 		}
 
-		std::cout << "Cube Mesh " << timer.getElapsedTime().asMicroseconds() << std::endl;
-		timer.restart();
 		return;
 	}
 
@@ -253,7 +249,7 @@ void VoxelChunk::GenerateMesh(Model *cube)
 			}
 		}
 	}
-	std::cout << "Time to generate is " << timer.getElapsedTime().asMicroseconds() << std::endl;
+	//std::cout << "Time to generate is " << timer.getElapsedTime().asMicroseconds() << std::endl;
 	//std::cout << "comparisons " << checks << std::endl;
 }
 

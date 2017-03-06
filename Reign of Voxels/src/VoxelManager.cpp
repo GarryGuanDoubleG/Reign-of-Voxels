@@ -15,8 +15,7 @@ VoxelManager::~VoxelManager()
 
 void VoxelManager::GenerateVoxels()
 {
-	Vec3 m_worldSize = Vec3(512, 512, 512);
-	int noiseResolution = 512;
+	int noiseResolution = 1 << 10;
 
 	sf::Image *heightmap = new sf::Image();
 	if (!heightmap->loadFromFile(GenerateTerrainMap(noiseResolution)))
@@ -25,7 +24,7 @@ void VoxelManager::GenerateVoxels()
 	{
 		//GenerateVoxelChunks(heightmap);
 		m_octree = new VoxelOctree(NULL);
-		m_octree->InitializeOctree(heightmap, m_worldSize);
+		m_octree->InitializeOctree(heightmap, noiseResolution);
 	}
 	delete heightmap;
 }

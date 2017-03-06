@@ -23,14 +23,11 @@ public:
 
 	void Render();
 	
-	void InitializeOctree(sf::Image *heightmap, Vec3 size); // length of each side of the world
+	void InitializeOctree(sf::Image *heightmap, int size); // length of each side of the world
 	bool BuildNode();
 
 	//updates nodes when user interacts
 	void UpdateTree();
-	
-	//inserts voxel and actives all voxels below it
-	void InsertVoxelAtHeight(int x, int y, int z);
 
 	//create vertices for world
 	void GenerateMesh(Model *cube, int i, int length);

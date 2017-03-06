@@ -142,8 +142,8 @@
     <LibraryPath>$(assimp)\;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\build\code\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\Garry\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
-    <LibraryPath>$(assimp)\;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;$(LibraryPath)</LibraryPath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\assimp\assimp\include;$(IncludePath)</IncludePath>
+    <LibraryPath>C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\assimp\assimp\build\code\Release;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
     <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\assimp\assimp\include;C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\libnoise\include;$(IncludePath)</IncludePath>
@@ -186,14 +186,15 @@
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>
-      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm;#(LIBNOSIE)\include</AdditionalIncludeDirectories>
+      <AdditionalIncludeDirectories>$(SFML)\include;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\src;C:\Users\Garry\Documents\Visual Studio 2015\Projects\Reign of Voxels\Reign of Voxels\Utility\glm;$(LIBNOSIE)\include;C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\assimp\assimp\include</AdditionalIncludeDirectories>
       <PreprocessorDefinitions>SFML_STATIC;_CRT_SECURE_NO_WARNINGS;WIN32_LEAN_AND_MEAN;%(PreprocessorDefinitions)</PreprocessorDefinitions>
     </ClCompile>
     <Link>
       <EnableCOMDATFolding>true</EnableCOMDATFolding>
       <OptimizeReferences>true</OptimizeReferences>
-      <AdditionalDependencies>sfml-audio-s-d.lib;sfml-graphics-s-d.lib;sfml-system-s-d.lib;sfml-window-s-d.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;winmm.lib;gdi32.lib;freetype.lib;jpeg.lib;OpenGL32.lib;enet.lib;libnoise.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <AdditionalDependencies>sfml-audio-s.lib;sfml-graphics-s.lib;sfml-system-s.lib;sfml-window-s.lib;openal32.lib;flac.lib;vorbisenc.lib;vorbisfile.lib;vorbis.lib;ogg.lib;ws2_32.lib;winmm.lib;gdi32.lib;freetype.lib;jpeg.lib;OpenGL32.lib;enet.lib;libnoise.lib;assimp-vc140-mt.lib;%(AdditionalDependencies)</AdditionalDependencies>
       <AdditionalLibraryDirectories>$(SFML)\lib;$(assimp)\;$(LIBNOISE)\bin;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
     </Link>
   </ItemDefinitionGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">

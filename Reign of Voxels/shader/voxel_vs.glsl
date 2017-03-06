@@ -6,6 +6,7 @@ layout (location = 2) in vec2 verts_UV;
 out vec2 UV;
 out vec3 vs_normal;
 out vec3 FragPos;
+
 //out vec2 UV;
 //uniforms
 uniform mat4 model;
