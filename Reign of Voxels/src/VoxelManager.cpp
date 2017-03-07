@@ -10,15 +10,27 @@ VoxelManager::VoxelManager()
 	
 	int worldSizeXZ = m_worldSize * m_worldSize;
 
+	//intialize chunkpool
 	int maxChunks = worldSizeXZ * (VoxelOctree::maxHeight * 2) / VoxelChunk::CHUNK_SIZE_CUBED;
 
-	//chunk pooling
 	m_chunkPool = new VoxelChunk[maxChunks];
+	
+	//set next available nodes
+	for (int i = 0; i < maxChunks - 1; i++)
+		m_chunkPool[i].m_next = &m_chunkPool[i + 1];
 
-	int maxOctree =  log(m_worldSize) - log(VoxelChunk::CHUNK_SIZE);
+
+	//intialize octree
+	int maxOctree =  (int)log2(m_worldSize) - (int)log2(VoxelChunk::CHUNK_SIZE);
 		maxOctree = 1 << (3 * maxOctree); //2^3 times for 8 child nodes
 
 	m_octreePool = new VoxelOctree[maxOctree];
+	sizeof(VoxelOctree);
+	m_freeOctreeHead = m_octreePool;
+
+	//set next available nodes
+	for (int i = 0; i < maxOctree - 1; i++)
+		m_octreePool[i].m_nextFree = &m_octreePool[i + 1];
 }
 
 VoxelManager::~VoxelManager()
@@ -28,17 +40,16 @@ VoxelManager::~VoxelManager()
 
 void VoxelManager::GenerateVoxels()
 {
-	int noiseResolution = 1 << 9;
-
 	sf::Image *heightmap = new sf::Image();
-	if (!heightmap->loadFromFile(GenerateTerrainMap(noiseResolution)))
+
+	if (!heightmap->loadFromFile(GenerateTerrainMap(m_worldSize)))
 		slog("Failed to Load or Generate HeightMap");
 	else
 	{
-		//GenerateVoxelChunks(heightmap);
-		m_octreeRoot = new VoxelOctree(NULL);
-		m_octreeRoot->InitializeOctree(heightmap, noiseResolution);
+		m_octreeRoot = createOctreeNode(NULL);//root octree
+		m_octreeRoot->InitializeOctree(heightmap, m_worldSize, this);
 	}
+
 	delete heightmap;
 }
 
@@ -86,7 +97,21 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 
 VoxelChunk * VoxelManager::createChunk(Vec3 worldPosition)
 {
-	return NULL;
+	VoxelChunk * chunk = m_freeChunkHead;
+	chunk->m_flag |= CHUNK_FLAG_INUSE;
+
+	m_freeChunkHead = m_freeChunkHead->m_next;
+	return chunk;
+}
+
+void VoxelManager::destroyChunk(VoxelChunk * chunk)
+{
+	chunk->m_flag = 0; //clear in use flag
+	chunk->m_next = m_freeChunkHead;
+
+	memset(chunk->m_voxels, VOXEL_TYPE_AIR, sizeof(chunk->m_voxels));
+
+	m_freeChunkHead = chunk; //prepend chunk to head of free list
 }
 
 VoxelOctree *VoxelManager::createOctreeNode(VoxelOctree *parent)
@@ -98,4 +123,13 @@ VoxelOctree *VoxelManager::createOctreeNode(VoxelOctree *parent)
 	node->InitNode(parent);
 
 	return node;
+}
+
+void VoxelManager::destroyOctreeNode(VoxelOctree * node)
+{
+	node->m_nextFree = m_freeOctreeHead;
+
+	node->DestroyNode(); //clears minimal data for reuse
+
+	m_freeOctreeHead = node;//prepend node to free list
 }

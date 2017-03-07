@@ -19,13 +19,13 @@ class VoxelOctree
 {
 	friend class VoxelManager;
 public:
-	VoxelOctree();
-	~VoxelOctree();
+	VoxelOctree() 
+		: m_flag(0) 
+	{}
 
 	void Render();
 	
 	void InitNode(VoxelOctree * parent);
-	void DestroyNode();
 
 	void InitializeOctree(sf::Image *heightmap, int size, VoxelManager *manager); // length of each side of the world
 	bool BuildTree();
@@ -39,8 +39,8 @@ public:
 	static const int maxHeight = 32;
 	static std::vector<VoxelChunk *> render_list;//list of leaf nodes
 
+	//leaf node
 	VoxelChunk	*m_chunk;
-	VoxelOctree *m_childNodes[8];
 private:
 	static unsigned int m_chunkCount;
 	static VoxelManager * voxelManager;
@@ -51,6 +51,7 @@ private:
 	//mask for which nodes are active
 	sf::Uint8 m_childMask;
 	
+	//if node is active, initialize parent else pointer to next free node
 	union
 	{
 		VoxelOctree * m_parent;

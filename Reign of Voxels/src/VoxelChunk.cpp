@@ -1,22 +1,6 @@
 #include "VoxelChunk.hpp"
 #include "model.hpp"
 
-VoxelChunk::VoxelChunk()
-{
-}
-
-VoxelChunk::~VoxelChunk()
-{
-	if (m_vao)
-		glDeleteVertexArrays(1, &m_vao);
-
-	if (m_vbo)
-		glDeleteBuffers(1, &m_vbo);
-
-	if (m_ebo)
-		glDeleteBuffers(1, &m_ebo);
-}
-
 void VoxelChunk::Init(Vec3 position)
 {
 	m_flag = CHUNK_FLAG_INUSE;
@@ -56,8 +40,6 @@ void VoxelChunk::InsertVoxelAtPos(int x, int y, int z)
 	{
 		if (i <= y - (int)m_position.y)
 		{
-			//m_voxels[x - (int)m_position.x][i][z - (int)m_position.z].SetActive(true);//convert world coor to local
-			int index = GetIndex(x - (int)m_position.x, i, z - (int)m_position.z);
 			m_voxels[GetIndex(x - (int)m_position.x, i, z - (int)m_position.z)] = VOXEL_TYPE_GRASS;
 		}
 	}

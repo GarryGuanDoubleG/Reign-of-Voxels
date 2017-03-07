@@ -18,16 +18,6 @@ unsigned int VoxelOctree::m_chunkCount = 0;
 std::vector<VoxelChunk *> VoxelOctree::render_list; //list of leaf nodes
 std::mutex g_render_list_mutex;
 
-VoxelOctree::VoxelOctree()
-{
-	m_parent = NULL;
-}
-
-VoxelOctree::~VoxelOctree()
-{
-	if (m_chunk)
-		delete m_chunk;
-}
 
 void VoxelOctree::GenerateMesh(Model *cube, int portion, int portion_len)
 {
@@ -50,12 +40,6 @@ void VoxelOctree::InitNode(VoxelOctree *parent)
 
 	m_childMask = 0;
 	m_chunkCount = 0;
-}
-
-void VoxelOctree::DestroyNode()
-{
-	m_parent = NULL;
-	m_flag = 0;
 }
 
 void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize, VoxelManager *manager)

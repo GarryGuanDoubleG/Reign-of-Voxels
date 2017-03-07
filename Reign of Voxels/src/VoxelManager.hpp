@@ -14,9 +14,15 @@ public:
 	void RenderVoxels(Camera * player_cam);
 
 	VoxelChunk *createChunk(Vec3 worldPosition);
+	void		destroyChunk(VoxelChunk * chunk);
 
-	VoxelOctree *createOctreeNode(VoxelOctree * parent);
-	void		 destroyOctreeNode();
+	void		createOctreeRoot(VoxelOctree * parent);
+	void		 destroyOctreeNode(VoxelOctree * node);
+
+	//gets the child of a node at a specific index
+	VoxelOctree *getOctreeChild(VoxelOctree * caller, int child_index);
+	VoxelOctree *createOctreeChild();
+
 private:
 	int m_worldSize; //size of one side of cubic world region
 

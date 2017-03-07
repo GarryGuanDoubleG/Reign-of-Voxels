@@ -27,9 +27,9 @@ typedef struct
 
 class VoxelChunk
 {
+	friend class VoxelManager;
 public:
-	VoxelChunk();
-	~VoxelChunk();
+	VoxelChunk() : m_flag(0) {};
 
 	//dimensions of chunk
 	static const int CHUNK_SIZE = 16;
