@@ -4,20 +4,39 @@
 #include <SFML\OpenGL.hpp>
 
 #include "model.hpp"
-#include "VoxelBlock.hpp"
 #include "glm.hpp"
+
+#define VOXEL_TYPE_AIR 1
+#define VOXEL_TYPE_GRASS 2
+#define VOXEL_TYPE_DIRT 4
+#define VOXEL_TYPE_WOOD 8
+#define VOXEL_TYPE_WATER 16
+#define VOXEL_TYPE_MINERAL 32
+#define VOXEL_TYPE_ENERGY 64
+
+#define CHUNK_FLAG_INUSE 1
+#define CHUNK_FLAG_ACTIVE 2
+#define CHUNK_FLAG_FULL 4
+
+typedef struct
+{
+	sf::Uint8 position[3]; /**< vertex postion in ndc */
+	sf::Uint8 normal[3]; /**< normal value of vertex */
+	sf::Uint8 uv[2]; /**< texture coordinates */
+}VoxelVertex;
 
 class VoxelChunk
 {
 public:
-	VoxelChunk(Vec3 position);
+	VoxelChunk();
 	~VoxelChunk();
-
-	std::vector<Vertex> m_vertices;
 
 	//dimensions of chunk
 	static const int CHUNK_SIZE = 16;
-	static const int CHUNK_SIZE_CUBED = CHUNK_SIZE * CHUNK_SIZE * CHUNK_SIZE;
+	static const int CHUNK_SIZE_SQ = CHUNK_SIZE * CHUNK_SIZE;
+	static const int CHUNK_SIZE_CUBED = CHUNK_SIZE_SQ * CHUNK_SIZE;
+
+	void Init(Vec3 position);
 
 	Vec3 getPosition();
 	Vec3 getSize();
@@ -28,27 +47,29 @@ public:
 	void GenerateMesh(Model *cube);
 	void BindMesh();
 
+	void ClearVertices();
+
 	void InsertVoxelAtPos(int x, int y, int z);
 
 	void SetVoxelActive(int x, int y, int z);
 
 	void Render();
 
+	std::vector<Vertex> m_vertices;
+	VoxelChunk * m_next;
 private:
 	void AddTrianglesIndices();
+	int GetIndex(int x, int y, int z);
 
-
-	std::vector<GLuint> m_tri_indices;
+	std::vector<GLuint> m_tri_indices;//order to draw vertices
 
 	GLuint	m_vao, 
 			m_vbo, 
 			m_ebo;
 
-	bool m_active;
-
 	Vec3 m_position;
 
-	int m_voxel_count;
+	sf::Uint8 m_flag;//bool for active
 
-	VoxelBlock m_voxels[CHUNK_SIZE][CHUNK_SIZE][CHUNK_SIZE];
+	sf::Uint8 m_voxels[CHUNK_SIZE_CUBED];
 };

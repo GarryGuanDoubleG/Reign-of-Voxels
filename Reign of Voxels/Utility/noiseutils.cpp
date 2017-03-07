@@ -339,7 +339,7 @@ void NoiseMap::ReclaimMem ()
 void NoiseMap::SetSize (int width, int height)
 {
   if (width < 0 || height < 0
-    || width > RASTER_MAX_WIDTH || height > RASTER_MAX_HEIGHT) {
+    || width > RASTER_MAX_WIDTH || height > RASTER_maxHeight) {
     // Invalid width or height.
     throw noise::ExceptionInvalidParam ();
   } else if (width == 0 || height == 0) {
@@ -504,7 +504,7 @@ void Image::ReclaimMem ()
 void Image::SetSize (int width, int height)
 {
   if (width < 0 || height < 0
-    || width > RASTER_MAX_WIDTH || height > RASTER_MAX_HEIGHT) {
+    || width > RASTER_MAX_WIDTH || height > RASTER_maxHeight) {
     // Invalid width or height.
     throw noise::ExceptionInvalidParam ();
   } else if (width == 0 || height == 0) {

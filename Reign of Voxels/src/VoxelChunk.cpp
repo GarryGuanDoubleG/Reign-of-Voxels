@@ -1,17 +1,8 @@
 #include "VoxelChunk.hpp"
 #include "model.hpp"
 
-VoxelChunk::VoxelChunk(Vec3 position)
+VoxelChunk::VoxelChunk()
 {
-	m_active = false;
-	
-	m_position = position;
-	
-	m_voxel_count = 0;
-
-	m_vao = 0;
-	m_vbo = 0;
-	m_ebo = 0;
 }
 
 VoxelChunk::~VoxelChunk()
@@ -22,8 +13,22 @@ VoxelChunk::~VoxelChunk()
 	if (m_vbo)
 		glDeleteBuffers(1, &m_vbo);
 
-	if(m_ebo)
+	if (m_ebo)
 		glDeleteBuffers(1, &m_ebo);
+}
+
+void VoxelChunk::Init(Vec3 position)
+{
+	m_flag = CHUNK_FLAG_INUSE;
+
+	m_position = position;
+
+	memset(m_voxels, VOXEL_TYPE_AIR, sizeof(m_voxels));
+
+	//clear vertices and indices
+	std::vector<GLuint>empty_indices;
+	m_tri_indices = empty_indices;
+
 }
 
 Vec3 VoxelChunk::getSize()
@@ -33,22 +38,27 @@ Vec3 VoxelChunk::getSize()
 
 bool VoxelChunk::isActive()
 {
-	return m_active;
+	return m_flag & CHUNK_FLAG_ACTIVE;
 }
 
 void VoxelChunk::SetActive(bool active)
 {
-	m_active = active;
+	if (active)
+		m_flag |= CHUNK_FLAG_ACTIVE;
+	else
+		m_flag &= ~(CHUNK_FLAG_ACTIVE);
 }
 
+//assumes coordinates are in world position
 void VoxelChunk::InsertVoxelAtPos(int x, int y, int z)
 {
 	for (int i = 0; i < CHUNK_SIZE; i++)
 	{
 		if (i <= y - (int)m_position.y)
 		{
-			m_voxels[x - (int)m_position.x][i][z - (int)m_position.z].SetActive(true);//convert world coor to local
-			++m_voxel_count;
+			//m_voxels[x - (int)m_position.x][i][z - (int)m_position.z].SetActive(true);//convert world coor to local
+			int index = GetIndex(x - (int)m_position.x, i, z - (int)m_position.z);
+			m_voxels[GetIndex(x - (int)m_position.x, i, z - (int)m_position.z)] = VOXEL_TYPE_GRASS;
 		}
 	}
 }
@@ -95,16 +105,28 @@ void VoxelChunk::BindMesh()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
+void VoxelChunk::ClearVertices()
+{
+	std::vector<Vertex> empty;
+	m_vertices.swap(empty);
+}
+
+int inline VoxelChunk::GetIndex(int x, int y, int z)
+{
+	return x * CHUNK_SIZE_SQ + y * CHUNK_SIZE + z;
+}
+
 void VoxelChunk::GenerateMesh(Model *cube)
 {
-	if (!m_active)
+	if (!(m_flag & CHUNK_FLAG_ACTIVE))
 		return;
+
 	int checks = 0;
 
-	if (m_voxel_count >= CHUNK_SIZE_CUBED)
+	if (m_flag & CHUNK_FLAG_FULL)
 	{
 		Mesh cube_mesh = (*cube->GetMesh())[0];
-		
+
 		m_vertices = cube_mesh.vertices;
 		m_tri_indices = cube_mesh.indices;
 
@@ -123,11 +145,11 @@ void VoxelChunk::GenerateMesh(Model *cube)
 		{
 			for (int z = 0; z < CHUNK_SIZE; z++)
 			{
-				if (m_voxels[x][y][z].IsActive() == false)
+				if (m_voxels[GetIndex(x, y, z)] & VOXEL_TYPE_AIR)
 					continue;
 				//check if the voxel on the left is active
 				checks += 18;
-				if ((x > 0 && !m_voxels[x - 1][y][z].IsActive()) || x == 0)
+				if ((x > 0 && m_voxels[GetIndex(x, y, z)] & VOXEL_TYPE_AIR) || x == 0)
 				{
 					Vertex vertex;
 					vertex.position = Vec3(x, y, z + 1.0f);
@@ -147,7 +169,7 @@ void VoxelChunk::GenerateMesh(Model *cube)
 					AddTrianglesIndices();
 				}
 
-				if ((x < CHUNK_SIZE - 1 && !m_voxels[x + 1][y][z].IsActive()) || x == CHUNK_SIZE - 1)
+				if ((x < CHUNK_SIZE - 1 && m_voxels[GetIndex(x + 1, y, z)] & VOXEL_TYPE_AIR) || x == CHUNK_SIZE - 1)
 				{
 					Vertex vertex;
 					vertex.normal = Vec3(1.0f, 0, 0);
@@ -166,7 +188,7 @@ void VoxelChunk::GenerateMesh(Model *cube)
 					m_vertices.push_back(vertex);
 					AddTrianglesIndices();
 				}
-				if ((y > 0 && !m_voxels[x][y - 1][z].IsActive()) || y == 0)
+				if ((y > 0 && (m_voxels[GetIndex(x, y - 1, z)] & VOXEL_TYPE_AIR)) || y == 0)
 				{
 					Vertex vertex;
 					vertex.normal = Vec3(0.0f, -1, 0);
@@ -186,7 +208,7 @@ void VoxelChunk::GenerateMesh(Model *cube)
 
 					AddTrianglesIndices();
 				}
-				if ((y < CHUNK_SIZE - 1 && !m_voxels[x][y + 1][z].IsActive()) || y == CHUNK_SIZE - 1)
+				if ((y < CHUNK_SIZE - 1 && m_voxels[GetIndex(x, y + 1, z)] & VOXEL_TYPE_AIR) || y == CHUNK_SIZE - 1)
 				{
 					Vertex vertex;
 					vertex.normal = Vec3(0.0f, 1.0f, 0);
@@ -207,7 +229,7 @@ void VoxelChunk::GenerateMesh(Model *cube)
 					AddTrianglesIndices();
 				}
 
-				if ((z > 0 && !m_voxels[x][y][z - 1].IsActive()) || z == 0)
+				if ((z > 0 && m_voxels[GetIndex(x, y, z - 1)] & VOXEL_TYPE_AIR) || z == 0)
 				{
 					Vertex vertex;
 					vertex.normal = Vec3(0.0f, 0, -1.0f);
@@ -226,7 +248,7 @@ void VoxelChunk::GenerateMesh(Model *cube)
 
 					AddTrianglesIndices();
 				}
-				if ((z < CHUNK_SIZE - 1 && !m_voxels[x][y][z + 1].IsActive()) || z == CHUNK_SIZE - 1)
+				if ((z < CHUNK_SIZE - 1 && m_voxels[GetIndex(x, y, z + 1)] & VOXEL_TYPE_AIR) || z == CHUNK_SIZE - 1)
 				{
 					Vertex vertex;
 					vertex.normal = Vec3(0.0f, 0, 1.0f);
@@ -255,7 +277,7 @@ void VoxelChunk::GenerateMesh(Model *cube)
 
 void VoxelChunk::SetVoxelActive(int x, int y, int z)
 {
-	m_voxels[x - (int)m_position.x][y - (int)m_position.y][z - (int)m_position.z].SetActive(true);//convert world coor to local
+	//m_voxels[x - (int)m_position.x][y - (int)m_position.y][z - (int)m_position.z].SetActive(true);//convert world coor to local
 }
 
 Vec3 VoxelChunk::getPosition()

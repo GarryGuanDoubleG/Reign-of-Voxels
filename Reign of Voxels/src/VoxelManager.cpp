@@ -6,8 +6,21 @@
 
 VoxelManager::VoxelManager()
 {
-	m_voxelModel = new Model("Resources\\models\\cube.obj");
+	m_worldSize = 512;
+	
+	int worldSizeXZ = m_worldSize * m_worldSize;
+
+	int maxChunks = worldSizeXZ * (VoxelOctree::maxHeight * 2) / VoxelChunk::CHUNK_SIZE_CUBED;
+
+	//chunk pooling
+	m_chunkPool = new VoxelChunk[maxChunks];
+
+	int maxOctree =  log(m_worldSize) - log(VoxelChunk::CHUNK_SIZE);
+		maxOctree = 1 << (3 * maxOctree); //2^3 times for 8 child nodes
+
+	m_octreePool = new VoxelOctree[maxOctree];
 }
+
 VoxelManager::~VoxelManager()
 {
 
@@ -15,7 +28,7 @@ VoxelManager::~VoxelManager()
 
 void VoxelManager::GenerateVoxels()
 {
-	int noiseResolution = 1 << 10;
+	int noiseResolution = 1 << 9;
 
 	sf::Image *heightmap = new sf::Image();
 	if (!heightmap->loadFromFile(GenerateTerrainMap(noiseResolution)))
@@ -23,8 +36,8 @@ void VoxelManager::GenerateVoxels()
 	else
 	{
 		//GenerateVoxelChunks(heightmap);
-		m_octree = new VoxelOctree(NULL);
-		m_octree->InitializeOctree(heightmap, noiseResolution);
+		m_octreeRoot = new VoxelOctree(NULL);
+		m_octreeRoot->InitializeOctree(heightmap, noiseResolution);
 	}
 	delete heightmap;
 }
@@ -69,4 +82,20 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 		VoxelOctree::render_list[i]->Render();
 	}
 	//glPolygonMode(GL_FRONT, GL_FILL);
+}
+
+VoxelChunk * VoxelManager::createChunk(Vec3 worldPosition)
+{
+	return NULL;
+}
+
+VoxelOctree *VoxelManager::createOctreeNode(VoxelOctree *parent)
+{
+	VoxelOctree *node = m_freeOctreeHead;
+
+	m_freeOctreeHead = m_freeOctreeHead->m_nextFree;
+	
+	node->InitNode(parent);
+
+	return node;
 }

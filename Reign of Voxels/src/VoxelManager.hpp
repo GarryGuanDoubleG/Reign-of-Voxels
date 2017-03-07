@@ -13,14 +13,18 @@ public:
 	void GenerateVoxels();
 	void RenderVoxels(Camera * player_cam);
 
+	VoxelChunk *createChunk(Vec3 worldPosition);
+
+	VoxelOctree *createOctreeNode(VoxelOctree * parent);
+	void		 destroyOctreeNode();
 private:
-	std::vector<VoxelChunk*> m_voxelChunks;
+	int m_worldSize; //size of one side of cubic world region
 
-	Model *m_voxelModel;
-	Mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
-	VoxelOctree *m_octree;
+	VoxelChunk * m_chunkPool;//array of chunks
+	VoxelChunk * m_freeChunkHead;//head ptr to free chunk list
 
-	Vec3 m_worldSize;
+	VoxelOctree *m_octreeRoot; // ptr to octree root node
 
-	void GenerateVoxelChunks(sf::Image *heightmap);
+	VoxelOctree * m_octreePool;//array of octrees
+	VoxelOctree * m_freeOctreeHead;//ptr to first available octree node
 };

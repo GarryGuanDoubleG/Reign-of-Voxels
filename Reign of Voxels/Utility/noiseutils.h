@@ -79,7 +79,7 @@ namespace noise
     const int RASTER_MAX_WIDTH = 32767;
 
     /// The maximum height of a raster.
-    const int RASTER_MAX_HEIGHT = 32767;
+    const int RASTER_maxHeight = 32767;
 
     #ifndef DOXYGEN_SHOULD_SKIP_THIS
     // The raster's stride length must be a multiple of this constant.
