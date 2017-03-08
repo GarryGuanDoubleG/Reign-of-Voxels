@@ -92,21 +92,20 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize, VoxelMan
 
 
 	//initialize 8 children children
-	InitializeChildren();
+	//InitializeChildren();
 
-	//start a thread for each child to build its respective region
-	for (int i = 0; i < 8; i++)
-	{
-		//threads.push_back(std::thread(&VoxelOctree::BuildTree, voxelManager->getOctreeChild(this, i)));
-		VoxelOctree *child = voxelManager->getOctreeChild(this, i);
-		child->BuildTree();
-	}
+	////start a thread for each child to build its respective region
+	//for (int i = 0; i < 8; i++)
+	//{
+	//	threads.push_back(std::thread(&VoxelOctree::BuildTree, voxelManager->getOctreeChild(this, i)));
+	//}
 
+	this->BuildTree();
 	//sync threads
-	for (auto& t : threads)
-	{
-		t.join();
-	}
+	//for (auto& t : threads)
+	//{
+	//	t.join();
+	//}
 
 	threads.clear();
 
@@ -166,7 +165,7 @@ bool VoxelOctree::BuildTree()
 			m_chunk = voxelManager->createChunk(m_region.position);
 		}
 
-		float scale = VoxelOctree::maxHeight / 256;
+		float scale = (float)VoxelOctree::maxHeight / (float)256;
 
 		for (int x = m_region.position.x; x < m_region.position.x + size; x++)
 		{
@@ -186,13 +185,13 @@ bool VoxelOctree::BuildTree()
 
 		if (active)
 		{
+			//lock global
+			g_render_list_mutex.lock();
+
 			m_chunk->SetActive(active);
 			
 			m_flag |= OCTREE_ACTIVE;
 			m_flag |= OCTREE_LEAF;
-
-			//lock global
-			g_render_list_mutex.lock();
 
 			++leaf_count;
 			//push chunk

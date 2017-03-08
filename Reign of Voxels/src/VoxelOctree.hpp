@@ -39,6 +39,8 @@ public:
 
 	//leaf node
 	VoxelChunk	*m_chunk;
+
+	int index;
 private:
 	static unsigned int m_chunkCount;
 	static VoxelManager * voxelManager;

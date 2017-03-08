@@ -15,8 +15,8 @@ VoxelManager::VoxelManager()
 	int worldSizeXZ = m_worldSize * m_worldSize;
 
 	//intialize chunkpool
-	//int maxChunks = worldSizeXZ * (VoxelOctree::maxHeight * 2) / VoxelChunk::CHUNK_SIZE_CUBED;
-	int maxChunks = worldSizeXZ * m_worldSize / VoxelChunk::CHUNK_SIZE_CUBED;
+	int maxChunks = worldSizeXZ * (VoxelOctree::maxHeight * 2) / VoxelChunk::CHUNK_SIZE_CUBED;
+	//int maxChunks = worldSizeXZ * m_worldSize / VoxelChunk::CHUNK_SIZE_CUBED;
 
 	m_maxChunks = maxChunks;
 	
@@ -28,16 +28,16 @@ VoxelManager::VoxelManager()
 	for (int i = 0; i < maxChunks - 1; i++)
 		m_chunkPool[i].m_next = &m_chunkPool[i + 1];
 
-
-	//Allocate space for Octree
+	//Allocate space for Octree. 2^(3h + 1) - 1 nodes
 	int maxOctree =  (int)log2(m_worldSize) - (int)log2(VoxelChunk::CHUNK_SIZE);
-		maxOctree = 1 << (3 * maxOctree); //2^3 times for 8 child nodes
-		maxOctree += 8;
+		maxOctree = (2 << (3 * maxOctree)) - 1; //2^3 times for 8 child nodes
 	m_maxOctNodes = maxOctree;
 
 	m_octreePool = new VoxelOctree[maxOctree];
 	m_octreeRoot = &m_octreePool[0];
 
+	for (int i = 0; i < maxOctree; i++)
+		m_octreePool[i].index = i;
 }
 
 VoxelManager::~VoxelManager()
