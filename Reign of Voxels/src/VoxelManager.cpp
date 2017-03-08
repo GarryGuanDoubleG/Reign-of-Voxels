@@ -1,8 +1,12 @@
+#include <mutex>
+
 #include "VoxelManager.hpp"
 #include "VoxelNoise.hpp"
 #include "texture.hpp"
 #include "game.hpp"
 #include "simple_logger.h"
+
+std::mutex g_free_chunk_guard;
 
 VoxelManager::VoxelManager()
 {
@@ -11,26 +15,29 @@ VoxelManager::VoxelManager()
 	int worldSizeXZ = m_worldSize * m_worldSize;
 
 	//intialize chunkpool
-	int maxChunks = worldSizeXZ * (VoxelOctree::maxHeight * 2) / VoxelChunk::CHUNK_SIZE_CUBED;
+	//int maxChunks = worldSizeXZ * (VoxelOctree::maxHeight * 2) / VoxelChunk::CHUNK_SIZE_CUBED;
+	int maxChunks = worldSizeXZ * m_worldSize / VoxelChunk::CHUNK_SIZE_CUBED;
 
-	m_chunkPool = new VoxelChunk[maxChunks];
+	m_maxChunks = maxChunks;
 	
+	m_chunkPool = new VoxelChunk[maxChunks];
+	m_freeChunkHead = &m_chunkPool[0];
+	
+
 	//set next available nodes
 	for (int i = 0; i < maxChunks - 1; i++)
 		m_chunkPool[i].m_next = &m_chunkPool[i + 1];
 
 
-	//intialize octree
+	//Allocate space for Octree
 	int maxOctree =  (int)log2(m_worldSize) - (int)log2(VoxelChunk::CHUNK_SIZE);
 		maxOctree = 1 << (3 * maxOctree); //2^3 times for 8 child nodes
+		maxOctree += 8;
+	m_maxOctNodes = maxOctree;
 
 	m_octreePool = new VoxelOctree[maxOctree];
-	sizeof(VoxelOctree);
-	m_freeOctreeHead = m_octreePool;
+	m_octreeRoot = &m_octreePool[0];
 
-	//set next available nodes
-	for (int i = 0; i < maxOctree - 1; i++)
-		m_octreePool[i].m_nextFree = &m_octreePool[i + 1];
 }
 
 VoxelManager::~VoxelManager()
@@ -46,7 +53,9 @@ void VoxelManager::GenerateVoxels()
 		slog("Failed to Load or Generate HeightMap");
 	else
 	{
-		m_octreeRoot = createOctreeNode(NULL);//root octree
+		CubeRegion region = { Vec3(0.0), m_worldSize };
+
+		m_octreeRoot->InitNode(region);//root octree
 		m_octreeRoot->InitializeOctree(heightmap, m_worldSize, this);
 	}
 
@@ -95,41 +104,60 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 	//glPolygonMode(GL_FRONT, GL_FILL);
 }
 
-VoxelChunk * VoxelManager::createChunk(Vec3 worldPosition)
+VoxelChunk * VoxelManager::createChunk( Vec3 worldPosition)
 {
+	if (m_freeChunkHead == m_freeChunkHead->m_next)
+		std::cout << "free list is empty" << std::endl;
+	
 	VoxelChunk * chunk = m_freeChunkHead;
-	chunk->m_flag |= CHUNK_FLAG_INUSE;
+	m_freeChunkHead = chunk->m_next;
+	 
+	chunk->Init(worldPosition);
+	chunk->m_next = NULL;
 
-	m_freeChunkHead = m_freeChunkHead->m_next;
 	return chunk;
 }
 
 void VoxelManager::destroyChunk(VoxelChunk * chunk)
 {
-	chunk->m_flag = 0; //clear in use flag
+	chunk->Destroy();
+
+
 	chunk->m_next = m_freeChunkHead;
-
-	memset(chunk->m_voxels, VOXEL_TYPE_AIR, sizeof(chunk->m_voxels));
-
 	m_freeChunkHead = chunk; //prepend chunk to head of free list
 }
 
-VoxelOctree *VoxelManager::createOctreeNode(VoxelOctree *parent)
+
+VoxelOctree *VoxelManager::getOctreeChild(VoxelOctree * currentNode, int child_index)
 {
-	VoxelOctree *node = m_freeOctreeHead;
+	//root node has children at index 1-8
+	if (currentNode == m_octreeRoot)
+		return &m_octreePool[child_index + 1];
 
-	m_freeOctreeHead = m_freeOctreeHead->m_nextFree;
+	//bound child_index
+	if (child_index > 7 || child_index < 0)
+		slog("Error child index is from 0-7");
+
+	//get index of current node
+	int index = currentNode - m_octreePool;
+
+	if (8 * index + child_index + 1 >= m_maxOctNodes)
+		std::cout << "Too many octree nodes" << std::endl;
+
+	//in-array octree, return child at given index
+	return &m_octreePool[8 * index + child_index + 1];
+}
+
+VoxelOctree *VoxelManager::createOctreeChild(VoxelOctree *currentNode, int child_index, CubeRegion &region)
+{
+	VoxelOctree *child = getOctreeChild(currentNode, child_index);
 	
-	node->InitNode(parent);
+	child->InitNode(region);
 
-	return node;
+	return child;
 }
 
 void VoxelManager::destroyOctreeNode(VoxelOctree * node)
 {
-	node->m_nextFree = m_freeOctreeHead;
-
 	node->DestroyNode(); //clears minimal data for reuse
-
-	m_freeOctreeHead = node;//prepend node to free list
 }

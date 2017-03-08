@@ -1,19 +1,41 @@
 #include "VoxelChunk.hpp"
 #include "model.hpp"
 
+
+VoxelChunk::VoxelChunk() : m_flag(0)
+{
+
+}
+
 void VoxelChunk::Init(Vec3 position)
 {
+	if (m_flag & CHUNK_FLAG_INUSE)
+		std::cout << "Error already using chunk" << std::endl;
+
 	m_flag = CHUNK_FLAG_INUSE;
 
 	m_position = position;
 
 	memset(m_voxels, VOXEL_TYPE_AIR, sizeof(m_voxels));
 
-	//clear vertices and indices
 	std::vector<GLuint>empty_indices;
-	m_tri_indices = empty_indices;
+	m_tri_indices  = empty_indices;
 
+	std::vector<Vertex> empty_vertices;
+	m_vertices = empty_vertices;
 }
+
+void VoxelChunk::Destroy()
+{
+	m_flag = 0;
+	//clear vertices and indicse
+	/*std::vector<GLuint>empty_indices;
+	m_tri_indices.swap(empty_indices);
+
+	std::vector<Vertex> empty_vertices;
+	m_vertices.swap(empty_vertices);*/
+}
+
 
 Vec3 VoxelChunk::getSize()
 {

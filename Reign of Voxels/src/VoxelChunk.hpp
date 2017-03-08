@@ -29,7 +29,7 @@ class VoxelChunk
 {
 	friend class VoxelManager;
 public:
-	VoxelChunk() : m_flag(0) {};
+	VoxelChunk();
 
 	//dimensions of chunk
 	static const int CHUNK_SIZE = 16;
@@ -37,6 +37,7 @@ public:
 	static const int CHUNK_SIZE_CUBED = CHUNK_SIZE_SQ * CHUNK_SIZE;
 
 	void Init(Vec3 position);
+	void Destroy();
 
 	Vec3 getPosition();
 	Vec3 getSize();

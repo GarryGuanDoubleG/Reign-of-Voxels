@@ -16,15 +16,15 @@ public:
 	VoxelChunk *createChunk(Vec3 worldPosition);
 	void		destroyChunk(VoxelChunk * chunk);
 
-	void		createOctreeRoot(VoxelOctree * parent);
-	void		 destroyOctreeNode(VoxelOctree * node);
-
 	//gets the child of a node at a specific index
-	VoxelOctree *getOctreeChild(VoxelOctree * caller, int child_index);
-	VoxelOctree *createOctreeChild();
+	VoxelOctree *getOctreeChild(VoxelOctree * currentNode, int child_index);
+	VoxelOctree *createOctreeChild(VoxelOctree * currentNode, int child_index, CubeRegion &region);
+	void		 destroyOctreeNode(VoxelOctree * node);
 
 private:
 	int m_worldSize; //size of one side of cubic world region
+	int m_maxChunks;
+	int m_maxOctNodes;
 
 	VoxelChunk * m_chunkPool;//array of chunks
 	VoxelChunk * m_freeChunkHead;//head ptr to free chunk list
@@ -32,5 +32,4 @@ private:
 	VoxelOctree *m_octreeRoot; // ptr to octree root node
 
 	VoxelOctree * m_octreePool;//array of octrees
-	VoxelOctree * m_freeOctreeHead;//ptr to first available octree node
 };
