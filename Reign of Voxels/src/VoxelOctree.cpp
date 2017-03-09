@@ -233,5 +233,5 @@ bool VoxelOctree::BuildTree()
 
 void VoxelOctree::Render()
 {
-	m_chunk->Render();
+
 }

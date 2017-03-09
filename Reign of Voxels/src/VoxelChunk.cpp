@@ -21,19 +21,13 @@ void VoxelChunk::Init(Vec3 position)
 	std::vector<GLuint>empty_indices;
 	m_tri_indices  = empty_indices;
 
-	std::vector<Vertex> empty_vertices;
+	std::vector<VoxelVertex> empty_vertices;
 	m_vertices = empty_vertices;
 }
 
 void VoxelChunk::Destroy()
 {
 	m_flag = 0;
-	//clear vertices and indicse
-	/*std::vector<GLuint>empty_indices;
-	m_tri_indices.swap(empty_indices);
-
-	std::vector<Vertex> empty_vertices;
-	m_vertices.swap(empty_vertices);*/
 }
 
 
@@ -89,20 +83,20 @@ void VoxelChunk::BindMesh()
 	glBindVertexArray(m_vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(VoxelVertex), &m_vertices[0], GL_STATIC_DRAW);
 
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_tri_indices.size() * sizeof(GLuint), &m_tri_indices[0], GL_STATIC_DRAW);
 
 	//location 0 should be verts
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_BYTE, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)0);
 	//now normals
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+	glVertexAttribPointer(1, 3, GL_BYTE, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, normal));
 	//now textures
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
+	glVertexAttribPointer(2, 2, GL_BYTE, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, uv));
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -111,7 +105,7 @@ void VoxelChunk::BindMesh()
 
 void VoxelChunk::ClearVertices()
 {
-	std::vector<Vertex> empty;
+	std::vector<VoxelVertex> empty;
 	m_vertices.swap(empty);
 }
 
@@ -127,27 +121,12 @@ void VoxelChunk::GenerateMesh(Model *cube)
 
 	int checks = 0;
 
-	if (m_flag & CHUNK_FLAG_FULL)
-	{
-		Mesh cube_mesh = (*cube->GetMesh())[0];
-
-		m_vertices = cube_mesh.vertices;
-		m_tri_indices = cube_mesh.indices;
-
-		for (int i = 0; i < m_vertices.size(); i++)
-		{
-			m_vertices[i].position *= CHUNK_SIZE;
-		}
-
-		return;
-	}
-
 	sf::Clock timer;
-	for (int x = 0; x < CHUNK_SIZE; x++)
+	for (GLbyte x = 0; x < CHUNK_SIZE; x++)
 	{
-		for (int y = 0; y < CHUNK_SIZE; y++)
+		for (GLbyte y = 0; y < CHUNK_SIZE; y++)
 		{
-			for (int z = 0; z < CHUNK_SIZE; z++)
+			for (GLbyte z = 0; z < CHUNK_SIZE; z++)
 			{
 				if (m_voxels[GetIndex(x, y, z)] & VOXEL_TYPE_AIR)
 					continue;
@@ -155,19 +134,19 @@ void VoxelChunk::GenerateMesh(Model *cube)
 				checks += 18;
 				if ((x > 0 && m_voxels[GetIndex(x, y, z)] & VOXEL_TYPE_AIR) || x == 0)
 				{
-					Vertex vertex;
-					vertex.position = Vec3(x, y, z + 1.0f);
-					vertex.normal = Vec3(-1.0f, 0, 0);
-					vertex.uv = Vec2(.5f);
+					VoxelVertex vertex = { (x,y,z + 1), 
+											(-1,0,0), 
+											(0,0) };
+
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
+					vertex.position = Vec3byte{ (x, y + 1, z + 1) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x, y + 1.0f, z);
+					vertex.position = Vec3byte{ (x, y + 1, z) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x, y, z);
+					vertex.position = Vec3byte{ (x, y, z) };
 					m_vertices.push_back(vertex);
 
 					AddTrianglesIndices();
@@ -175,59 +154,59 @@ void VoxelChunk::GenerateMesh(Model *cube)
 
 				if ((x < CHUNK_SIZE - 1 && m_voxels[GetIndex(x + 1, y, z)] & VOXEL_TYPE_AIR) || x == CHUNK_SIZE - 1)
 				{
-					Vertex vertex;
-					vertex.normal = Vec3(1.0f, 0, 0);
-					vertex.uv = Vec2(.5f);
+					VoxelVertex vertex = { (x,y,z + 1),
+											(1,0,0),
+											(0,0) };
 
-					vertex.position = Vec3(x + 1.0f, y, z);
+					vertex.position = Vec3byte{ (x + 1, y, z) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
+					vertex.position = Vec3byte{ (x + 1, y + 1, z) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z + 1.0f);
+					vertex.position = Vec3byte{ (x + 1, y + 1, z + 1) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
+					vertex.position = Vec3byte{ (x + 1, y, z + 1) };
 					m_vertices.push_back(vertex);
 					AddTrianglesIndices();
 				}
 				if ((y > 0 && (m_voxels[GetIndex(x, y - 1, z)] & VOXEL_TYPE_AIR)) || y == 0)
 				{
-					Vertex vertex;
-					vertex.normal = Vec3(0.0f, -1, 0);
-					vertex.uv = Vec2(.5f);
+					VoxelVertex vertex = { (x,y,z + 1),
+										(0,-1,0),
+										(0,0) };
 
-					vertex.position = Vec3(x, y, z);
+					vertex.position = Vec3byte{ (x, y, z) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 1.0f, y, z);
+					vertex.position = Vec3byte{ (x + 1, y, z) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
+					vertex.position = Vec3byte{ (x + 1, y, z + 1) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x, y, z + 1.0f);
+					vertex.position = Vec3byte{ (x, y, z + 1) };
 					m_vertices.push_back(vertex);
 
 					AddTrianglesIndices();
 				}
 				if ((y < CHUNK_SIZE - 1 && m_voxels[GetIndex(x, y + 1, z)] & VOXEL_TYPE_AIR) || y == CHUNK_SIZE - 1)
 				{
-					Vertex vertex;
-					vertex.normal = Vec3(0.0f, 1.0f, 0);
-					vertex.uv = Vec2(.5f);
+					VoxelVertex vertex = { (x,y,z + 1),
+											(0,1,0),
+											(0,0) };
 
-					vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
+					vertex.position = Vec3byte{ (x, y + 1, z + 1) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z + 1.0f);
+					vertex.position = Vec3byte{ (x + 1, y + 1, z + 1) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
+					vertex.position = Vec3byte{ (x + 1, y + 1, z) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x, y + 1.0f, z);
+					vertex.position = Vec3byte{ (x, y + 1, z) };
 					m_vertices.push_back(vertex);
 
 					AddTrianglesIndices();
@@ -235,39 +214,39 @@ void VoxelChunk::GenerateMesh(Model *cube)
 
 				if ((z > 0 && m_voxels[GetIndex(x, y, z - 1)] & VOXEL_TYPE_AIR) || z == 0)
 				{
-					Vertex vertex;
-					vertex.normal = Vec3(0.0f, 0, -1.0f);
-					vertex.uv = Vec2(.5f);
+					VoxelVertex vertex= { (x,y,z + 1),
+									(0,0,-1),
+									(0,0) };
 
-					vertex.position = Vec3(x, y, z);
+					vertex.position = Vec3byte{ (x, y, z) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x, y + 1.0f, z);
+					vertex.position = Vec3byte{ (x, y + 1, z) };
 					m_vertices.push_back(vertex);
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
+					vertex.position = Vec3byte{ (x + 1, y + 1, z) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 1.0f, y, z);
+					vertex.position = Vec3byte{ (x + 1, y, z) };
 					m_vertices.push_back(vertex);
 
 					AddTrianglesIndices();
 				}
 				if ((z < CHUNK_SIZE - 1 && m_voxels[GetIndex(x, y, z + 1)] & VOXEL_TYPE_AIR) || z == CHUNK_SIZE - 1)
 				{
-					Vertex vertex;
-					vertex.normal = Vec3(0.0f, 0, 1.0f);
-					vertex.uv = Vec2(.5f);
+					VoxelVertex vertex = { (x,y,z + 1),
+											(0, 0,1),
+											(0,0) };
 
-					vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
+					vertex.position = Vec3byte{ (x + 1, y, z + 1) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z + 1.0f);
+					vertex.position = Vec3byte{ (x + 1, y + 1, z + 1) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
+					vertex.position = Vec3byte{ (x, y + 1, z + 1) };
 					m_vertices.push_back(vertex);
 
-					vertex.position = Vec3(x, y, z + 1.0f);
+					vertex.position = Vec3byte{ (x, y, z + 1) };
 					m_vertices.push_back(vertex);
 					AddTrianglesIndices();
 				}
@@ -289,11 +268,13 @@ Vec3 VoxelChunk::getPosition()
 	return m_position;
 }
 
-void VoxelChunk::Render()
+void VoxelChunk::Render(GLuint shader)
 {
 	if ((m_vertices.size() == 0) || m_tri_indices.size() == 0)
 		return;
 	glBindVertexArray(m_vao);
+
+	glUniform3fv(glGetUniformLocation(shader, "chunkPosition"), 1, &m_position[0]);
 	glDrawElements(GL_TRIANGLES, m_tri_indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
