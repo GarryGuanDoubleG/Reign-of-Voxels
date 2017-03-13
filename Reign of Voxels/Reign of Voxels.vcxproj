@@ -136,11 +136,11 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\assimp\assimp\include;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\assimp\assimp\include;$(IncludePath)</IncludePath>
     <LibraryPath>$(assimp)\;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\build\code\Debug;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
-    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\assimp\assimp\include;C:\Users\Garry Guan\Documents\Visual Studio 2015\assimp\assimp\include;$(IncludePath)</IncludePath>
+    <IncludePath>$(SFML)\include;$(ProjectDir)\src;$(ENET)\include;$(LIBNOISE)\include;$(ProjectDir)\Utility;C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\assimp\assimp\include;$(IncludePath)</IncludePath>
     <LibraryPath>C:\Users\GarryG\Documents\Visual Studio 2015\Utility\3D\assimp\assimp\build\code\Release;$(ENET)\;$(LIBNOISE)\bin\;C:\Users\Garry\Documents\Visual Studio 2015\libnoise\bin;$(SFML)\lib;$(LibraryPath)</LibraryPath>
   </PropertyGroup>
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">

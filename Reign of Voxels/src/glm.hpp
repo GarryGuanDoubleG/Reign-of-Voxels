@@ -7,8 +7,6 @@
 #include <glm/gtc/constants.hpp> // glm::pi
 #include <glm/gtc/type_ptr.hpp>
 
-#include "SFML\Graphics.hpp"
-
 #define Vec4 glm::vec4/**<replace glm::vec4 with Vec4 type  */
 #define Vec3 glm::vec3/**<replace glm::vec4 with Vec3 type  */
 #define Vec2 glm::vec2 /**<replace glm::vec4 with Vec2 type  */
@@ -29,16 +27,3 @@ typedef struct
 	Vec3 normal; /**< normal value of vertex */
 	Vec2 uv; /**< texture coordinates */
 }Vertex;
-
-typedef struct
-{
-	GLbyte x;
-	GLbyte y;
-	GLbyte z;
-}Vec3byte;
-
-typedef struct
-{
-	GLbyte x;
-	GLbyte y;
-}Vec2byte;

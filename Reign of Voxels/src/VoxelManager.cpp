@@ -99,7 +99,7 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 		model = glm::translate(model, VoxelOctree::render_list[i]->getPosition());
 		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
-		VoxelOctree::render_list[i]->Render(voxel_shader);
+		VoxelOctree::render_list[i]->Render();
 	}
 	//glPolygonMode(GL_FRONT, GL_FILL);
 }

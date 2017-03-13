@@ -20,9 +20,9 @@
 
 typedef struct
 {
-	Vec3byte position; /**< vertex postion in ndc */
-	Vec3byte normal; /**< normal value of vertex */
-	Vec2byte uv; /**< texture coordinates */
+	sf::Uint8 position[3]; /**< vertex postion in ndc */
+	sf::Uint8 normal[3]; /**< normal value of vertex */
+	sf::Uint8 uv[2]; /**< texture coordinates */
 }VoxelVertex;
 
 class VoxelChunk
@@ -54,9 +54,9 @@ public:
 
 	void SetVoxelActive(int x, int y, int z);
 
-	void Render(GLuint shader);
+	void Render();
 
-	std::vector<VoxelVertex> m_vertices;
+	std::vector<Vertex> m_vertices;
 	VoxelChunk * m_next;
 private:
 	void AddTrianglesIndices();
