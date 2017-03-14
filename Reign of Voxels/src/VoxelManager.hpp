@@ -32,4 +32,5 @@ private:
 	VoxelOctree *m_octreeRoot; // ptr to octree root node
 
 	VoxelOctree * m_octreePool;//array of octrees
+
 };

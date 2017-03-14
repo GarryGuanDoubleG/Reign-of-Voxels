@@ -120,6 +120,131 @@ int inline VoxelChunk::GetIndex(int x, int y, int z)
 	return x * CHUNK_SIZE_SQ + y * CHUNK_SIZE + z;
 }
 
+
+void VoxelChunk::AddLeftFace(int x, int y, int z)
+{
+	Vertex vertex;
+	vertex.position = Vec3(x, y, z + 1.0f);
+	vertex.normal = Vec3(-1.0f, 0, 0); //normal reversed because this is the previous voxel's rirght
+	vertex.uv = Vec2(.5f);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x, y + 1.0f, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x, y, z);
+	m_vertices.push_back(vertex);
+
+	AddTrianglesIndices();
+}
+
+void VoxelChunk::AddBottomFace(int x, int y, int z)
+{
+	Vertex vertex;
+	vertex.normal = Vec3(0.0f, -1, 0);
+	vertex.uv = Vec2(.5f);
+
+	vertex.position = Vec3(x, y, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1.0f, y, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x, y, z + 1.0f);
+	m_vertices.push_back(vertex);
+
+	AddTrianglesIndices();
+}
+
+void VoxelChunk::AddFrontFace(int x, int y, int z)
+{
+	Vertex vertex;
+	vertex.normal = Vec3(0.0f, 0, -1.0f);
+	vertex.uv = Vec2(.5f);
+
+	vertex.position = Vec3(x, y, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x, y + 1.0f, z);
+	m_vertices.push_back(vertex);
+	vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1.0f, y, z);
+	m_vertices.push_back(vertex);
+
+	AddTrianglesIndices();
+}
+
+void VoxelChunk::AddRightFace(int x, int y, int z)
+{
+	Vertex vertex;	
+	vertex.normal = Vec3(1.0f, 0, 0);
+	vertex.uv = Vec2(.5f);
+
+	
+	vertex.position = Vec3(x + 1, y, z + 1.0f);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1, y + 1.0f, z + 1.0f);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1, y + 1.0f, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1, y, z);
+	m_vertices.push_back(vertex);
+
+	AddTrianglesIndices();
+}
+
+void VoxelChunk::AddTopFace(int x, int y, int z)
+{
+	Vertex vertex;
+	vertex.normal = Vec3(0.0f, 1, 0);
+	vertex.uv = Vec2(.5f);
+
+	vertex.position = Vec3(x, y + 1, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1.0f, y + 1, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1.0f, y + 1, z + 1.0f);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x, y + 1, z + 1.0f);
+	m_vertices.push_back(vertex);
+
+	AddTrianglesIndices();
+}
+
+void VoxelChunk::AddBackFace(int x, int y, int z)
+{
+	Vertex vertex;
+	vertex.normal = Vec3(0.0f, 0, 1.0f);
+	vertex.uv = Vec2(.5f);
+
+	vertex.position = Vec3(x, y, z + 1);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x, y + 1.0f, z + 1);
+	m_vertices.push_back(vertex);
+	vertex.position = Vec3(x + 1.0f, y + 1.0f, z + 1);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1.0f, y, z + 1);
+	m_vertices.push_back(vertex);
+
+	AddTrianglesIndices();
+}
+
 void VoxelChunk::GenerateMesh(Model *cube)
 {
 	if (!(m_flag & CHUNK_FLAG_ACTIVE))
@@ -143,140 +268,55 @@ void VoxelChunk::GenerateMesh(Model *cube)
 	}
 
 	sf::Clock timer;
-	for (int x = 0; x < CHUNK_SIZE; x++)
+
+
+	//generate vertices for each face of the chunk
+	//loop through each face rather than each voxel
+	for (int x = 1; x < CHUNK_SIZE; x++)
 	{
-		for (int y = 0; y < CHUNK_SIZE; y++)
+		for (int y = 1; y < CHUNK_SIZE; y++)
 		{
-			for (int z = 0; z < CHUNK_SIZE; z++)
-			{
+			for (int z = 1; z < CHUNK_SIZE; z++)
+			{			
 				if (m_voxels[GetIndex(x, y, z)] & VOXEL_TYPE_AIR)
-					continue;
-				//check if the voxel on the left is active
-				checks += 18;
-				if ((x > 0 && m_voxels[GetIndex(x, y, z)] & VOXEL_TYPE_AIR) || x == 0)
 				{
-					Vertex vertex;
-					vertex.position = Vec3(x, y, z + 1.0f);
-					vertex.normal = Vec3(-1.0f, 0, 0);
-					vertex.uv = Vec2(.5f);
-					m_vertices.push_back(vertex);
+					
+					if (!(m_voxels[GetIndex(x - 1, y, z)] & VOXEL_TYPE_AIR))
+					{
+						AddRightFace(x - 1, y, z);
+					}
 
-					vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
-					m_vertices.push_back(vertex);
+					if (!(m_voxels[GetIndex(x, y - 1, z)] & VOXEL_TYPE_AIR))
+					{
+						AddTopFace(x, y - 1, z);
+					}
 
-					vertex.position = Vec3(x, y + 1.0f, z);
-					m_vertices.push_back(vertex);
+					if (!(m_voxels[GetIndex(x, y, z - 1)] & VOXEL_TYPE_AIR))
+					{
+						AddBackFace(x, y, z - 1);
+					}
 
-					vertex.position = Vec3(x, y, z);
-					m_vertices.push_back(vertex);
-
-					AddTrianglesIndices();
 				}
+				else
+				{					
+					if (m_voxels[GetIndex(x - 1, y, z)] & VOXEL_TYPE_AIR)
+					{
+						AddLeftFace(x, y, z);
+					}
 
-				if ((x < CHUNK_SIZE - 1 && m_voxels[GetIndex(x + 1, y, z)] & VOXEL_TYPE_AIR) || x == CHUNK_SIZE - 1)
-				{
-					Vertex vertex;
-					vertex.normal = Vec3(1.0f, 0, 0);
-					vertex.uv = Vec2(.5f);
-
-					vertex.position = Vec3(x + 1.0f, y, z);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z + 1.0f);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
-					m_vertices.push_back(vertex);
-					AddTrianglesIndices();
-				}
-				if ((y > 0 && (m_voxels[GetIndex(x, y - 1, z)] & VOXEL_TYPE_AIR)) || y == 0)
-				{
-					Vertex vertex;
-					vertex.normal = Vec3(0.0f, -1, 0);
-					vertex.uv = Vec2(.5f);
-
-					vertex.position = Vec3(x, y, z);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x + 1.0f, y, z);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x, y, z + 1.0f);
-					m_vertices.push_back(vertex);
-
-					AddTrianglesIndices();
-				}
-				if ((y < CHUNK_SIZE - 1 && m_voxels[GetIndex(x, y + 1, z)] & VOXEL_TYPE_AIR) || y == CHUNK_SIZE - 1)
-				{
-					Vertex vertex;
-					vertex.normal = Vec3(0.0f, 1.0f, 0);
-					vertex.uv = Vec2(.5f);
-
-					vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z + 1.0f);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x, y + 1.0f, z);
-					m_vertices.push_back(vertex);
-
-					AddTrianglesIndices();
-				}
-
-				if ((z > 0 && m_voxels[GetIndex(x, y, z - 1)] & VOXEL_TYPE_AIR) || z == 0)
-				{
-					Vertex vertex;
-					vertex.normal = Vec3(0.0f, 0, -1.0f);
-					vertex.uv = Vec2(.5f);
-
-					vertex.position = Vec3(x, y, z);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x, y + 1.0f, z);
-					m_vertices.push_back(vertex);
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x + 1.0f, y, z);
-					m_vertices.push_back(vertex);
-
-					AddTrianglesIndices();
-				}
-				if ((z < CHUNK_SIZE - 1 && m_voxels[GetIndex(x, y, z + 1)] & VOXEL_TYPE_AIR) || z == CHUNK_SIZE - 1)
-				{
-					Vertex vertex;
-					vertex.normal = Vec3(0.0f, 0, 1.0f);
-					vertex.uv = Vec2(.5f);
-
-					vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x + 1.0f, y + 1.0f, z + 1.0f);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
-					m_vertices.push_back(vertex);
-
-					vertex.position = Vec3(x, y, z + 1.0f);
-					m_vertices.push_back(vertex);
-					AddTrianglesIndices();
-				}
-
+					if (m_voxels[GetIndex(x, y - 1, z)] & VOXEL_TYPE_AIR)
+					{
+						AddBottomFace(x, y, z);
+					}
+					
+					if (m_voxels[GetIndex(x, y, z - 1)] & VOXEL_TYPE_AIR)
+					{
+						AddFrontFace(x, y, z);
+					}
+				}				
 			}
 		}
 	}
-	//std::cout << "Time to generate is " << timer.getElapsedTime().asMicroseconds() << std::endl;
-	//std::cout << "comparisons " << checks << std::endl;
 }
 
 void VoxelChunk::SetVoxelActive(int x, int y, int z)

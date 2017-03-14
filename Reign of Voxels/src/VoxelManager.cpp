@@ -23,6 +23,7 @@ VoxelManager::VoxelManager()
 	m_chunkPool = new VoxelChunk[maxChunks];
 	m_freeChunkHead = &m_chunkPool[0];
 	
+	sizeof(VoxelChunk);
 
 	//set next available nodes
 	for (int i = 0; i < maxChunks - 1; i++)
@@ -91,6 +92,7 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 	glUniform3fv(light_loc, 1, &light_color[0]);
 	glUniform3fv(obj_loc, 1, &obj_color[0]);
 	glUniform3fv(view_pos_loc, 1, &player_cam->getPosition()[0]);
+
 
 	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
 	{

@@ -17,12 +17,7 @@
 * @param argv An array of command - line argument strings.
 */
 
-int APIENTRY WinMain(
-	HINSTANCE   hInstance,
-	HINSTANCE   hPrevInstance,
-	LPSTR       lpCmdLine,
-	int         nCmdShow
-)
+int main(int argc, char **argv)
 {
 	srand(0);
 

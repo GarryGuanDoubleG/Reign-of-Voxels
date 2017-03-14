@@ -45,6 +45,14 @@ public:
 	bool isActive();
 	void SetActive(bool active);
 
+
+	void VoxelChunk::AddLeftFace(int x, int y, int z);
+	void VoxelChunk::AddBottomFace(int x, int y, int z);
+	void VoxelChunk::AddFrontFace(int x, int y, int z);
+	void VoxelChunk::AddRightFace(int x, int y, int z);
+	void VoxelChunk::AddTopFace(int x, int y, int z);
+	void VoxelChunk::AddBackFace(int x, int y, int z);
+
 	void GenerateMesh(Model *cube);
 	void BindMesh();
 

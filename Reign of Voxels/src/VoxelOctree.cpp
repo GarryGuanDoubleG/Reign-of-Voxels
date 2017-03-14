@@ -107,7 +107,7 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize, VoxelMan
 	//	t.join();
 	//}
 
-	threads.clear();
+	//threads.clear();
 
 	std::cout << "Build time is " << build_time.getElapsedTime().asSeconds() << std::endl;
 	std::cout << "Childnode calls is " << vox_count << std::endl;
@@ -231,7 +231,7 @@ bool VoxelOctree::BuildTree()
 	return m_childMask;
 }
 
-void VoxelOctree::Render()
-{
-	m_chunk->Render();
-}
+//void VoxelOctree::AssignNeighbors()
+//{
+//
+//}

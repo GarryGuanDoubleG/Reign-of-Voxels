@@ -15,7 +15,7 @@ Camera::Camera()
 	m_proj_mat = glmPerspective(glm::radians(45.0f), (float)win_size.x / win_size.y, 0.1f, 1000.0f);
 
 	m_pitch = 0.0f;
-	m_yaw = -90.0f;
+	m_yaw = 0.0f;
 	m_roll = 0.0f;
 
 	m_last_mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
