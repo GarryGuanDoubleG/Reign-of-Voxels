@@ -123,10 +123,11 @@ int inline VoxelChunk::GetIndex(int x, int y, int z)
 
 void VoxelChunk::AddLeftFace(int x, int y, int z)
 {
-	Vertex vertex;
-	vertex.position = Vec3(x, y, z + 1.0f);
+	Vertex vertex;	
 	vertex.normal = Vec3(-1.0f, 0, 0); //normal reversed because this is the previous voxel's rirght
 	vertex.uv = Vec2(.5f);
+
+	vertex.position = Vec3(x, y, z + 1.0f);
 	m_vertices.push_back(vertex);
 
 	vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
@@ -136,47 +137,6 @@ void VoxelChunk::AddLeftFace(int x, int y, int z)
 	m_vertices.push_back(vertex);
 
 	vertex.position = Vec3(x, y, z);
-	m_vertices.push_back(vertex);
-
-	AddTrianglesIndices();
-}
-
-void VoxelChunk::AddBottomFace(int x, int y, int z)
-{
-	Vertex vertex;
-	vertex.normal = Vec3(0.0f, -1, 0);
-	vertex.uv = Vec2(.5f);
-
-	vertex.position = Vec3(x, y, z);
-	m_vertices.push_back(vertex);
-
-	vertex.position = Vec3(x + 1.0f, y, z);
-	m_vertices.push_back(vertex);
-
-	vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
-	m_vertices.push_back(vertex);
-
-	vertex.position = Vec3(x, y, z + 1.0f);
-	m_vertices.push_back(vertex);
-
-	AddTrianglesIndices();
-}
-
-void VoxelChunk::AddFrontFace(int x, int y, int z)
-{
-	Vertex vertex;
-	vertex.normal = Vec3(0.0f, 0, -1.0f);
-	vertex.uv = Vec2(.5f);
-
-	vertex.position = Vec3(x, y, z);
-	m_vertices.push_back(vertex);
-
-	vertex.position = Vec3(x, y + 1.0f, z);
-	m_vertices.push_back(vertex);
-	vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
-	m_vertices.push_back(vertex);
-
-	vertex.position = Vec3(x + 1.0f, y, z);
 	m_vertices.push_back(vertex);
 
 	AddTrianglesIndices();
@@ -204,6 +164,27 @@ void VoxelChunk::AddRightFace(int x, int y, int z)
 	AddTrianglesIndices();
 }
 
+void VoxelChunk::AddBottomFace(int x, int y, int z)
+{
+	Vertex vertex;
+	vertex.normal = Vec3(0.0f, -1, 0);
+	vertex.uv = Vec2(.5f);
+
+	vertex.position = Vec3(x, y, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1.0f, y, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x, y, z + 1.0f);
+	m_vertices.push_back(vertex);
+
+	AddTrianglesIndices();
+}
+
 void VoxelChunk::AddTopFace(int x, int y, int z)
 {
 	Vertex vertex;
@@ -226,6 +207,26 @@ void VoxelChunk::AddTopFace(int x, int y, int z)
 }
 
 void VoxelChunk::AddBackFace(int x, int y, int z)
+{
+	Vertex vertex;
+	vertex.normal = Vec3(0.0f, 0, -1.0f);
+	vertex.uv = Vec2(.5f);
+
+	vertex.position = Vec3(x, y, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x, y + 1.0f, z);
+	m_vertices.push_back(vertex);
+	vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
+	m_vertices.push_back(vertex);
+
+	vertex.position = Vec3(x + 1.0f, y, z);
+	m_vertices.push_back(vertex);
+
+	AddTrianglesIndices();
+}
+
+void VoxelChunk::AddFrontFace(int x, int y, int z)
 {
 	Vertex vertex;
 	vertex.normal = Vec3(0.0f, 0, 1.0f);
@@ -272,51 +273,46 @@ void VoxelChunk::GenerateMesh(Model *cube)
 
 	//generate vertices for each face of the chunk
 	//loop through each face rather than each voxel
-	for (int x = 1; x < CHUNK_SIZE; x++)
+	for (int x = 0; x < CHUNK_SIZE; x++)
 	{
-		for (int y = 1; y < CHUNK_SIZE; y++)
+		for (int y = 0; y < CHUNK_SIZE; y++)
 		{
-			for (int z = 1; z < CHUNK_SIZE; z++)
+			for (int z = 0; z < CHUNK_SIZE; z++)
 			{			
-				if (m_voxels[GetIndex(x, y, z)] & VOXEL_TYPE_AIR)
-				{
-					
-					if (!(m_voxels[GetIndex(x - 1, y, z)] & VOXEL_TYPE_AIR))
-					{
-						AddRightFace(x - 1, y, z);
-					}
-
-					if (!(m_voxels[GetIndex(x, y - 1, z)] & VOXEL_TYPE_AIR))
-					{
-						AddTopFace(x, y - 1, z);
-					}
-
-					if (!(m_voxels[GetIndex(x, y, z - 1)] & VOXEL_TYPE_AIR))
-					{
-						AddBackFace(x, y, z - 1);
-					}
-
-				}
-				else
-				{					
-					if (m_voxels[GetIndex(x - 1, y, z)] & VOXEL_TYPE_AIR)
+				if (~m_voxels[GetIndex(x, y, z)] & VOXEL_TYPE_AIR)
+				{						
+					if (x == 0 || m_voxels[GetIndex(x - 1, y, z)] & VOXEL_TYPE_AIR)
 					{
 						AddLeftFace(x, y, z);
 					}
 
-					if (m_voxels[GetIndex(x, y - 1, z)] & VOXEL_TYPE_AIR)
+					if (x == CHUNK_SIZE - 1 || m_voxels[GetIndex(x + 1, y, z)] & VOXEL_TYPE_AIR)
+					{
+						AddRightFace(x, y, z);
+					}
+
+					if (y == 0 || m_voxels[GetIndex(x, y - 1, z)] & VOXEL_TYPE_AIR)
 					{
 						AddBottomFace(x, y, z);
 					}
-					
-					if (m_voxels[GetIndex(x, y, z - 1)] & VOXEL_TYPE_AIR)
+					if (y == CHUNK_SIZE - 1 || m_voxels[GetIndex(x, y + 1, z)] & VOXEL_TYPE_AIR)
+					{
+						AddTopFace(x, y, z);
+					}
+
+					if (z == 0 || m_voxels[GetIndex(x, y, z - 1)] & VOXEL_TYPE_AIR)
+					{
+						AddBackFace(x, y, z);
+					}
+					if (z == CHUNK_SIZE - 1 || m_voxels[GetIndex(x, y, z + 1)] & VOXEL_TYPE_AIR)
 					{
 						AddFrontFace(x, y, z);
 					}
-				}				
+				}			
 			}
 		}
 	}
+
 }
 
 void VoxelChunk::SetVoxelActive(int x, int y, int z)

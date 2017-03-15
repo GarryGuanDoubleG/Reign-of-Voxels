@@ -51,6 +51,8 @@ void GameScene::Render()
 
 	m_light->Draw(m_camera->GetViewMat(), m_camera->GetProj());
 
+	glDisable(GL_CULL_FACE);
+
 	if(wire_frame)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
@@ -58,6 +60,7 @@ void GameScene::Render()
 	m_voxelManager->RenderVoxels(m_camera);
 	
 	Game::instance().getWindow()->display();
+	
 }
 /**
 *@brief Listens to user input events and handles it

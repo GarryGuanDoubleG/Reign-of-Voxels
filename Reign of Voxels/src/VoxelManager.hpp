@@ -33,4 +33,6 @@ private:
 
 	VoxelOctree * m_octreePool;//array of octrees
 
+	Model *m_cube;
+
 };

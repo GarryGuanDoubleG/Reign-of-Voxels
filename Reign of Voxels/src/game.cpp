@@ -62,7 +62,6 @@ void Game::GraphicsInit()
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
-	glFrontFace(GL_CW);
 }
 /*
 * @brief initializes the game from graphics to loading scene and managing client connection
