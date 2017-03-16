@@ -7,8 +7,6 @@ sf::Clock Game::g_clock; /**<tracks total time since ininitation of gamescene*/
 
 Game Game::m_instance; /**<singleton instance of game */ 
 
-#define SCREEN_WIDTH 1280 /**<width of the window */ 
-#define SCREEN_HEIGHT 720 /**<height of the window */ 
 
 #define FPS_TIME 0.01666666666f /**<total time per frame in seconds. 60 dps */ 
 

@@ -27,17 +27,6 @@ VoxelOctree::VoxelOctree()
 {
 }
 
-void VoxelOctree::GenerateMesh(Model *cube, int portion, int portion_len)
-{
-	sf::Clock timer;
-
-	for (int j = portion * portion_len; j < portion * portion_len + portion_len; j++)
-	{
-		if(j < render_list.size())
-			render_list[j]->GenerateMesh(cube);
-	}
-	std::cout << "Time for i: " << portion << " is " << timer.getElapsedTime().asSeconds() << std::endl;
-}
 
 void VoxelOctree::InitNode(CubeRegion region)
 {
@@ -54,6 +43,19 @@ void VoxelOctree::InitNode(CubeRegion region)
 void VoxelOctree::DestroyNode()
 {
 	m_flag = 0;
+}
+
+
+void VoxelOctree::GenerateMesh(Model *cube, int portion, int portion_len)
+{
+	sf::Clock timer;
+
+	for (int j = portion * portion_len; j < portion * portion_len + portion_len; j++)
+	{
+		if(j < render_list.size())
+			render_list[j]->GenerateMesh(cube);
+	}
+	//std::cout << "Time for i: " << portion << " is " << timer.getElapsedTime().asSeconds() << std::endl;
 }
 
 void VoxelOctree::InitializeChildren()
@@ -135,7 +137,6 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize, VoxelMan
 	std::cout << "Generate Mesh time is " << build_time.getElapsedTime().asSeconds() << std::endl;	
 	build_time.restart();
 	
-
 	//send vertices to gpu
 	unsigned int vertices = 0;
 

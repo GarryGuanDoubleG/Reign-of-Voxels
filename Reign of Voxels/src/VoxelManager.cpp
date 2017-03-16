@@ -127,33 +127,30 @@ void VoxelManager::destroyOctreeNode(VoxelOctree * node)
 void VoxelManager::RenderVoxels(Camera * player_cam)
 {
 	GLuint voxel_shader = GetShader("voxel");
-	GLuint model_loc, view_loc, proj_loc, 
-		light_loc, obj_loc, light_pos_loc, view_pos_loc;
+	GLuint model_loc;
 
 	glUseProgram(voxel_shader);
 
-	model_loc = glGetUniformLocation(voxel_shader, "model");
-	view_loc = glGetUniformLocation(voxel_shader, "view");
-	proj_loc = glGetUniformLocation(voxel_shader, "projection");
-	light_loc = glGetUniformLocation(voxel_shader, "lightColor");
-	obj_loc = glGetUniformLocation(voxel_shader, "objectColor");
-	light_pos_loc = glGetUniformLocation(voxel_shader, "lightPos");
-	view_pos_loc = glGetUniformLocation(voxel_shader, "viewPos");
-	//
 	Vec3 light_pos = Vec3(-32, 512, -32);
 	Vec3 light_color = Vec3(1.0f, 1.0f, 1.0f);
-	Vec3 voxel_color = Vec3(.2f, .6f, .2f);
+
 	Mat4 view = player_cam->GetViewMat();
 	Mat4 proj = player_cam->GetProj();
-	glUniformMatrix4fv(view_loc, 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
-	glUniformMatrix4fv(proj_loc, 1, GL_FALSE, &player_cam->GetProj()[0][0]);
 
-	Vec3 obj_color(0.6f, 1.0f, 0.3f);
-	glUniform3fv(light_pos_loc, 1, &light_pos[0]);
-	glUniform3fv(light_loc, 1, &light_color[0]);
-	glUniform3fv(obj_loc, 1, &obj_color[0]);
-	glUniform3fv(view_pos_loc, 1, &player_cam->getPosition()[0]);
+	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
 
+	Vec3 voxel_color(0.6f, 1.0f, 0.3f);
+
+	//lighting
+	glUniform3fv(glGetUniformLocation(voxel_shader, "viewPos"), 1, &player_cam->GetPosition()[0]);
+	glUniform3fv(glGetUniformLocation(voxel_shader, "lightPos"), 1, &light_pos[0]);
+	glUniform3fv(glGetUniformLocation(voxel_shader, "lightColor"), 1, &light_color[0]);
+
+	//voxels
+	glUniform3fv(glGetUniformLocation(voxel_shader, "voxelColor"), 1, &voxel_color[0]);
+
+	model_loc = glGetUniformLocation(voxel_shader, "model");
 
 	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
 	{
@@ -163,8 +160,25 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 
 		glUniform1i(glGetUniformLocation(voxel_shader, "chunkID"), i);
 
-
-		VoxelOctree::render_list[i]->Render();
+		VoxelOctree::render_list[i]->RenderMinimap();
 	}
 	
+}
+
+void VoxelManager::RenderMinimap(GLuint shader, Vec2 &scale, Vec2 &position)
+{
+	GLuint model_loc = glGetUniformLocation(shader, "model");
+
+	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
+	{
+		Mat4 model = Mat4(1.0f);
+
+		model = glm::scale(model, Vec3(scale.x, 1.0f, scale.y));
+		model = glm::translate(model, VoxelOctree::render_list[i]->getPosition());
+		model = glm::translate(model, Vec3(position, 0.0f));		
+
+		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));		
+
+		VoxelOctree::render_list[i]->RenderMinimap();
+	}
 }

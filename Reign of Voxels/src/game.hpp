@@ -9,6 +9,10 @@
 #include "sceneManager.hpp"
 #include "Gui\Menu.hpp"
 #include "client.hpp"
+
+#define SCREEN_WIDTH 1920 /**<width of the window */ 
+#define SCREEN_HEIGHT 1080 /**<height of the window */ 
+
 /**
 * Singleton Game class
 * Handles game loops and stores all managers & systems

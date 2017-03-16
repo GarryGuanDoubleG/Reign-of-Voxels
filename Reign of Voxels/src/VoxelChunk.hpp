@@ -45,7 +45,6 @@ public:
 	bool isActive();
 	void SetActive(bool active);
 
-
 	void VoxelChunk::AddLeftFace(int x, int y, int z);
 	void VoxelChunk::AddBottomFace(int x, int y, int z);
 	void VoxelChunk::AddFrontFace(int x, int y, int z);
@@ -63,18 +62,29 @@ public:
 	void SetVoxelActive(int x, int y, int z);
 
 	void Render();
+	void RenderMinimap();
 
 	std::vector<Vertex> m_vertices;
+	std::vector<Vertex> m_top_verts;
+
 	VoxelChunk * m_next;
 private:
 	void AddTrianglesIndices();
+	void AddMinimapIndices();
+
 	int GetIndex(int x, int y, int z);
 
 	std::vector<GLuint> m_tri_indices;//order to draw vertices
+	std::vector<GLuint> m_mp_indices;
 
 	GLuint	m_vao, 
 			m_vbo, 
 			m_ebo;
+
+	//minimap
+	GLuint m_mp_vao,
+		m_mp_vbo,
+		m_mp_ebo;
 
 	Vec3 m_position;
 

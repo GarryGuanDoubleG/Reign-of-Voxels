@@ -67,6 +67,16 @@ void VoxelChunk::InsertVoxelAtPos(int x, int y, int z)
 	}
 }
 
+void VoxelChunk::AddMinimapIndices()
+{
+	m_mp_indices.push_back(m_top_verts.size() - 4);
+	m_mp_indices.push_back(m_top_verts.size() - 3);
+	m_mp_indices.push_back(m_top_verts.size() - 2);
+	m_mp_indices.push_back(m_top_verts.size() - 4);
+	m_mp_indices.push_back(m_top_verts.size() - 2);
+	m_mp_indices.push_back(m_top_verts.size() - 1);
+}
+
 void VoxelChunk::AddTrianglesIndices()
 {
 	m_tri_indices.push_back(m_vertices.size() - 4);
@@ -95,6 +105,32 @@ void VoxelChunk::BindMesh()
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_tri_indices.size() * sizeof(GLuint), &m_tri_indices[0], GL_STATIC_DRAW);
 
 	//location 0 should be verts
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+	//now normals
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
+	//now textures
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	////minimap
+	glGenVertexArrays(1, &m_mp_vao);
+	glGenBuffers(1, &m_mp_vbo);
+	glGenBuffers(1, &m_mp_ebo);
+
+	glBindVertexArray(m_mp_vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, m_mp_vbo);
+	glBufferData(GL_ARRAY_BUFFER, m_top_verts.size() * sizeof(Vertex), &m_top_verts[0], GL_STATIC_DRAW);
+
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mp_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_mp_indices.size() * sizeof(GLuint), &m_mp_indices[0], GL_STATIC_DRAW);
+
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
 	//now normals
@@ -193,17 +229,22 @@ void VoxelChunk::AddTopFace(int x, int y, int z)
 
 	vertex.position = Vec3(x, y + 1, z);
 	m_vertices.push_back(vertex);
+	m_top_verts.push_back(vertex);
 
 	vertex.position = Vec3(x + 1.0f, y + 1, z);
 	m_vertices.push_back(vertex);
+	m_top_verts.push_back(vertex);
 
 	vertex.position = Vec3(x + 1.0f, y + 1, z + 1.0f);
 	m_vertices.push_back(vertex);
+	m_top_verts.push_back(vertex);
 
 	vertex.position = Vec3(x, y + 1, z + 1.0f);
 	m_vertices.push_back(vertex);
+	m_top_verts.push_back(vertex);
 
 	AddTrianglesIndices();
+	AddMinimapIndices();
 }
 
 void VoxelChunk::AddBackFace(int x, int y, int z)
@@ -230,8 +271,8 @@ void VoxelChunk::AddFrontFace(int x, int y, int z)
 {
 	Vertex vertex;
 	vertex.normal = Vec3(0.0f, 0, 1.0f);
-	vertex.uv = Vec2(.5f);
-
+	
+	vertex.uv = Vec2(0, 0);
 	vertex.position = Vec3(x, y, z + 1);
 	m_vertices.push_back(vertex);
 
@@ -248,28 +289,6 @@ void VoxelChunk::AddFrontFace(int x, int y, int z)
 
 void VoxelChunk::GenerateMesh(Model *cube)
 {
-	if (!(m_flag & CHUNK_FLAG_ACTIVE))
-		return;
-
-	int checks = 0;
-
-	if (m_flag & CHUNK_FLAG_FULL)
-	{
-		Mesh cube_mesh = (*cube->GetMesh())[0];
-
-		m_vertices = cube_mesh.vertices;
-		m_tri_indices = cube_mesh.indices;
-
-		for (int i = 0; i < m_vertices.size(); i++)
-		{
-			m_vertices[i].position *= CHUNK_SIZE;
-		}
-
-		return;
-	}
-
-	sf::Clock timer;
-
 
 	//generate vertices for each face of the chunk
 	//loop through each face rather than each voxel
@@ -327,9 +346,14 @@ Vec3 VoxelChunk::getPosition()
 
 void VoxelChunk::Render()
 {
-	if ((m_vertices.size() == 0) || m_tri_indices.size() == 0)
-		return;
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_TRIANGLES, m_tri_indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
+
+void VoxelChunk::RenderMinimap()
+{
+	glBindVertexArray(m_mp_vao);
+	glDrawElements(GL_TRIANGLES, m_mp_indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

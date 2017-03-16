@@ -20,6 +20,7 @@
 
 #define glmLookAt glm::lookAt /**<define glm::lookat to glmLookAt for convenience  */  
 #define glmPerspective glm::perspective /**< define glm::perspective to glmPerspective for convenience */  
+#define glmOrthographic glm::ortho
 
 typedef struct
 {

@@ -30,6 +30,9 @@ public:
 	*@brief Handles drawing the game scene 
 	*/
 	virtual void Render();
+
+	void RenderWorld();
+	void RenderMinimap();
 	/**
 	*@brief Listens to user input events and handles it
 	*@param event type of user input event
@@ -49,7 +52,13 @@ private:
 	LightSource *m_light;
 
 	VoxelManager * m_voxelManager;
+
 	Camera *m_camera; /**<player camera*/  
+	Camera *m_minimap_cam; /**<camera used to display minimap*/
+
+	Vec2 m_minimap_size;//size to display minimap
+	Vec2 m_minimap_scale;
+	Vec2 m_minimap_pos;
 
 	bool wire_frame = false;
 };

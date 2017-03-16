@@ -11,7 +11,9 @@ public:
 	~VoxelManager();
 
 	void GenerateVoxels();
+
 	void RenderVoxels(Camera * player_cam);
+	void RenderMinimap(GLuint shader, Vec2 &scale, Vec2 &position);
 
 	VoxelChunk *createChunk(Vec3 worldPosition);
 	void		destroyChunk(VoxelChunk * chunk);
@@ -34,5 +36,4 @@ private:
 	VoxelOctree * m_octreePool;//array of octrees
 
 	Model *m_cube;
-
 };
