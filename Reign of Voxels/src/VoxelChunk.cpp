@@ -287,6 +287,16 @@ void VoxelChunk::AddFrontFace(int x, int y, int z)
 	AddTrianglesIndices();
 }
 
+void VoxelChunk::SetVoxelActive(int x, int y, int z)
+{
+	//m_voxels[x - (int)m_position.x][y - (int)m_position.y][z - (int)m_position.z].SetActive(true);//convert world coor to local
+}
+
+Vec3 VoxelChunk::getPosition()
+{
+	return m_position;
+}
+
 void VoxelChunk::GenerateMesh(Model *cube)
 {
 
@@ -297,9 +307,9 @@ void VoxelChunk::GenerateMesh(Model *cube)
 		for (int y = 0; y < CHUNK_SIZE; y++)
 		{
 			for (int z = 0; z < CHUNK_SIZE; z++)
-			{			
+			{
 				if (~m_voxels[GetIndex(x, y, z)] & VOXEL_TYPE_AIR)
-				{						
+				{
 					if (x == 0 || m_voxels[GetIndex(x - 1, y, z)] & VOXEL_TYPE_AIR)
 					{
 						AddLeftFace(x, y, z);
@@ -327,33 +337,35 @@ void VoxelChunk::GenerateMesh(Model *cube)
 					{
 						AddFrontFace(x, y, z);
 					}
-				}			
+				}
 			}
 		}
 	}
 
 }
 
-void VoxelChunk::SetVoxelActive(int x, int y, int z)
+void VoxelChunk::ClearMeshData()
 {
-	//m_voxels[x - (int)m_position.x][y - (int)m_position.y][z - (int)m_position.z].SetActive(true);//convert world coor to local
-}
+	m_mp_indices_count = m_mp_indices.size();
+	m_indices_count = m_tri_indices.size();
 
-Vec3 VoxelChunk::getPosition()
-{
-	return m_position;
+	std::vector<Vertex>().swap(m_vertices);
+	std::vector<Vertex>().swap(m_top_verts);
+
+	std::vector<GLuint>().swap(m_tri_indices);
+	std::vector<GLuint>().swap(m_mp_indices);	
 }
 
 void VoxelChunk::Render()
 {
 	glBindVertexArray(m_vao);
-	glDrawElements(GL_TRIANGLES, m_tri_indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_indices_count, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
 void VoxelChunk::RenderMinimap()
 {
 	glBindVertexArray(m_mp_vao);
-	glDrawElements(GL_TRIANGLES, m_mp_indices.size(), GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_mp_indices_count, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }

@@ -5,9 +5,7 @@
 
 HUD::HUD()
 {
-//	m_minimapCam = new Camera();
-	/*m_minimapCam->SetToOrtho();
-	m_minimapCam->SetPosition(Vec3(256 * 16, 512, 256 * 16));*/
+
 }
 
 
@@ -18,6 +16,12 @@ void HUD::DrawMiniMap()
 	//manager->RenderMinimap(m_minimapCam);
 
 	glDisable(GL_CULL_FACE);
+}
+
+//load textures and fonts
+void HUD::Init()
+{
+
 }
 
 void HUD::HandleInput(sf::Event event)

@@ -53,6 +53,7 @@ public:
 	void VoxelChunk::AddBackFace(int x, int y, int z);
 
 	void GenerateMesh(Model *cube);
+	void ClearMeshData();
 	void BindMesh();
 
 	void ClearVertices();
@@ -77,6 +78,9 @@ private:
 	std::vector<GLuint> m_tri_indices;//order to draw vertices
 	std::vector<GLuint> m_mp_indices;
 
+	int m_indices_count; /**< number of indices for world */
+	int m_mp_indices_count; /**< number of indices for minimap */
+
 	GLuint	m_vao, 
 			m_vbo, 
 			m_ebo;
@@ -89,6 +93,5 @@ private:
 	Vec3 m_position;
 
 	sf::Uint8 m_flag;//bool for active
-
 	sf::Uint8 m_voxels[CHUNK_SIZE_CUBED];
 };

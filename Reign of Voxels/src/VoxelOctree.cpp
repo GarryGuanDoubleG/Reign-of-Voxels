@@ -146,6 +146,11 @@ void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize, VoxelMan
 		render_list[i]->BindMesh();
 	}
 
+	for (int i = 0; i < render_list.size(); i++)
+	{		
+		render_list[i]->ClearMeshData();		
+	}
+
 	//get binding time
 	std::cout << "Bind Mesh time is " << build_time.getElapsedTime().asSeconds() << std::endl;
 	std::cout << "Vertices: " << vertices << std::endl;

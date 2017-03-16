@@ -175,7 +175,7 @@ void VoxelManager::RenderMinimap(GLuint shader, Vec2 &scale, Vec2 &position)
 
 		model = glm::scale(model, Vec3(scale.x, 1.0f, scale.y));
 		model = glm::translate(model, VoxelOctree::render_list[i]->getPosition());
-		model = glm::translate(model, Vec3(position, 0.0f));		
+		model = glm::translate(model, Vec3(position.x, 0.0f, position.y));		
 
 		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));		
 

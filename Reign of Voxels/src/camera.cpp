@@ -89,10 +89,10 @@ void Camera::HandleInput(sf::Event event)
 			m_pos += m_right * cam_speed;
 			break;
 		case sf::Keyboard::PageUp:
-			m_perspective = true; //perspetive
+			SetToPersp();
 			break;
 		case sf::Keyboard::PageDown:
-			m_perspective = false; // ortho
+			SetToOrtho();
 			break;
 		default:
 			break;

@@ -1,36 +1,31 @@
 #include "GameScene.hpp"
 #include "simple_logger.h"
+
 /**
 * constructor
 * Subscribes to event system and sets up a camera and loads models
 */#
 GameScene::GameScene()
 {
-	std::cout << "Init Game \n";
-
 	m_camera = new Camera(Vec3(256, 256, 256), Vec3(256, 0, 255), Vec3(0, -1.0f, 0));
 
-	m_minimap_cam = new Camera(Vec3(256, 256, 256), Vec3(256,0,255), Vec3(0, -1.0f, 0));
-	m_minimap_cam->SetToOrtho();
-
-
 	Vec2 minimap_size = Vec2(512.0f, 512.0f);
-	std::cout << "minimap size " << minimap_size.x << " \t\t\t\t" << minimap_size. y<< std::endl;
-	//m_minimap_pos = Vec2((float)SCREEN_WIDTH - minimap_size.x, (float)SCREEN_HEIGHT - minimap_size.y);
-	m_minimap_pos = Vec2(1408, 0);
+	
+	//m_minimap_pos = Vec2(0.0f, SCREEN_HEIGHT - minimap_size.y);
+	m_minimap_pos = Vec2(0.0f, SCREEN_HEIGHT - (minimap_size.y / 2.0f));
 	m_minimap_scale = Vec2(minimap_size.x / (float)SCREEN_WIDTH, minimap_size.y / (float)SCREEN_HEIGHT);
 	
+	m_minimap_cam = new Camera(Vec3(256, 256, 512), Vec3(255, 0, 255), Vec3(0, -1.0f, 0));
+	m_minimap_cam->SetToOrtho();
+
 	//m_model = new Model("Resources\\models\\nanosuit\\nanosuit.obj");
 	m_model = new Model("Resources\\models\\sphere.obj");
-	
-	
+		
 	m_light = new LightSource(); 
 	m_light->m_model = m_model;// use the same model for the lighitng for now
 
-
 	m_voxelManager = new VoxelManager();
 	m_voxelManager->GenerateVoxels();
-
 
 	Game::instance().getEventSystem().addObserver(this);
 }
@@ -121,4 +116,5 @@ void GameScene::HandleInput(sf::Event event)
 		}
 	}
 	m_camera->HandleInput(event);
+	//m_minimap_cam->HandleInput(event);
 }

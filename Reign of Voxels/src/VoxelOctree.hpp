@@ -33,6 +33,7 @@ public:
 
 	//create vertices for world
 	void GenerateMesh(Model *cube, int i, int length);
+	
 
 	static const int maxHeight = 32;
 	static std::vector<VoxelChunk *> render_list;//list of leaf nodes

@@ -60,6 +60,9 @@ void Game::GraphicsInit()
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 }
 /*
 * @brief initializes the game from graphics to loading scene and managing client connection
@@ -133,10 +136,16 @@ void Game::GameLoop()
 			else*/
 			m_eventSystem->Notify(ClientInput, event);
 			if (event.key.code == sf::Keyboard::Delete)
-				m_lock_mouse = false;
+			{
+				Game::instance().getWindow()->setMouseCursorGrabbed(false);
+				Game::instance().getWindow()->setMouseCursorVisible(true);
+				m_lock_mouse != m_lock_mouse;
+			}
+				
 		}
 		if (m_lock_mouse)
 		{
+
 			sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
 		}
 			g_delta_clock.restart();
