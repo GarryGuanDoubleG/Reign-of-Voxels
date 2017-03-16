@@ -17,6 +17,11 @@
   "minimap": {
     "vs": "shader/minimap_vs.glsl",
     "fs": "shader/minimap_fs.glsl"
+  },
+
+  "HUD": {
+    "vs": "shader/hud_vs.glsl",
+    "fs": "shader/hud_fs.glsl"
   }
 }
 

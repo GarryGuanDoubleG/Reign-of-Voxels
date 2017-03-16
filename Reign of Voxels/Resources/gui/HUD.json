@@ -1,13 +1,14 @@
 {
-  "actions": {
+  "action_grid": {
     "texture": "Resources/textures/3grid.png",
-    "position": "br",
+    "position": "bottom_right",
     "width": 255,
     "height": 255
   },
-  "unitBar": {
-    "texture": "Resources/texturs/checker_texture.png",
-    "postion": "bottom",
+
+  "unit_display": {
+    "texture": "Resources/textures/unit_display.png",
+    "postion": "bottom_center",
     "width": 1410,
     "height": 255
   }

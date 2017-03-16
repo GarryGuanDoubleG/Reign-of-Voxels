@@ -4,6 +4,7 @@
 #include "model.hpp"
 #include "LightSource.hpp"
 #include "camera.hpp"
+#include "HUD.hpp"
 #include "game.hpp"
 #include "VoxelManager.hpp"
 /**
@@ -45,6 +46,8 @@ public:
 	*/
 	virtual void HandleInput(sf::Event event) ;
 private:
+	HUD * m_hud;
+
 	int m_size; /**<size of the voxel world. This is to test instance rendering */
 	Mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
 

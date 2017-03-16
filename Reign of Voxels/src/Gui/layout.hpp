@@ -9,7 +9,7 @@ enum MenuLayouts
 {
 	LoginMenu, /**< enum value LoginMenu indicating login menu scene or layout should be used */  
 	LobbyMenu, /**< enum value LobbyMenu indicating Lobby menu scene or layout should be used */  
-	OptionsMenu /**< enum value OptionsMenu indicating Options menu scene or layout should be used */  
+	OptionsMenu, /**< enum value OptionsMenu indicating Options menu scene or layout should be used */ 
 };
 /**
 * A utility class used to load gui position, color, text, events, and size from a JSON file
@@ -17,6 +17,7 @@ enum MenuLayouts
 class Layout
 {
 public:
+
 	/*
 	* @brief Reads a specific menu layout from a json file and generates widgets from data outlined for each component
 	* @param menu the layout to load

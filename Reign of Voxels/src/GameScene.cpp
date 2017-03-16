@@ -4,9 +4,11 @@
 /**
 * constructor
 * Subscribes to event system and sets up a camera and loads models
-*/#
+*/
 GameScene::GameScene()
 {
+	m_hud = new HUD();
+
 	m_camera = new Camera(Vec3(256, 256, 256), Vec3(256, 0, 255), Vec3(0, -1.0f, 0));
 
 	Vec2 minimap_size = Vec2(512.0f, 512.0f);
@@ -56,6 +58,7 @@ void GameScene::Render()
 	
 	RenderWorld();
 	RenderMinimap();
+	m_hud->Render();
 
 	Game::instance().getWindow()->display();	
 }

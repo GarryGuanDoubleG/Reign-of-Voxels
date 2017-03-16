@@ -28,3 +28,9 @@ typedef struct
 	Vec3 normal; /**< normal value of vertex */
 	Vec2 uv; /**< texture coordinates */
 }Vertex;
+
+typedef struct
+{
+	Vec2 position;
+	Vec2 size;
+}Rectf;
