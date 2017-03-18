@@ -11,7 +11,7 @@
 
 typedef struct CubeRegion
 {
-	Vec3 position;
+	glm::vec3 position;
 	int size;
 };
 

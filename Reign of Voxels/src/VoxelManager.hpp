@@ -13,9 +13,9 @@ public:
 	void GenerateVoxels();
 
 	void RenderVoxels(Camera * player_cam);
-	void RenderMinimap(GLuint shader, Vec2 &scale, Vec2 &position);
+	void RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &position);
 
-	VoxelChunk *createChunk(Vec3 worldPosition);
+	VoxelChunk *createChunk(glm::vec3 worldPosition);
 	void		destroyChunk(VoxelChunk * chunk);
 
 	//gets the child of a node at a specific index

@@ -4,9 +4,6 @@
     <Filter Include="Headers">
       <UniqueIdentifier>{aad02c42-e38e-4d06-b8a4-0598d1bb3097}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Shaders">
-      <UniqueIdentifier>{ca0efe23-79b3-4209-b183-f557aafa637c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source">
       <UniqueIdentifier>{459ab808-5af5-4355-b8a1-bc022eb180a0}</UniqueIdentifier>
     </Filter>
@@ -15,6 +12,9 @@
     </Filter>
     <Filter Include="Source\Gui">
       <UniqueIdentifier>{5bd3669a-4fb0-42e2-b976-d9ab4f9a38f3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Shaders">
+      <UniqueIdentifier>{80e5e3e1-73aa-4538-9a78-cdd61e35f2f6}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -190,10 +190,19 @@
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
+    <None Include="packages.config" />
+    <None Include="shader\hud_fs.glsl" />
+    <None Include="shader\hud_vs.glsl" />
     <None Include="shader\lighting_fs.glsl">
       <Filter>Shaders</Filter>
     </None>
     <None Include="shader\lighting_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\minimap_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\minimap_vs.glsl">
       <Filter>Shaders</Filter>
     </None>
     <None Include="shader\model_fs.glsl">
@@ -208,11 +217,10 @@
     <None Include="shader\voxel_vs.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="packages.config" />
-    <None Include="shader\minimap_vs.glsl">
+    <None Include="shader\ui.frag">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shader\minimap_fs.glsl">
+    <None Include="shader\ui.vert">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

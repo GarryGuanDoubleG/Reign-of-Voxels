@@ -8,34 +8,35 @@
 
 typedef struct HUDWidget
 {
-	sf::Texture* texture;
 	Rectf rect;
+
+	GLuint textureID;
+	GLuint vao,
+		vbo,
+		ebo;
+
+	//float *vertices;
+	glm::vec3 vertices[4];
+	glm::vec2 uv[4];
+
+	GLuint indices[6];
 };
 
 class HUD
 {
 public:
 	HUD();
-
+	~HUD();
 	void Init();
-
-	void DrawMiniMap();
 	
 	void GenerateMesh();
-	void BindMesh();
+	void BindWidgets();
 
 	void Render();
 
 	void HandleInput(sf::Event event);
 private:
 	std::vector<HUDWidget> m_widgets;
-
-	std::vector<Vertex> m_vertices;
-	std::vector<GLuint> m_indices;
-
-	GLuint m_vao,
-		m_vbo,
-		m_ebo;
-
-	GLint m_indices_count;
+	
+	Camera *m_camera;
 };

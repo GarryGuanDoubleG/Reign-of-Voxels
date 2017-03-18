@@ -23,6 +23,10 @@ public:
 	* unSubscribes from event system
 	*/
 	~GameScene();
+
+
+	void InitHUD();
+
 	/**
 	*@brief code to run every frame of game loop
 	*/
@@ -34,6 +38,7 @@ public:
 
 	void RenderWorld();
 	void RenderMinimap();
+	void RenderHUD();
 	/**
 	*@brief Listens to user input events and handles it
 	*@param event type of user input event
@@ -49,7 +54,7 @@ private:
 	HUD * m_hud;
 
 	int m_size; /**<size of the voxel world. This is to test instance rendering */
-	Mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
+	glm::mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
 
 	Model *m_model; /**<pointer to model loaded */
 	LightSource *m_light;
@@ -59,9 +64,9 @@ private:
 	Camera *m_camera; /**<player camera*/  
 	Camera *m_minimap_cam; /**<camera used to display minimap*/
 
-	Vec2 m_minimap_size;//size to display minimap
-	Vec2 m_minimap_scale;
-	Vec2 m_minimap_pos;
+	glm::vec2 m_minimap_size;//size to display minimap
+	glm::vec2 m_minimap_scale;
+	glm::vec2 m_minimap_pos;
 
 	bool wire_frame = false;
 };

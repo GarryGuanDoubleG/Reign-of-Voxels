@@ -36,11 +36,11 @@ public:
 	static const int CHUNK_SIZE_SQ = CHUNK_SIZE * CHUNK_SIZE;
 	static const int CHUNK_SIZE_CUBED = CHUNK_SIZE_SQ * CHUNK_SIZE;
 
-	void Init(Vec3 position);
+	void Init(glm::vec3 position);
 	void Destroy();
 
-	Vec3 getPosition();
-	Vec3 getSize();
+	glm::vec3 getPosition();
+	glm::vec3 getSize();
 
 	bool isActive();
 	void SetActive(bool active);
@@ -90,7 +90,7 @@ private:
 		m_mp_vbo,
 		m_mp_ebo;
 
-	Vec3 m_position;
+	glm::vec3 m_position;
 
 	sf::Uint8 m_flag;//bool for active
 	sf::Uint8 m_voxels[CHUNK_SIZE_CUBED];

@@ -125,8 +125,8 @@ Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 	for (GLuint i = 0; i < mesh->mNumVertices; i++)
 	{
 		Vertex vertex;
-		Vec3 vert, normal;
-		Vec2 uv;
+		glm::vec3 vert, normal;
+		glm::vec2 uv;
 
 		vert.x = mesh->mVertices[i].x;
 		vert.y = mesh->mVertices[i].y;
@@ -142,7 +142,7 @@ Mesh Model::ProcessMesh(aiMesh *mesh, const aiScene *scene)
 			uv.y = mesh->mTextureCoords[0][i].y;
 		}
 		else
-			uv = Vec2(0.0f, 0.0f);
+			uv = glm::vec2(0.0f, 0.0f);
 
 		vertex.position = vert;
 		vertex.normal = normal;

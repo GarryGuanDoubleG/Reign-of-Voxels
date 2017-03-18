@@ -80,12 +80,16 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="shader\hud_fs.glsl" />
+    <None Include="shader\hud_vs.glsl" />
     <None Include="shader\lighting_fs.glsl" />
     <None Include="shader\lighting_vs.glsl" />
     <None Include="shader\minimap_fs.glsl" />
     <None Include="shader\minimap_vs.glsl" />
     <None Include="shader\model_fs.glsl" />
     <None Include="shader\model_vs.glsl" />
+    <None Include="shader\ui.frag" />
+    <None Include="shader\ui.vert" />
     <None Include="shader\voxel_fs.glsl" />
     <None Include="shader\voxel_vs.glsl" />
   </ItemGroup>

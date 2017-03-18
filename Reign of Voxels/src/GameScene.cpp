@@ -9,25 +9,23 @@ GameScene::GameScene()
 {
 	m_hud = new HUD();
 
-	m_camera = new Camera(Vec3(256, 256, 256), Vec3(256, 0, 255), Vec3(0, -1.0f, 0));
+	//main player camera
+	m_camera = new Camera(glm::vec3(256, 256, 256), glm::vec3(256, 0, 255), glm::vec3(0, -1.0f, 0));
+	//minimap cam
+	m_minimap_cam = new Camera(glm::vec3(256, 256, 512), glm::vec3(255, 0, 255), glm::vec3(0, -1.0f, 0));
+	m_minimap_cam->SetToOrtho(glm::ortho(-256.0f, 256.0f, -256.0f, 256.0f, 0.1f, 1000.0f));
 
-	Vec2 minimap_size = Vec2(512.0f, 512.0f);
-	
-	//m_minimap_pos = Vec2(0.0f, SCREEN_HEIGHT - minimap_size.y);
-	m_minimap_pos = Vec2(0.0f, SCREEN_HEIGHT - (minimap_size.y / 2.0f));
-	m_minimap_scale = Vec2(minimap_size.x / (float)SCREEN_WIDTH, minimap_size.y / (float)SCREEN_HEIGHT);
-	
-	m_minimap_cam = new Camera(Vec3(256, 256, 512), Vec3(255, 0, 255), Vec3(0, -1.0f, 0));
-	m_minimap_cam->SetToOrtho();
+	//minimap scale factors & position
+	glm::vec2 minimap_size = glm::vec2(512.0f, 512.0f);
 
-	//m_model = new Model("Resources\\models\\nanosuit\\nanosuit.obj");
+	//put screen on the bottom left
+	m_minimap_pos = glm::vec2(0.0f, SCREEN_HEIGHT - (minimap_size.y / 2.0f));
+	m_minimap_scale = glm::vec2(minimap_size.x / (float)SCREEN_WIDTH, minimap_size.y / (float)SCREEN_HEIGHT);
+	
 	m_model = new Model("Resources\\models\\sphere.obj");
-		
-	m_light = new LightSource(); 
-	m_light->m_model = m_model;// use the same model for the lighitng for now
 
 	m_voxelManager = new VoxelManager();
-	m_voxelManager->GenerateVoxels();
+	//m_voxelManager->GenerateVoxels();
 
 	Game::instance().getEventSystem().addObserver(this);
 }
@@ -39,6 +37,12 @@ GameScene::~GameScene()
 {
 	Game::instance().getEventSystem().removeObserver(this);
 }
+
+void GameScene::InitHUD()
+{
+
+}
+
 /**
 *@brief code to run every frame of game loop
 */
@@ -55,9 +59,10 @@ void GameScene::Render()
 
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  	glClearBufferfv(GL_COLOR, 0, bg_color);
-	
-	RenderWorld();
-	RenderMinimap();
+
+	//RenderWorld();
+	//RenderMinimap();
+
 	m_hud->Render();
 
 	Game::instance().getWindow()->display();	
@@ -80,15 +85,8 @@ void GameScene::RenderMinimap()
 
 	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_minimap_cam->GetViewMat()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_minimap_cam->GetProj()[0][0]);
-	
-	glUniform2fv(glGetUniformLocation(shader, "position"), 1, &m_minimap_pos[0]);
-	glUniform2fv(glGetUniformLocation(shader, "scale"), 1, &m_minimap_scale[0]);
-
-	//glEnable(GL_CULL_FACE);
 
 	m_voxelManager->RenderMinimap(shader, m_minimap_scale, m_minimap_pos);
-
-	//glDisable(GL_CULL_FACE);
 }
 
 /**

@@ -159,5 +159,6 @@ GLuint GetShader(std::string name)
 	{
 		slog("Could not find Shader: %s", name.c_str());
 	}
+
 	return g_shader_map[name];
 }

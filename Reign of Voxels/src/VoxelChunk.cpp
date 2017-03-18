@@ -7,7 +7,7 @@ VoxelChunk::VoxelChunk() : m_flag(0)
 
 }
 
-void VoxelChunk::Init(Vec3 position)
+void VoxelChunk::Init(glm::vec3 position)
 {
 	if (m_flag & CHUNK_FLAG_INUSE)
 		std::cout << "Error already using chunk" << std::endl;
@@ -37,9 +37,9 @@ void VoxelChunk::Destroy()
 }
 
 
-Vec3 VoxelChunk::getSize()
+glm::vec3 VoxelChunk::getSize()
 {
-	return Vec3(CHUNK_SIZE);
+	return glm::vec3(CHUNK_SIZE);
 }
 
 bool VoxelChunk::isActive()
@@ -160,19 +160,19 @@ int inline VoxelChunk::GetIndex(int x, int y, int z)
 void VoxelChunk::AddLeftFace(int x, int y, int z)
 {
 	Vertex vertex;	
-	vertex.normal = Vec3(-1.0f, 0, 0); //normal reversed because this is the previous voxel's rirght
-	vertex.uv = Vec2(.5f);
+	vertex.normal = glm::vec3(-1.0f, 0, 0); //normal reversed because this is the previous voxel's rirght
+	vertex.uv = glm::vec2(.5f);
 
-	vertex.position = Vec3(x, y, z + 1.0f);
+	vertex.position = glm::vec3(x, y, z + 1.0f);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x, y + 1.0f, z + 1.0f);
+	vertex.position = glm::vec3(x, y + 1.0f, z + 1.0f);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x, y + 1.0f, z);
+	vertex.position = glm::vec3(x, y + 1.0f, z);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x, y, z);
+	vertex.position = glm::vec3(x, y, z);
 	m_vertices.push_back(vertex);
 
 	AddTrianglesIndices();
@@ -181,20 +181,20 @@ void VoxelChunk::AddLeftFace(int x, int y, int z)
 void VoxelChunk::AddRightFace(int x, int y, int z)
 {
 	Vertex vertex;	
-	vertex.normal = Vec3(1.0f, 0, 0);
-	vertex.uv = Vec2(.5f);
+	vertex.normal = glm::vec3(1.0f, 0, 0);
+	vertex.uv = glm::vec2(.5f);
 
 	
-	vertex.position = Vec3(x + 1, y, z + 1.0f);
+	vertex.position = glm::vec3(x + 1, y, z + 1.0f);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x + 1, y + 1.0f, z + 1.0f);
+	vertex.position = glm::vec3(x + 1, y + 1.0f, z + 1.0f);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x + 1, y + 1.0f, z);
+	vertex.position = glm::vec3(x + 1, y + 1.0f, z);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x + 1, y, z);
+	vertex.position = glm::vec3(x + 1, y, z);
 	m_vertices.push_back(vertex);
 
 	AddTrianglesIndices();
@@ -203,19 +203,19 @@ void VoxelChunk::AddRightFace(int x, int y, int z)
 void VoxelChunk::AddBottomFace(int x, int y, int z)
 {
 	Vertex vertex;
-	vertex.normal = Vec3(0.0f, -1, 0);
-	vertex.uv = Vec2(.5f);
+	vertex.normal = glm::vec3(0.0f, -1, 0);
+	vertex.uv = glm::vec2(.5f);
 
-	vertex.position = Vec3(x, y, z);
+	vertex.position = glm::vec3(x, y, z);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x + 1.0f, y, z);
+	vertex.position = glm::vec3(x + 1.0f, y, z);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x + 1.0f, y, z + 1.0f);
+	vertex.position = glm::vec3(x + 1.0f, y, z + 1.0f);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x, y, z + 1.0f);
+	vertex.position = glm::vec3(x, y, z + 1.0f);
 	m_vertices.push_back(vertex);
 
 	AddTrianglesIndices();
@@ -224,22 +224,22 @@ void VoxelChunk::AddBottomFace(int x, int y, int z)
 void VoxelChunk::AddTopFace(int x, int y, int z)
 {
 	Vertex vertex;
-	vertex.normal = Vec3(0.0f, 1, 0);
-	vertex.uv = Vec2(.5f);
+	vertex.normal = glm::vec3(0.0f, 1, 0);
+	vertex.uv = glm::vec2(.5f);
 
-	vertex.position = Vec3(x, y + 1, z);
+	vertex.position = glm::vec3(x, y + 1, z);
 	m_vertices.push_back(vertex);
 	m_top_verts.push_back(vertex);
 
-	vertex.position = Vec3(x + 1.0f, y + 1, z);
+	vertex.position = glm::vec3(x + 1.0f, y + 1, z);
 	m_vertices.push_back(vertex);
 	m_top_verts.push_back(vertex);
 
-	vertex.position = Vec3(x + 1.0f, y + 1, z + 1.0f);
+	vertex.position = glm::vec3(x + 1.0f, y + 1, z + 1.0f);
 	m_vertices.push_back(vertex);
 	m_top_verts.push_back(vertex);
 
-	vertex.position = Vec3(x, y + 1, z + 1.0f);
+	vertex.position = glm::vec3(x, y + 1, z + 1.0f);
 	m_vertices.push_back(vertex);
 	m_top_verts.push_back(vertex);
 
@@ -250,18 +250,18 @@ void VoxelChunk::AddTopFace(int x, int y, int z)
 void VoxelChunk::AddBackFace(int x, int y, int z)
 {
 	Vertex vertex;
-	vertex.normal = Vec3(0.0f, 0, -1.0f);
-	vertex.uv = Vec2(.5f);
+	vertex.normal = glm::vec3(0.0f, 0, -1.0f);
+	vertex.uv = glm::vec2(.5f);
 
-	vertex.position = Vec3(x, y, z);
+	vertex.position = glm::vec3(x, y, z);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x, y + 1.0f, z);
+	vertex.position = glm::vec3(x, y + 1.0f, z);
 	m_vertices.push_back(vertex);
-	vertex.position = Vec3(x + 1.0f, y + 1.0f, z);
+	vertex.position = glm::vec3(x + 1.0f, y + 1.0f, z);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x + 1.0f, y, z);
+	vertex.position = glm::vec3(x + 1.0f, y, z);
 	m_vertices.push_back(vertex);
 
 	AddTrianglesIndices();
@@ -270,18 +270,18 @@ void VoxelChunk::AddBackFace(int x, int y, int z)
 void VoxelChunk::AddFrontFace(int x, int y, int z)
 {
 	Vertex vertex;
-	vertex.normal = Vec3(0.0f, 0, 1.0f);
+	vertex.normal = glm::vec3(0.0f, 0, 1.0f);
 	
-	vertex.uv = Vec2(0, 0);
-	vertex.position = Vec3(x, y, z + 1);
+	vertex.uv = glm::vec2(0, 0);
+	vertex.position = glm::vec3(x, y, z + 1);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x, y + 1.0f, z + 1);
+	vertex.position = glm::vec3(x, y + 1.0f, z + 1);
 	m_vertices.push_back(vertex);
-	vertex.position = Vec3(x + 1.0f, y + 1.0f, z + 1);
+	vertex.position = glm::vec3(x + 1.0f, y + 1.0f, z + 1);
 	m_vertices.push_back(vertex);
 
-	vertex.position = Vec3(x + 1.0f, y, z + 1);
+	vertex.position = glm::vec3(x + 1.0f, y, z + 1);
 	m_vertices.push_back(vertex);
 
 	AddTrianglesIndices();
@@ -292,7 +292,7 @@ void VoxelChunk::SetVoxelActive(int x, int y, int z)
 	//m_voxels[x - (int)m_position.x][y - (int)m_position.y][z - (int)m_position.z].SetActive(true);//convert world coor to local
 }
 
-Vec3 VoxelChunk::getPosition()
+glm::vec3 VoxelChunk::getPosition()
 {
 	return m_position;
 }

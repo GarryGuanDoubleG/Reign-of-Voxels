@@ -10,16 +10,16 @@ public:
 	LightSource();
 	~LightSource();
 
-	void setPosition(Vec3 pos);
-	void setColor(Vec3 color);
-	Vec3 getPosition();
-	Vec3 getColor();
+	void setPosition(glm::vec3 pos);
+	void setColor(glm::vec3 color);
+	glm::vec3 getPosition();
+	glm::vec3 getColor();
 
-	void Draw(Mat4 view, Mat4 proj);
+	void Draw(glm::mat4 view, glm::mat4 proj);
 
 	Model *m_model;
 private:
 
-	Vec3 m_pos;
-	Vec3 m_color;
+	glm::vec3 m_pos;
+	glm::vec3 m_color;
 };

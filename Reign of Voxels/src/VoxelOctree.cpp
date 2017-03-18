@@ -70,7 +70,7 @@ void VoxelOctree::InitializeChildren()
 		{
 			for (float z = 0; z < 2; z++)
 			{
-				CubeRegion childRegion = { m_region.position + Vec3(x * childSize, y * childSize, z * childSize),
+				CubeRegion childRegion = { m_region.position + glm::vec3(x * childSize, y * childSize, z * childSize),
 					childSize };
 
 				voxelManager->createOctreeChild(this, i, childRegion);

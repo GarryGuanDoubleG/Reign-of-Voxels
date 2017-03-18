@@ -55,7 +55,7 @@ void VoxelManager::GenerateVoxels()
 		slog("Failed to Load or Generate HeightMap");
 	else
 	{
-		CubeRegion region = { Vec3(0.0), m_worldSize };
+		CubeRegion region = { glm::vec3(0.0), m_worldSize };
 
 		m_octreeRoot->InitNode(region);//root octree
 		m_octreeRoot->InitializeOctree(heightmap, m_worldSize, this);
@@ -65,7 +65,7 @@ void VoxelManager::GenerateVoxels()
 }
 
 
-VoxelChunk * VoxelManager::createChunk(Vec3 worldPosition)
+VoxelChunk * VoxelManager::createChunk(glm::vec3 worldPosition)
 {
 	if (m_freeChunkHead == m_freeChunkHead->m_next)
 		std::cout << "free list is empty" << std::endl;
@@ -131,16 +131,16 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 
 	glUseProgram(voxel_shader);
 
-	Vec3 light_pos = Vec3(-32, 512, -32);
-	Vec3 light_color = Vec3(1.0f, 1.0f, 1.0f);
+	glm::vec3 light_pos = glm::vec3(-32, 512, -32);
+	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
-	Mat4 view = player_cam->GetViewMat();
-	Mat4 proj = player_cam->GetProj();
+	glm::mat4 view = player_cam->GetViewMat();
+	glm::mat4 proj = player_cam->GetProj();
 
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
 
-	Vec3 voxel_color(0.6f, 1.0f, 0.3f);
+	glm::vec3 voxel_color(0.6f, 1.0f, 0.3f);
 
 	//lighting
 	glUniform3fv(glGetUniformLocation(voxel_shader, "viewPos"), 1, &player_cam->GetPosition()[0]);
@@ -154,28 +154,28 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 
 	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
 	{
-		Mat4 model = Mat4(1.0f);		
+		glm::mat4 model = glm::mat4(1.0f);		
 		model = glm::translate(model, VoxelOctree::render_list[i]->getPosition());
 		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
 		glUniform1i(glGetUniformLocation(voxel_shader, "chunkID"), i);
 
-		VoxelOctree::render_list[i]->RenderMinimap();
+		VoxelOctree::render_list[i]->Render();
 	}
 	
 }
 
-void VoxelManager::RenderMinimap(GLuint shader, Vec2 &scale, Vec2 &position)
+void VoxelManager::RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &position)
 {
 	GLuint model_loc = glGetUniformLocation(shader, "model");
 
 	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
 	{
-		Mat4 model = Mat4(1.0f);
+		glm::mat4 model = glm::mat4(1.0f);
 
-		model = glm::scale(model, Vec3(scale.x, 1.0f, scale.y));
+		model = glm::scale(model, glm::vec3(scale.x, 1.0f, scale.y));
 		model = glm::translate(model, VoxelOctree::render_list[i]->getPosition());
-		model = glm::translate(model, Vec3(position.x, 0.0f, position.y));		
+		model = glm::translate(model, glm::vec3(position.x, 0.0f, position.y));		
 
 		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));		
 

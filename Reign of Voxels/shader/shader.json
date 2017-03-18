@@ -19,9 +19,9 @@
     "fs": "shader/minimap_fs.glsl"
   },
 
-  "HUD": {
-    "vs": "shader/hud_vs.glsl",
-    "fs": "shader/hud_fs.glsl"
+  "hud": {
+    "vs": "shader/ui.vert",
+    "fs": "shader/ui.frag"
   }
 }
 

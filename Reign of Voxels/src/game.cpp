@@ -47,8 +47,8 @@ void Game::GraphicsInit()
 	settings.minorVersion = .0;
 	//Create context
 	m_window = new sf::RenderWindow(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Reign of Voxels", sf::Style::Default, settings);
-	Game::instance().getWindow()->setMouseCursorGrabbed(true);
-	Game::instance().getWindow()->setMouseCursorVisible(false);
+	Game::instance().getWindow()->setMouseCursorGrabbed(false);
+	Game::instance().getWindow()->setMouseCursorVisible(true);
 	m_window->setVerticalSyncEnabled(true);
 
 	if ((err = glewInit()) != GLEW_OK)
@@ -63,6 +63,10 @@ void Game::GraphicsInit()
 
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//glDisableClientState(GL_COLOR_ARRAY);
+	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
 }
 /*
 * @brief initializes the game from graphics to loading scene and managing client connection
@@ -78,7 +82,7 @@ void Game::Initialize()
 	m_instance.m_client = new Client();//managers communication with the server
 
 	m_initialized = true;
-	m_lock_mouse = true;
+	m_lock_mouse = false;
 }
 /*
 * @brief throws a close game event to start clean up process
@@ -126,26 +130,35 @@ void Game::GameLoop()
 	while (m_running)
 	{
 		sf::Event event;
-
-		m_window->clear(sf::Color::Black);
 		
 		while (m_window->pollEvent(event))
 		{
 			/*if (event.key.code == sf::Keyboard::Escape)
 				GameClose();
 			else*/
-			m_eventSystem->Notify(ClientInput, event);
-			if (event.key.code == sf::Keyboard::Delete)
+
+			if (event.type == sf::Event::KeyPressed)
 			{
-				Game::instance().getWindow()->setMouseCursorGrabbed(false);
-				Game::instance().getWindow()->setMouseCursorVisible(true);
-				m_lock_mouse != m_lock_mouse;
+				if (event.key.code == sf::Keyboard::Q)
+				{
+					m_lock_mouse = !m_lock_mouse;
+
+					if (m_lock_mouse)
+					{
+						Game::instance().getWindow()->setMouseCursorGrabbed(true);
+						Game::instance().getWindow()->setMouseCursorVisible(false);
+					}
+					else
+					{
+						Game::instance().getWindow()->setMouseCursorGrabbed(false);
+						Game::instance().getWindow()->setMouseCursorVisible(true);
+					}
+				}
 			}
-				
+			m_eventSystem->Notify(ClientInput, event);				
 		}
 		if (m_lock_mouse)
 		{
-
 			sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
 		}
 			g_delta_clock.restart();
