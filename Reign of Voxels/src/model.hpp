@@ -11,6 +11,11 @@ public:
 	* Loads model data using Assimp
 	*/
 	Model(GLchar * filepath);
+	/** Constructor
+	* Loads model data using Assimp
+	*/
+	Model(std::string &filepath);
+
 	/** Destructor
 	*
 	*/

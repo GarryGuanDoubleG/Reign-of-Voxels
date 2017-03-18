@@ -24,40 +24,50 @@ public:
 	*/
 	~GameScene();
 
-
-	void InitHUD();
-
 	/**
 	*@brief code to run every frame of game loop
 	*/
 	virtual void SceneFrame();
-	/**
-	*@brief Handles drawing the game scene 
-	*/
-	virtual void Render();
 
-	void RenderWorld();
-	void RenderMinimap();
-	void RenderHUD();
 	/**
 	*@brief Listens to user input events and handles it
 	*@param event type of user input event
 	*@param input the input from client or server
 	*/
 	virtual void onNotify(Event event, sf::Event &input);
+private:
+
 	/**
 	*@brief Handles user input
 	*@param event the user input
 	*/
-	virtual void HandleInput(sf::Event event) ;
-private:
+	virtual void HandleInput(sf::Event event);
+
+	/**
+	*@brief Handles drawing the game scene
+	*/
+	virtual void Render();
+	/**
+	* @brief Renders the voxel terrain
+	*/
+	void RenderWorld();
+
+	/**
+	* @brief Renders a scaled down version of world
+	*/
+	void RenderMinimap();
+
+	/**
+	* @brief Loads model into global array
+	*/
+	void LoadModels();
+
+	GLint GetModelID(std::string name);
+
 	HUD * m_hud;
 
 	int m_size; /**<size of the voxel world. This is to test instance rendering */
 	glm::mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
-
-	Model *m_model; /**<pointer to model loaded */
-	LightSource *m_light;
 
 	VoxelManager * m_voxelManager;
 

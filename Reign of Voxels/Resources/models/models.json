@@ -1,0 +1,14 @@
+{
+  "worker": {
+    "path": "Resources\\models\\worker.obj",
+    "mtl": "Resources\\models\\worker.mtl"
+  },
+
+  "cube": {
+    "path": "Resources\\models\\cube.obj"
+  },
+
+  "sphere": {
+    "path" : "Resources\\models\\sphere.obj"
+  }
+}

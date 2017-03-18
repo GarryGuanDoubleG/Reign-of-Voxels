@@ -188,6 +188,9 @@
     <ClInclude Include="src\HUD.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="src\entity.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
