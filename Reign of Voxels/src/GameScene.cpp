@@ -25,7 +25,7 @@ GameScene::GameScene()
 	m_model = new Model("Resources\\models\\sphere.obj");
 
 	m_voxelManager = new VoxelManager();
-	//m_voxelManager->GenerateVoxels();
+	m_voxelManager->GenerateVoxels();
 
 	Game::instance().getEventSystem().addObserver(this);
 }
@@ -60,8 +60,8 @@ void GameScene::Render()
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  	glClearBufferfv(GL_COLOR, 0, bg_color);
 
-	//RenderWorld();
-	//RenderMinimap();
+	RenderWorld();
+	RenderMinimap();
 
 	m_hud->Render();
 

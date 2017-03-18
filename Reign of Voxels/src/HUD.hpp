@@ -6,6 +6,12 @@
 #include "camera.hpp"
 #include "glm.hpp"
 
+typedef struct Vertex2D
+{
+	glm::vec3 position;
+	glm::vec2 texCoord;
+};
+
 typedef struct HUDWidget
 {
 	Rectf rect;
@@ -15,9 +21,7 @@ typedef struct HUDWidget
 		vbo,
 		ebo;
 
-	//float *vertices;
-	glm::vec3 vertices[4];
-	glm::vec2 uv[4];
+	Vertex2D vertices[4];
 
 	GLuint indices[6];
 };

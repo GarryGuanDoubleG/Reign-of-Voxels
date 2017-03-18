@@ -92,24 +92,24 @@ void HUD::GenerateMesh()
 	for (int i = 0; i < m_widgets.size(); i++)
 	{
 		//top left vertice
-		m_widgets[i].vertices[0] = glm::vec3(m_widgets[i].rect.position.x, 
+		m_widgets[i].vertices[0].position = glm::vec3(m_widgets[i].rect.position.x, 
 											 m_widgets[i].rect.position.y, 0.5f);
-		m_widgets[i].uv[0] = glm::vec2(0.0f, 0.0f);
+		m_widgets[i].vertices[0].texCoord = glm::vec2(0.0f, 0.0f);
 
 		//top right
-		m_widgets[i].vertices[1] = glm::vec3(m_widgets[i].rect.position.x + m_widgets[i].rect.size.x,
+		m_widgets[i].vertices[1].position = glm::vec3(m_widgets[i].rect.position.x + m_widgets[i].rect.size.x,
 											 m_widgets[i].rect.position.y, 0.5f);
-		m_widgets[i].uv[1] = glm::vec2(1.0f, 0.0f);
+		m_widgets[i].vertices[1].texCoord = glm::vec2(1.0f, 0.0f);
 
 		//bottom left
-		m_widgets[i].vertices[2] = glm::vec3(m_widgets[i].rect.position.x, 
+		m_widgets[i].vertices[2].position = glm::vec3(m_widgets[i].rect.position.x,
 											 m_widgets[i].rect.position.y + m_widgets[i].rect.size.y, 0.5f);
-		m_widgets[i].uv[2] = glm::vec2(0.0f, 1.0f);
+		m_widgets[i].vertices[2].texCoord = glm::vec2(0.0f, 1.0f);
 
 		//bottom right
-		m_widgets[i].vertices[3] = glm::vec3(m_widgets[i].rect.position.x + m_widgets[i].rect.size.x,
+		m_widgets[i].vertices[3].position = glm::vec3(m_widgets[i].rect.position.x + m_widgets[i].rect.size.x,
 											 m_widgets[i].rect.position.y + m_widgets[i].rect.size.y, 0.5f);
-		m_widgets[i].uv[3] = glm::vec2(1.0f, 1.0f);
+		m_widgets[i].vertices[3].texCoord = glm::vec2(1.0f, 1.0f);
 
 		//top left triangle
 		m_widgets[i].indices[0] = 0;
@@ -134,19 +134,18 @@ void HUD::BindWidgets()
 		//gen and bind vertex buffer
 		glGenBuffers(1, &m_widgets[i].vbo);
 		glBindBuffer(GL_ARRAY_BUFFER, m_widgets[i].vbo);
-		//4 vertex and uv positions
-		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(glm::vec3) + 4 * sizeof(glm::vec2), &m_widgets[i].vertices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ARRAY_BUFFER, 4 * sizeof(Vertex2D), &m_widgets[i].vertices[0], GL_STATIC_DRAW);
 
 		//gen and bind indices
 		glGenBuffers(1, &m_widgets[i].ebo);
 		glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_widgets[i].ebo);
-		glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(m_widgets[i].indices), &m_widgets[i].indices[0], GL_STATIC_DRAW);
+		glBufferData(GL_ELEMENT_ARRAY_BUFFER, 6 * sizeof(GLuint), &m_widgets[i].indices[0], GL_STATIC_DRAW);
 
 		glEnableVertexAttribArray(0);
-		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*)0);
+		glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (GLvoid*)0);
 
 		glEnableVertexAttribArray(1);
-		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(glm::vec2), (GLvoid*)0);
+		glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex2D), (GLvoid*)offsetof(Vertex2D, texCoord));
 
 		glBindVertexArray(0);
 		glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -157,30 +156,19 @@ void HUD::BindWidgets()
 void HUD::Render()
 {
 	GLuint shader = GetShader("hud");
-	GLuint model_location = glGetUniformLocation(shader, "model");
-	
+
 	glUseProgram(shader);
 
-	glm::mat4 projection = glm::ortho(0.0f, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT, 0.0f);
-
-	glUniformMatrix4fv(glGetUniformLocation(shader, "proj"), 1, GL_FALSE, &projection[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
-
+	glUniformMatrix4fv(glGetUniformLocation(shader, "proj"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);	
 
 	for (int i = 0; i < m_widgets.size(); i++)
 	{
-		glm::mat4 model = glm::mat4(1.0f);
-		model = glm::translate(model, glm::vec3(m_widgets[i].rect.position, 0.0f));
-
 		glBindTexture(GL_TEXTURE_2D, m_widgets[i].textureID);
 
 		glBindVertexArray(m_widgets[i].vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
 	}
-
-
-	
 }
 
 void HUD::HandleInput(sf::Event event)
