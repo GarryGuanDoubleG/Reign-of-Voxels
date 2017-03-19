@@ -168,7 +168,7 @@ bool VoxelOctree::BuildTree()
 	{
 		if (!m_chunk)
 		{
-			m_chunk = voxelManager->createChunk(m_region.position);
+			m_chunk = voxelManager->CreateChunk(m_region.position);
 		}
 
 		float scale = (float)VoxelOctree::maxHeight / (float)256;

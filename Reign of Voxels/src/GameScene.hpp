@@ -1,12 +1,18 @@
 #pragma once
 #include "SFML\Graphics.hpp"
+
 #include "scene.hpp"
-#include "model.hpp"
 #include "LightSource.hpp"
+
+#include "entity.hpp"
 #include "camera.hpp"
 #include "HUD.hpp"
-#include "game.hpp"
 #include "VoxelManager.hpp"
+
+GLint GetModelID(std::string name);
+
+#define MAX_ENTITES 400
+
 /**
 * GameScene class that manages rendering the voxel world. Inherits from abstract class Scene
 */
@@ -37,6 +43,13 @@ public:
 	virtual void onNotify(Event event, sf::Event &input);
 private:
 
+	void InitMinimap();
+
+	/**
+	*@brief Updates game world 
+	*/
+	void Update();
+
 	/**
 	*@brief Handles user input
 	*@param event the user input
@@ -52,6 +65,8 @@ private:
 	*/
 	void RenderWorld();
 
+	void RenderEntities();
+	void RenderModel(Entity *entity);
 	/**
 	* @brief Renders a scaled down version of world
 	*/
@@ -62,21 +77,31 @@ private:
 	*/
 	void LoadModels();
 
-	GLint GetModelID(std::string name);
+	void CreateEntity();
 
-	HUD * m_hud;
+	/***********************MEMBER VARIABLES ****************************/
+	
+	//entites
+	Entity *m_entity_list;/**<object pool of entities. */
+	Entity *m_next_free_entity; /**<head of free list for entites*/
+	GLuint m_entity_count;
 
-	int m_size; /**<size of the voxel world. This is to test instance rendering */
-	glm::mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
 
-	VoxelManager * m_voxelManager;
+	HUD * m_hud;/**<HUD handler class that managers hud inputs and rendering*/
+	
+	VoxelManager * m_voxelManager; /**<Handles Voxel Generation, rendering, and interaction*/
 
+	//main player camera
 	Camera *m_camera; /**<player camera*/  
+	
+	//minimap
 	Camera *m_minimap_cam; /**<camera used to display minimap*/
 
 	glm::vec2 m_minimap_size;//size to display minimap
 	glm::vec2 m_minimap_scale;
 	glm::vec2 m_minimap_pos;
+
+	Model * m_model; // test model, get rid of it once entities work
 
 	bool wire_frame = false;
 };

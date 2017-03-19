@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\client.cpp" />
+    <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\EventSystem.cpp" />
     <ClCompile Include="src\game.cpp" />
     <ClCompile Include="src\GameScene.cpp" />
@@ -36,6 +37,7 @@
     <ClCompile Include="src\main.cpp" />
     <ClCompile Include="src\mesh.cpp" />
     <ClCompile Include="src\model.cpp" />
+    <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\sceneManager.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\simple_logger.cpp" />
@@ -69,6 +71,7 @@
     <ClInclude Include="src\model.hpp" />
     <ClInclude Include="src\observer.hpp" />
     <ClInclude Include="src\packet.hpp" />
+    <ClInclude Include="src\ResourceManager.hpp" />
     <ClInclude Include="src\scene.hpp" />
     <ClInclude Include="src\sceneManager.hpp" />
     <ClInclude Include="src\shader.hpp" />

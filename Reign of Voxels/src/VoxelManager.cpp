@@ -17,7 +17,6 @@ VoxelManager::VoxelManager()
 	m_cube = new Model("Resources\\models\\cube.obj");
 	//intialize chunkpool
 	int maxChunks = worldSizeXZ * (VoxelOctree::maxHeight * 2) / VoxelChunk::CHUNK_SIZE_CUBED;
-	//int maxChunks = worldSizeXZ * m_worldSize / VoxelChunk::CHUNK_SIZE_CUBED;
 
 	m_maxChunks = maxChunks;
 	
@@ -65,7 +64,7 @@ void VoxelManager::GenerateVoxels()
 }
 
 
-VoxelChunk * VoxelManager::createChunk(glm::vec3 worldPosition)
+VoxelChunk * VoxelManager::CreateChunk(glm::vec3 worldPosition)
 {
 	if (m_freeChunkHead == m_freeChunkHead->m_next)
 		std::cout << "free list is empty" << std::endl;
@@ -119,6 +118,8 @@ VoxelOctree *VoxelManager::createOctreeChild(VoxelOctree *currentNode, int child
 	return child;
 }
 
+
+
 void VoxelManager::destroyOctreeNode(VoxelOctree * node)
 {
 	node->DestroyNode(); //clears minimal data for reuse
@@ -131,7 +132,7 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 
 	glUseProgram(voxel_shader);
 
-	glm::vec3 light_pos = glm::vec3(-32, 512, -32);
+	glm::vec3 light_pos = glm::vec3(256, 512, 256);
 	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	glm::mat4 view = player_cam->GetViewMat();

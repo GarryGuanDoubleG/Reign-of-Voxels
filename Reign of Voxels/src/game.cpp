@@ -126,17 +126,18 @@ void Game::GameLoop()
 {
 	m_running = true;
 	g_clock.restart();
+	
+	//center mouse in window
 	sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
+	
 	while (m_running)
 	{
 		sf::Event event;
-		
+		g_delta_clock.restart();
+
+		//get user inputs
 		while (m_window->pollEvent(event))
 		{
-			/*if (event.key.code == sf::Keyboard::Escape)
-				GameClose();
-			else*/
-
 			if (event.type == sf::Event::KeyPressed)
 			{
 				if (event.key.code == sf::Keyboard::Q)
@@ -157,14 +158,14 @@ void Game::GameLoop()
 			}
 			m_eventSystem->Notify(ClientInput, event);				
 		}
+
 		if (m_lock_mouse)
 		{
 			sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
 		}
-			g_delta_clock.restart();
-			m_sceneManager->SceneFrame();
-		/*sf::Vector2i center = sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-		sf::Mouse::setPosition(center);*/
+
+		g_delta_clock.restart();
+		m_sceneManager->SceneFrame();
 	}
 	m_window->close();
 }

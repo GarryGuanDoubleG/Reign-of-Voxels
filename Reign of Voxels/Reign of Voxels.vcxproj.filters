@@ -96,6 +96,12 @@
     <ClCompile Include="src\HUD.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="src\entity.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\ResourceManager.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actor.hpp">
@@ -189,6 +195,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\entity.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\ResourceManager.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

@@ -1,4 +1,3 @@
-#version 400 core
 out vec4 color;
 
 in vec2 UV;
@@ -13,7 +12,7 @@ uniform sampler2D texture_specular2;
 uniform vec3 viewPos;
 uniform vec3 lightPos; 
 uniform vec3 lightColor;
-uniform vec3 objectColor;
+
 
 void main(void)
 {
@@ -33,7 +32,7 @@ void main(void)
 	float ambientStrength = 0.1f;
 	vec3 ambient = ambientStrength * lightColor;
 
-    vec3 result = (specular + ambient + diffuse)* objectColor;
+    vec3 result = (specular + ambient + diffuse) * vec3(.5f,.5f,.5f);
 	color = vec4(result, 1.0f);
 	//color = vec4(0.5, 0.5, 1.0, 1.0);
 }

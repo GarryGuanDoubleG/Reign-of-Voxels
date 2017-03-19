@@ -56,6 +56,8 @@ public:
 	* @return pointer to RenderWindow
 	*/
 	sf::RenderWindow*		getWindow();
+
+	void HandleInput();
 private:
 	/*
 	* @brief Initializes sfml window and glew
