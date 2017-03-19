@@ -18,7 +18,7 @@ void Entity::Init(GLint modelID, glm::vec3 position)
 	m_modelID = modelID;
 	m_position = position;
 
-	m_speed = 15.0f;
+	m_speed = 1.0f;
 
 	MoveTo(glm::vec3(256.0f, 256.0f, 256.0f));
 }
@@ -45,7 +45,7 @@ void Entity::Update()
 	{
 		if (glm::distance(m_position, m_target) > .3f)
 		{
-			m_position += m_velocity * Game::g_delta_clock.getElapsedTime().asSeconds();
+			m_position += m_velocity;
 		}			
 		else
 		{

@@ -74,7 +74,7 @@ void Camera::SetPosition(glm::vec3 position)
 void Camera::HandleInput(sf::Event event)
 {
 	sf::Time time = Game::g_delta_clock.getElapsedTime();
-	GLfloat cam_speed = 200.0f * time.asSeconds();
+	GLfloat cam_speed = 3.0f;
 
 	if (event.type == sf::Event::KeyPressed)
 	{
@@ -96,7 +96,7 @@ void Camera::HandleInput(sf::Event event)
 			SetToPersp();
 			break;
 		case sf::Keyboard::PageDown:
-			SetToOrtho();
+			//SetToOrtho();
 			break;
 		default:
 			break;

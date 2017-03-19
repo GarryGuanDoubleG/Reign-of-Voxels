@@ -27,7 +27,7 @@ GameScene::GameScene()
 
 	//main player camera
 	m_camera = new Camera(glm::vec3(256, 256, 256), glm::vec3(256, 0, 255), glm::vec3(0, -1.0f, 0));
-
+	m_camera->SetToPersp();
 	//Generate vertice and types for voxels
 	m_voxelManager = new VoxelManager();
 	m_voxelManager->GenerateVoxels();
