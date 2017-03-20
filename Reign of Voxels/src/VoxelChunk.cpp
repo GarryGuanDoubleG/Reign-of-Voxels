@@ -28,12 +28,10 @@ void VoxelChunk::Init(glm::vec3 position)
 void VoxelChunk::Destroy()
 {
 	m_flag = 0;
-	//clear vertices and indicse
-	/*std::vector<GLuint>empty_indices;
-	m_tri_indices.swap(empty_indices);
 
-	std::vector<Vertex> empty_vertices;
-	m_vertices.swap(empty_vertices);*/
+	glDeleteBuffers(1, &m_vbo);
+	glDeleteBuffers(1, &m_ebo);
+	glDeleteVertexArrays(1, &m_vao);
 }
 
 
@@ -145,11 +143,6 @@ void VoxelChunk::BindMesh()
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VoxelChunk::ClearVertices()
-{
-	std::vector<Vertex> empty;
-	m_vertices.swap(empty);
-}
 
 int inline VoxelChunk::GetIndex(int x, int y, int z)
 {
@@ -297,9 +290,8 @@ glm::vec3 VoxelChunk::getPosition()
 	return m_position;
 }
 
-void VoxelChunk::GenerateMesh(Model *cube)
+void VoxelChunk::GenerateMesh()
 {
-
 	//generate vertices for each face of the chunk
 	//loop through each face rather than each voxel
 	for (int x = 0; x < CHUNK_SIZE; x++)
@@ -356,8 +348,51 @@ void VoxelChunk::ClearMeshData()
 	std::vector<GLuint>().swap(m_mp_indices);	
 }
 
+void VoxelChunk::ClearPlayerStart(float height)
+{
+	for (int x = 0; x < CHUNK_SIZE; x++)
+	{
+		for (int y = 0; y < CHUNK_SIZE; y++)
+		{
+			for (int z = 0; z < CHUNK_SIZE; z++)
+			{
+				//TODO if air get perlin noise map and find a different terrain
+				if (y > height)
+					m_voxels[GetIndex(x, y, z)] = VOXEL_TYPE_AIR;
+				else
+					m_voxels[GetIndex(x, y, z)] = VOXEL_TYPE_GRASS;
+			}
+		}
+	}
+}
+
+void VoxelChunk::SmoothTerrain(float scale, glm::vec3 origin)
+{
+	//smooth terrain from the origin
+	for (int x = 0; x < CHUNK_SIZE; x++)
+	{
+		for (int z = 0; z < CHUNK_SIZE; z++)
+		{
+			//TODO reduce distance calculations
+			glm::vec3 position = m_position + glm::vec3(x, 0, z);
+			float distance = glm::abs(origin.x - position.x) + glm::abs(origin.z - position.x);
+			
+			float max_height = distance - CHUNK_SIZE / 2.0f;
+
+			for (int y = max_height; y < CHUNK_SIZE; y++)
+			{
+				m_voxels[GetIndex(x, y, z)] = VOXEL_TYPE_AIR;
+			}
+		}
+	}
+
+}
+
 void VoxelChunk::Render()
 {
+	if (~m_flag & CHUNK_FLAG_ACTIVE)
+		return; 
+
 	glBindVertexArray(m_vao);
 	glDrawElements(GL_TRIANGLES, m_indices_count, GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);

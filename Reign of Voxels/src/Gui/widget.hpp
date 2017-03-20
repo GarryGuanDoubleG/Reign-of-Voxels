@@ -5,10 +5,7 @@
 #include <SFML\Main.hpp>
 #include "glm.hpp"
 #include "Json.hpp"
-/**
-* A macro used to detect 2D collision. Useful to see if mouse click is inside a widget's bounds
-*/
-#define CHECKBOUNDS(x,y, bx,by,bw,bh) ((x >= bx && y >= by) && (x <= bx + bw && y <= by + bh))
+
 using Json = nlohmann::json; /**< convenience specified by nlohmann himself */  
 enum WidgetState
 {

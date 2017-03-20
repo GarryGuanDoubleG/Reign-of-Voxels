@@ -19,3 +19,10 @@ typedef struct
 	glm::vec2 position;
 	glm::vec2 size;
 }Rectf;
+
+/**
+* A macro used to detect 2D collision. Useful to see if mouse click is inside a widget's bounds
+*/
+#define BOUNDCONTAINS2D(x,y, bx,by,bw,bh) ((x >= bx && y >= by) && (x <= bx + bw && y <= by + bh))
+#define BOUNDCONTAINS3D(x,y,z, bx,by,bz,  bw,bh,bl) ((x >= bx && y >= by && z >= bz) \
+					   && (x <= bx + bw && y <= by + bh && z <= bz + bl))

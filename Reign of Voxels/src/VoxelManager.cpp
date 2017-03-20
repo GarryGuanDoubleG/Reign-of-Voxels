@@ -56,8 +56,15 @@ void VoxelManager::GenerateVoxels()
 	{
 		CubeRegion region = { glm::vec3(0.0), m_worldSize };
 
-		m_octreeRoot->InitNode(region);//root octree
+		m_octreeRoot->InitNode(region);//activate root octree node
+		
+		//start building tree and voxel data
 		m_octreeRoot->InitializeOctree(heightmap, m_worldSize, this);
+		
+		CreatePlayerStartAreas();
+
+		//start generating vertices
+		m_octreeRoot->GenerateWorldMesh();
 	}
 
 	delete heightmap;
@@ -88,6 +95,10 @@ void VoxelManager::destroyChunk(VoxelChunk * chunk)
 	m_freeChunkHead = chunk; //prepend chunk to head of free list
 }
 
+VoxelOctree *VoxelManager::getRootNode()
+{
+	return m_octreeRoot;
+}
 
 VoxelOctree *VoxelManager::getOctreeChild(VoxelOctree * currentNode, int child_index)
 {
@@ -182,4 +193,13 @@ void VoxelManager::RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &pos
 
 		VoxelOctree::render_list[i]->RenderMinimap();
 	}
+}
+
+//player start areas will flattened and set to voxel type air
+void VoxelManager::CreatePlayerStartAreas()
+{
+	//start with player 1
+	m_octreeRoot->CreatePlayerStart(glm::vec3(VoxelChunk::CHUNK_SIZE * 3, 8, VoxelChunk::CHUNK_SIZE * 3));
+
+	//TODO multiple players 2 3 4
 }

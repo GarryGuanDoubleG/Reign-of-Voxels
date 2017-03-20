@@ -52,11 +52,9 @@ public:
 	void VoxelChunk::AddTopFace(int x, int y, int z);
 	void VoxelChunk::AddBackFace(int x, int y, int z);
 
-	void GenerateMesh(Model *cube);
+	void GenerateMesh();
 	void ClearMeshData();
 	void BindMesh();
-
-	void ClearVertices();
 
 	void InsertVoxelAtPos(int x, int y, int z);
 
@@ -64,6 +62,9 @@ public:
 
 	void Render();
 	void RenderMinimap();
+
+	void ClearPlayerStart(float height);
+	void SmoothTerrain(float scale, glm::vec3 origin);
 
 	std::vector<Vertex> m_vertices;
 	std::vector<Vertex> m_top_verts;

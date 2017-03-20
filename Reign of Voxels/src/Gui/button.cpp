@@ -32,7 +32,7 @@ void Button::onMouseEntered(float x, float y)
 	float height = m_box.getSize().y;
 
 	//if button click, trigger callbacks
-	if (CHECKBOUNDS(x, y, pos.x, pos.y, width, height))
+	if (BOUNDCONTAINS2D(x, y, pos.x, pos.y, width, height))
 	{
 		triggerCallBack();
 	}

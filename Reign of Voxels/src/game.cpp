@@ -133,7 +133,6 @@ void Game::GameLoop()
 	while (m_running)
 	{
 		sf::Event event;
-		g_delta_clock.restart();
 
 		//get user inputs
 		while (m_window->pollEvent(event))

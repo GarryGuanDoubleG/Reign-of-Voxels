@@ -75,7 +75,7 @@ void TextBox::onMouseEntered(float x, float y)
 	float height = m_box.getSize().y;
 
 	//check if click is inside the textbox
-	if (CHECKBOUNDS(x, y, pos.x, pos.y, width, height))
+	if (BOUNDCONTAINS2D(x, y, pos.x, pos.y, width, height))
 	{
 		m_selected = true;
 		for (int i = m_text.getString().getSize(); i >= 0; --i)

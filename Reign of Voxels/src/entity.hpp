@@ -11,6 +11,14 @@
 //entity type
 #define ENTITY_AIR 8
 
+/**
+*@brief axis aligned bounding box
+*/
+typedef struct 
+{
+	glm::vec3 start_offset; /*<offset from entity position to start bounding box*/
+	glm::vec3 size; /** dimensions of bounding box*/
+}BoundingBox;
 
 class Entity
 {
@@ -54,4 +62,6 @@ private:
 	glm::vec3 m_velocity;
 
 	float m_speed;
+
+	BoundingBox bounds;
 };

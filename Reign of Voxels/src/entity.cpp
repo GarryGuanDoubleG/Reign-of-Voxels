@@ -43,7 +43,8 @@ void Entity::Update()
 {
 	if ((m_flag & ENTITY_MOVING) == ENTITY_MOVING)
 	{
-		if (glm::distance(m_position, m_target) > .3f)
+		m_velocity = glm::normalize(m_target - m_position) * m_speed;
+		if (glm::distance(m_position, m_target) > 3.0f)
 		{
 			m_position += m_velocity;
 		}			
@@ -81,9 +82,7 @@ void Entity::MoveTo(glm::vec3 target_pos)
 	//	m_target = glm::vec3(target_pos.x, 0, target_pos.z);
 	//}
 
-	m_velocity = glm::normalize(target_pos - m_position) * m_speed;
 	m_target = glm::vec3(target_pos.x, 0, target_pos.z);
-
 	m_flag |= ENTITY_MOVING;
 }
 

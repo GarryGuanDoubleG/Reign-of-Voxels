@@ -207,7 +207,7 @@ void GameScene::LoadModels()
 
 	int i = 0;
 
-	//goes thr ough every object in model.json and loads into globals
+	//goes through every object in model.json and loads into globals
 	for (Json::iterator it = data.begin(); it != data.end(); ++it)
 	{
 		Json model = *it;

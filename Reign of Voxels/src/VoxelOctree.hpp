@@ -32,8 +32,13 @@ public:
 	bool BuildTree();
 
 	//create vertices for world
-	void GenerateMesh(Model *cube, int i, int length);
-	
+	void GenerateMesh(int i, int length);
+	void GenerateWorldMesh();
+
+	VoxelOctree * FindLeafNode(glm::vec3 pos);
+	void		  ClearNode(glm::vec3 pos);
+	void		  SmoothTerrain(float scale, glm::vec3 pos);
+	void		  CreatePlayerStart(glm::vec3 pos);
 
 	static const int maxHeight = 32;
 	static std::vector<VoxelChunk *> render_list;//list of leaf nodes
