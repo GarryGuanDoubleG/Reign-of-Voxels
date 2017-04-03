@@ -34,11 +34,11 @@ typedef struct
 	float D; //equation of plane: Ax +By + Cz + D = 0
 }Plane;
 
-typedef struct CubeRegion
+typedef struct
 {
 	glm::vec3 position;
 	int size;
-};
+}CubeRegion;
 
 /**
 * A macro used to detect 2D collision. Useful to see if mouse click is inside a widget's bounds

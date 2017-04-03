@@ -33,7 +33,7 @@ public:
 	void		  SmoothTerrain(float scale, glm::vec3 pos);
 	void		  CreatePlayerStart(glm::vec3 pos);
 
-	static const int maxHeight = 32;
+	static const int maxHeight = 16;
 	static std::vector<VoxelChunk *> render_list;//list of leaf nodes
 	static void SortRenderList(glm::vec3 camera_pos);//closest chunks render first
 	//leaf node

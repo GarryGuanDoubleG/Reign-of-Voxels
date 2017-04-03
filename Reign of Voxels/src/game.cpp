@@ -94,6 +94,7 @@ void Game::GameClose()
 
 	m_running = false;
 	m_instance.getEventSystem().Notify(Event::Close, event);
+	exit(0);
 }
 /*
 * @brief returns a reference to the global game class
@@ -119,6 +120,48 @@ sf::RenderWindow*	Game::getWindow()
 { 
 	return m_window; 
 }
+
+void Game::HandleInput()
+{
+	sf::Event event;
+
+	//get user inputs
+	while (m_window->pollEvent(event))
+	{
+		if (event.type == sf::Event::KeyPressed)
+		{
+			switch (event.key.code)
+			{
+			case sf::Keyboard::Q:
+			{
+				m_lock_mouse = !m_lock_mouse;
+
+				if (m_lock_mouse)
+				{
+					Game::instance().getWindow()->setMouseCursorGrabbed(true);
+					Game::instance().getWindow()->setMouseCursorVisible(false);
+				}
+				else
+				{
+					Game::instance().getWindow()->setMouseCursorGrabbed(false);
+					Game::instance().getWindow()->setMouseCursorVisible(true);
+				}
+				break;
+			}
+			case sf::Keyboard::Escape:
+				GameClose();
+				break;
+			default:
+				break;
+			}
+
+		}
+
+
+		m_eventSystem->Notify(ClientInput, event);
+	}
+}
+
 /*
 * @brief Game loop that handles what happens every frame
 */
@@ -129,34 +172,13 @@ void Game::GameLoop()
 	
 	//center mouse in window
 	sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
-	
+	sf::Clock frame_rate;
+
 	while (m_running)
 	{
-		sf::Event event;
+		frame_rate.restart();
 
-		//get user inputs
-		while (m_window->pollEvent(event))
-		{
-			if (event.type == sf::Event::KeyPressed)
-			{
-				if (event.key.code == sf::Keyboard::Q)
-				{
-					m_lock_mouse = !m_lock_mouse;
-
-					if (m_lock_mouse)
-					{
-						Game::instance().getWindow()->setMouseCursorGrabbed(true);
-						Game::instance().getWindow()->setMouseCursorVisible(false);
-					}
-					else
-					{
-						Game::instance().getWindow()->setMouseCursorGrabbed(false);
-						Game::instance().getWindow()->setMouseCursorVisible(true);
-					}
-				}
-			}
-			m_eventSystem->Notify(ClientInput, event);				
-		}
+		HandleInput();
 
 		if (m_lock_mouse)
 		{
@@ -165,6 +187,8 @@ void Game::GameLoop()
 
 		g_delta_clock.restart();
 		m_sceneManager->SceneFrame();
+
+		std::cout << "Frame rate timer is " << frame_rate.getElapsedTime().asMilliseconds() << std::endl;
 	}
 	m_window->close();
 }

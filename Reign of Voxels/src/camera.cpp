@@ -14,7 +14,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 target)
 	m_forward = glm::normalize(target - position);
 
 	//default perspective mat
-	m_view_mat = glm::lookAt(m_pos, m_pos + m_forward, m_up);
+	m_view_mat = glm::lookAt(m_pos, target, m_up);
 
 	//set up perspective mat4
 	m_fov = glm::radians(45.0f);

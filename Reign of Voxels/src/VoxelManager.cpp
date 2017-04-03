@@ -166,7 +166,11 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 
 	int render_count = 0;
 
+	sf::Clock timer;
 	VoxelOctree::SortRenderList(player_cam->GetPosition());
+
+	std::cout << "Sorting time " << timer.getElapsedTime().asMilliseconds() << std::endl;
+	timer.restart();
 
 	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
 	{
@@ -177,6 +181,7 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 			continue;
 		else
 			++render_count;
+
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
 		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
@@ -184,6 +189,8 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 	}
 	
 	std::cout << "Render count " << render_count << std::endl;
+	std::cout << "Render time is " << timer.getElapsedTime().asMilliseconds() << std::endl;
+
 }
 
 void VoxelManager::RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &position)
@@ -194,8 +201,15 @@ void VoxelManager::RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &pos
 	{
 		glm::mat4 model = glm::mat4(1.0f);
 
+
+		
+		//scale down to minimap size
 		model = glm::scale(model, glm::vec3(scale.x, 1.0f, scale.y));
+
+		//translate voxels to world position
 		model = glm::translate(model, VoxelOctree::render_list[i]->getPosition());
+
+		//translate again to minimap position
 		model = glm::translate(model, glm::vec3(position.x, 0.0f, position.y));		
 
 		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));		

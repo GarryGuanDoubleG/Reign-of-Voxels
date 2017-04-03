@@ -6,15 +6,9 @@
 #include "GameScene.hpp"
 #include "simple_logger.h"
 
-static std::map<std::string, GLint> g_model_keys;
-static std::vector<Model *> g_models;
 
 #define MODEL_PATH "Resources/models/models.json"
 
-GLint GetModelID(std::string name)
-{
-	return g_model_keys[name];
-}
 
 /**
 * constructor
@@ -22,6 +16,10 @@ GLint GetModelID(std::string name)
 */
 GameScene::GameScene()
 {
+	//load models, textures, fonts, etc.
+	m_resrcMang = new ResourceManager();
+	m_resrcMang->LoadResources();
+
 	//hud handler
 	m_hud = new HUD();
 
@@ -33,7 +31,6 @@ GameScene::GameScene()
 	m_voxelManager = new VoxelManager();
 	m_voxelManager->GenerateVoxels();
 
-	LoadModels();
 	InitMinimap();
 
 	//allocate memeory for all entities
@@ -45,7 +42,6 @@ GameScene::GameScene()
 
 	//head of free list
 	m_next_free_entity = m_entity_list;
-
 
 	Game::instance().getEventSystem().addObserver(this);
 }
@@ -64,11 +60,12 @@ void GameScene::InitMinimap()
 	m_minimap_cam = new Camera(glm::vec3(256, 256, 512), glm::vec3(255, 0, 255));
 	m_minimap_cam->SetToOrtho(glm::ortho(-256.0f, 256.0f, -256.0f, 256.0f, 0.1f, 1000.0f));
 
-	//minimap resizing
+	//minimap resizing^
 	glm::vec2 minimap_size = glm::vec2(512.0f, 512.0f);
 
 	//put minimap on the bottom left
-	m_minimap_pos = glm::vec2(0.0f, SCREEN_HEIGHT - (minimap_size.y / 2.0f));
+	//m_minimap_pos = glm::vec2(0.0f, SCREEN_HEIGHT - (minimap_size.y / 2.0f));
+	m_minimap_pos = glm::vec2(-5.0f, -256.0f);
 	m_minimap_scale = glm::vec2(minimap_size.x / (float)SCREEN_WIDTH, minimap_size.y / (float)SCREEN_HEIGHT);
 }
 
@@ -133,7 +130,7 @@ void GameScene::RenderModel(Entity *entity)
 	glUniform3fv(glGetUniformLocation(shader, "lightPos"), 1, &light_pos[0]);
 	glUniform3fv(glGetUniformLocation(shader, "lightColor"), 1, &light_color[0]);
 
-	g_models[entity->GetModelID()]->Draw(shader);
+	m_resrcMang->GetModel(entity->GetModelID())->Draw(shader);	 
 }
 
 void GameScene::RenderWorld()
@@ -183,6 +180,7 @@ void GameScene::onNotify(Event event, sf::Event &input)
 */
 void GameScene::HandleInput(sf::Event event)
 {
+
 	if (event.type == sf::Event::KeyPressed)
 	{
 		switch (event.key.code)
@@ -199,28 +197,6 @@ void GameScene::HandleInput(sf::Event event)
 	m_camera->HandleInput(event);
 }
 
-void GameScene::LoadModels()
-{
-	Json data;
-
-	std::ifstream in(MODEL_PATH);
-	in >> data;
-
-	int i = 0;
-
-	//goes through every object in model.json and loads into globals
-	for (Json::iterator it = data.begin(); it != data.end(); ++it)
-	{
-		Json model = *it;
-
-		std::string path = model["path"];		
-
-		g_models.push_back(new Model(path));
-		g_model_keys.insert(std::pair<std::string, int>(it.key(), i));
-
-		++i;
-	}
-}
 
 void GameScene::CreateEntity()
 {
@@ -230,6 +206,6 @@ void GameScene::CreateEntity()
 
 	int id = entity - m_entity_list;
 
-	entity->Init(GetModelID("worker"), glm::vec3(64 * id,64, 64 * id));
+	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(64 * id,64, 64 * id));
 	entity->m_nextFree = NULL;
 }

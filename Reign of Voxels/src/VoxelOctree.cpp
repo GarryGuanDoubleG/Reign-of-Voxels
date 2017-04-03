@@ -52,6 +52,8 @@ void VoxelOctree::DestroyNode()
 void VoxelOctree::SortRenderList(glm::vec3 camera_pos)
 {
 	//update chunk's dist to cam
+	int threads = 8;
+
 	for (int i = 0; i < render_list.size(); i++)
 		render_list[i]->distToCam = glm::distance(camera_pos, render_list[i]->getPosition());
 

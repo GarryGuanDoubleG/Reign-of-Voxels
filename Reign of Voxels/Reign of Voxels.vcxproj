@@ -24,7 +24,9 @@
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\EventSystem.cpp" />
-    <ClCompile Include="src\game.cpp" />
+    <ClCompile Include="src\game.cpp">
+      <Optimization Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">MaxSpeed</Optimization>
+    </ClCompile>
     <ClCompile Include="src\GameScene.cpp" />
     <ClCompile Include="src\Gui\button.cpp" />
     <ClCompile Include="src\Gui\image.cpp" />

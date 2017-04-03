@@ -4,12 +4,11 @@
 #include "scene.hpp"
 #include "LightSource.hpp"
 
+#include "ResourceManager.hpp"
 #include "entity.hpp"
 #include "camera.hpp"
 #include "HUD.hpp"
 #include "VoxelManager.hpp"
-
-GLint GetModelID(std::string name);
 
 #define MAX_ENTITES 400
 
@@ -75,12 +74,10 @@ private:
 	/**
 	* @brief Loads model into global array
 	*/
-	void LoadModels();
-
 	void CreateEntity();
 
 	/***********************MEMBER VARIABLES ****************************/
-	
+	ResourceManager *m_resrcMang;
 	//entites
 	Entity *m_entity_list;/**<object pool of entities. */
 	Entity *m_next_free_entity; /**<head of free list for entites*/
