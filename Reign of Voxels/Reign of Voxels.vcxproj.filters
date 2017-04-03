@@ -102,6 +102,9 @@
     <ClCompile Include="src\ResourceManager.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="src\3dmath.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actor.hpp">
@@ -123,9 +126,6 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\GameScene.hpp">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\glm.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\LightSource.hpp">
@@ -198,6 +198,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\ResourceManager.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\3dmath.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

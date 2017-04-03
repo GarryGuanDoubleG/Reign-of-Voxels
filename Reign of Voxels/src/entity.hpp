@@ -1,7 +1,7 @@
 #pragma once
 #include "SFML\Graphics.hpp"
 
-#include "glm.hpp"
+#include "3dmath.hpp"
 
 //flags
 #define ENTITY_ACTIVE 1

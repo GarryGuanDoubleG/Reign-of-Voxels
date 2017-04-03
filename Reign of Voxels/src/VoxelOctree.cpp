@@ -4,7 +4,7 @@
 
 #include "VoxelOctree.hpp"
 #include "VoxelManager.hpp"
-#include "glm.hpp"
+#include "3dmath.hpp"
 #include "simple_logger.h"
 
 static sf::Image *g_heightMap;
@@ -48,6 +48,16 @@ void VoxelOctree::DestroyNode()
 
 }
 
+
+void VoxelOctree::SortRenderList(glm::vec3 camera_pos)
+{
+	//update chunk's dist to cam
+	for (int i = 0; i < render_list.size(); i++)
+		render_list[i]->distToCam = glm::distance(camera_pos, render_list[i]->getPosition());
+
+	//sort by distance
+	std::sort(render_list.begin(), render_list.end());
+}
 
 void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize, VoxelManager *manager)
 {
@@ -215,6 +225,8 @@ VoxelOctree * VoxelOctree::FindLeafNode(glm::vec3 pos)
 
 	return node == root ? NULL : node;
 }
+
+
 
 void VoxelOctree::CreatePlayerStart(glm::vec3 pos)
 {

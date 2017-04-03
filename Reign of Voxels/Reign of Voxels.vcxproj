@@ -19,6 +19,7 @@
     </ProjectConfiguration>
   </ItemGroup>
   <ItemGroup>
+    <ClCompile Include="src\3dmath.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\entity.cpp" />
@@ -57,7 +58,7 @@
     <ClInclude Include="src\eventSystem.hpp" />
     <ClInclude Include="src\game.hpp" />
     <ClInclude Include="src\GameScene.hpp" />
-    <ClInclude Include="src\glm.hpp" />
+    <ClInclude Include="src\3dmath.hpp" />
     <ClInclude Include="src\Gui\button.hpp" />
     <ClInclude Include="src\Gui\image.hpp" />
     <ClInclude Include="src\Gui\label.hpp" />
@@ -192,7 +193,7 @@
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
     <ClCompile>
       <WarningLevel>Level3</WarningLevel>
-      <Optimization>MaxSpeed</Optimization>
+      <Optimization>Disabled</Optimization>
       <FunctionLevelLinking>true</FunctionLevelLinking>
       <IntrinsicFunctions>true</IntrinsicFunctions>
       <SDLCheck>true</SDLCheck>

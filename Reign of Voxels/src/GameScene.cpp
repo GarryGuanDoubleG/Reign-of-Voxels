@@ -26,8 +26,9 @@ GameScene::GameScene()
 	m_hud = new HUD();
 
 	//main player camera
-	m_camera = new Camera(glm::vec3(256, 256, 256), glm::vec3(256, 0, 255), glm::vec3(0, -1.0f, 0));
+	m_camera = new Camera(glm::vec3(256, 128, 256), glm::vec3(256, 0, 255));
 	m_camera->SetToPersp();
+
 	//Generate vertice and types for voxels
 	m_voxelManager = new VoxelManager();
 	m_voxelManager->GenerateVoxels();
@@ -60,7 +61,7 @@ GameScene::~GameScene()
 void GameScene::InitMinimap()
 {
 	//minimap cam
-	m_minimap_cam = new Camera(glm::vec3(256, 256, 512), glm::vec3(255, 0, 255), glm::vec3(0, -1.0f, 0));
+	m_minimap_cam = new Camera(glm::vec3(256, 256, 512), glm::vec3(255, 0, 255));
 	m_minimap_cam->SetToOrtho(glm::ortho(-256.0f, 256.0f, -256.0f, 256.0f, 0.1f, 1000.0f));
 
 	//minimap resizing

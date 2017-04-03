@@ -3,7 +3,7 @@
 #include <SFML\Graphics.hpp>
 #include <SFML\OpenGL.hpp>
 #include <SFML\Main.hpp>
-#include "glm.hpp"
+#include "3dmath.hpp"
 #include "Json.hpp"
 
 using Json = nlohmann::json; /**< convenience specified by nlohmann himself */  

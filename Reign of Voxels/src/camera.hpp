@@ -1,6 +1,6 @@
 #pragma once
 #include "game.hpp"
-#include "glm.hpp"
+#include "3dmath.hpp"
 /**
 * Manages frustum by managing projection and view matrice. Sets up what the player can see.
 * Currently creates a perspective projection but will eventually change to orthographic projection
@@ -12,7 +12,7 @@ public:
 	* A constructor
 	* Sets up projection and view matrices. Starts at position 0,0,3 and looks towards origin
 	*/
-	Camera(glm::vec3 position, glm::vec3 target, glm::vec3 forward);
+	Camera(glm::vec3 position, glm::vec3 target);
 	/**
 	* Empty Destructor
 	*/
@@ -28,9 +28,6 @@ public:
 	*/
 	glm::mat4 GetProj();
 
-	glm::mat4 GetPerspectProj();
-
-	glm::mat4 GetOrthoProj();
 	/**
 	* @brief adjusts camera on user input
 	* @param event the user input
@@ -45,11 +42,21 @@ public:
 	void SetToPersp();
 
 	//uses ortho
-	void SetToOrtho();
 	void SetToOrtho(glm::mat4 ortho);
 
+	//checks if object is within frustum
+	bool PointInCamera(glm::vec3 &point);
+	bool SphereInCamera(glm::vec3 &point, float radius);
+	bool AABBInCamera(BBox &aabb);
+	bool AABBInCamera(CubeRegion &aabb);
+
 private:
-	sf::Vector2i m_last_mouse_pos; /**<The last position mouse was tracked. Used to compare to new mouse pos  */
+	enum {
+		TOP = 0, BOTTOM, LEFT, RIGHT, NEARP, FARP
+	};
+
+	void Update();
+
 	glm::vec3 m_pos; /**< position of camera */  
 	glm::vec3 m_target; /**<the position the camera looks at */  
 	glm::vec3 m_forward; /**< the direction the camera loks at */  
@@ -59,14 +66,27 @@ private:
 	GLfloat m_yaw; /**< x rotation of camera */  
 	GLfloat m_pitch; /**< y rotation of camera  */  
 	GLfloat m_roll; /**<  z rotation of camera*/  
+	
+	/**frustum culling**/
+	GLfloat m_fov;
+	GLfloat m_aspect_ratio;
+	GLfloat m_nearD;
+	GLfloat m_farD;
+
+	GLfloat m_nearH;
+	GLfloat m_nearW;
+	GLfloat m_farH;
+	GLfloat m_farW;	
+
+	Plane m_planes[6];
+	/**end of frustum culling **/
 
 	//projection and view matrices 			
 	glm::mat4 m_view_mat;
 	glm::mat4 m_perspect_proj; /**< projection matrix*/
 	glm::mat4 m_ortho_proj;
 
-	float m_zoom;
+	GLfloat m_zoom;
 
 	bool m_perspective; /**< flag to use projection or ortho view */
-
 };

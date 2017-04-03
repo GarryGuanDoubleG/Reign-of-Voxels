@@ -4,7 +4,7 @@
 #include <SFML\OpenGL.hpp>
 
 #include "camera.hpp"
-#include "glm.hpp"
+#include "3dmath.hpp"
 
 typedef struct Vertex2D
 {

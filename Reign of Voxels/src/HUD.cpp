@@ -13,8 +13,7 @@ HUD::HUD()
 {
 	
 	m_camera = new Camera(glm::vec3(0.0f, 0.0f, 1.0f), 
-						  glm::vec3(0.0f, 0.0f, 0.0f), 
-						  glm::vec3(0.0f, 1.0f, 0.0));
+						  glm::vec3(0.0f, 0.0f, 0.0f));
 	
 	m_camera->SetToOrtho(glm::ortho(0.0f, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT, 0.0f));
 

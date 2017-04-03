@@ -1,6 +1,6 @@
 #pragma once
 #include "VoxelChunk.hpp"
-#include "glm.hpp"
+#include "3dmath.hpp"
 #include "SFML\Graphics.hpp"
 #define MAX_QUEUED_INSERTIONS 10000
 
@@ -9,19 +9,11 @@
 #define OCTREE_ACTIVE 2
 #define OCTREE_LEAF 4
 
-typedef struct CubeRegion
-{
-	glm::vec3 position;
-	int size;
-};
-
 class VoxelOctree
 {
 	friend class VoxelManager;
 public:
 	VoxelOctree();
-
-	void Render();
 	
 	void InitNode(CubeRegion region);
 	void DestroyNode();
@@ -36,13 +28,14 @@ public:
 	void GenerateWorldMesh();
 
 	VoxelOctree * FindLeafNode(glm::vec3 pos);
-	void		  ClearNode(glm::vec3 pos);
+
+
 	void		  SmoothTerrain(float scale, glm::vec3 pos);
 	void		  CreatePlayerStart(glm::vec3 pos);
 
 	static const int maxHeight = 32;
 	static std::vector<VoxelChunk *> render_list;//list of leaf nodes
-
+	static void SortRenderList(glm::vec3 camera_pos);//closest chunks render first
 	//leaf node
 	VoxelChunk	*m_chunk;
 

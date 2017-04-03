@@ -4,7 +4,7 @@
 #include <SFML\OpenGL.hpp>
 
 #include "model.hpp"
-#include "glm.hpp"
+#include "3dmath.hpp"
 
 #define VOXEL_TYPE_AIR 1
 #define VOXEL_TYPE_GRASS 2
@@ -70,6 +70,13 @@ public:
 	std::vector<Vertex> m_top_verts;
 
 	VoxelChunk * m_next;
+
+	//used for rendering closer chunks first
+	float distToCam;
+	//used for sorting chunks
+	bool operator < (const VoxelChunk other) const {
+		return distToCam < other.distToCam;
+	}
 private:
 	void AddTrianglesIndices();
 	void AddMinimapIndices();
@@ -77,7 +84,7 @@ private:
 	int GetIndex(int x, int y, int z);
 
 	std::vector<GLuint> m_tri_indices;//order to draw vertices
-	std::vector<GLuint> m_mp_indices;
+	std::vector<GLuint> m_mp_indices;//indices for minimap
 
 	int m_indices_count; /**< number of indices for world */
 	int m_mp_indices_count; /**< number of indices for minimap */

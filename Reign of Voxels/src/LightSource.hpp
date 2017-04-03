@@ -2,7 +2,7 @@
 #include <SFML\Graphics.hpp>
 #include <GL/glew.h>
 #include <model.hpp>
-#include "glm.hpp"
+#include "3dmath.hpp"
 
 class LightSource
 {

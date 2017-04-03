@@ -164,17 +164,26 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 
 	model_loc = glGetUniformLocation(voxel_shader, "model");
 
+	int render_count = 0;
+
+	VoxelOctree::SortRenderList(player_cam->GetPosition());
+
 	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
 	{
-		glm::mat4 model = glm::mat4(1.0f);		
-		model = glm::translate(model, VoxelOctree::render_list[i]->getPosition());
-		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+		glm::vec3 position = VoxelOctree::render_list[i]->getPosition();
+		CubeRegion chunkRegion = { position, VoxelChunk::CHUNK_SIZE };
 
-		glUniform1i(glGetUniformLocation(voxel_shader, "chunkID"), i);
+		if (!player_cam->AABBInCamera(chunkRegion))
+			continue;
+		else
+			++render_count;
+		glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
 		VoxelOctree::render_list[i]->Render();
 	}
 	
+	std::cout << "Render count " << render_count << std::endl;
 }
 
 void VoxelManager::RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &position)
