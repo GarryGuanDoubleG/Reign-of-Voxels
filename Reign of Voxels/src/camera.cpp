@@ -205,6 +205,31 @@ bool Camera::AABBInCamera(CubeRegion &aabb)
 	return true;
 }
 
+glm::vec3 Camera::MouseToWorldSpace(sf::Vector2i mouse_pos)
+{
+	glm::vec4 ray_clip = glm::vec4((mouse_pos.x * 2.0f / (float)SCREEN_WIDTH) - 1.0f,
+								   1.0f - (mouse_pos.y * 2.0f / (float)SCREEN_HEIGHT),
+									1.0f, 
+									 1.0f);
+	//unproject the ray to view space
+	glm::vec4 ray_eye_space = glm::inverse(m_perspect_proj) * ray_clip;
+	ray_eye_space = glm::vec4(ray_eye_space.x, ray_eye_space.y, 1.0f, 0.0f);
+
+	//unproject ray to world space
+	glm::vec4 ray_world = glm::inverse(m_view_mat) * ray_eye_space;
+
+	
+	m_ray = glm::normalize(ray_world);
+	return m_ray;
+}
+
+void Camera::DrawRay()
+{
+	GetShader("ray");
+
+
+}
+
 void Camera::HandleInput(sf::Event event)
 {
 	sf::Time time = Game::g_delta_clock.getElapsedTime();

@@ -50,6 +50,10 @@ public:
 	bool AABBInCamera(BBox &aabb);
 	bool AABBInCamera(CubeRegion &aabb);
 
+	glm::vec3 MouseToWorldSpace(sf::Vector2i mouse_pos);
+
+	void DrawRay();
+
 private:
 	enum {
 		TOP = 0, BOTTOM, LEFT, RIGHT, NEARP, FARP
@@ -87,6 +91,8 @@ private:
 	glm::mat4 m_ortho_proj;
 
 	GLfloat m_zoom;
+
+	glm::vec3 m_ray;
 
 	bool m_perspective; /**< flag to use projection or ortho view */
 };

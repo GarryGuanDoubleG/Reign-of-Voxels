@@ -5,14 +5,11 @@ in vec2 UV;
 in vec3 vs_normal;
 in vec3 FragPos;
 
-uniform sampler2D texture_diffuse1;
-uniform sampler2D texture_specular1;
-uniform sampler2D texture_specular2;
-
 uniform vec3 viewPos;
 uniform vec3 lightPos; 
 uniform vec3 lightColor;
 
+uniform vec3 model_color;
 
 void main(void)
 {
@@ -32,7 +29,7 @@ void main(void)
 	float ambientStrength = 0.1f;
 	vec3 ambient = ambientStrength * lightColor;
 
-    vec3 result = (specular + ambient + diffuse) * vec3(.5f,.5f,.5f);
+    vec3 result = (specular + ambient + diffuse) * model_color;
 	color = vec4(result, 1.0f);
 	//color = vec4(0.5, 0.5, 1.0, 1.0);
 }

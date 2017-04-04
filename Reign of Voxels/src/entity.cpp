@@ -10,15 +10,17 @@ Entity::~Entity()
 
 }
 
-void Entity::Init(GLint modelID, glm::vec3 position)
+void Entity::Init(GLint modelID, glm::vec3 position, BBox aabb)
 {
-	m_flag >> 8;
+	m_flag = 0;
 	m_flag |= ENTITY_ACTIVE;
 
 	m_modelID = modelID;
 	m_position = position;
 
 	m_speed = 1.0f;
+
+	m_aabb = aabb;
 
 	MoveTo(glm::vec3(256.0f, 256.0f, 256.0f));
 }
@@ -90,4 +92,9 @@ void Entity::MoveTo(glm::vec3 target_pos)
 bool Entity::IsActive()
 {
 	return m_flag & ENTITY_ACTIVE;
+}
+
+bool Entity::IsSelected()
+{
+	return m_flag & ENTITY_SELECTED;
 }

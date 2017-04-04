@@ -166,11 +166,8 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 
 	int render_count = 0;
 
-	sf::Clock timer;
+	
 	VoxelOctree::SortRenderList(player_cam->GetPosition());
-
-	std::cout << "Sorting time " << timer.getElapsedTime().asMilliseconds() << std::endl;
-	timer.restart();
 
 	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
 	{
@@ -187,9 +184,6 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 
 		VoxelOctree::render_list[i]->Render();
 	}
-	
-	std::cout << "Render count " << render_count << std::endl;
-	std::cout << "Render time is " << timer.getElapsedTime().asMilliseconds() << std::endl;
 
 }
 

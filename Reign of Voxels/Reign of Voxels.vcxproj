@@ -95,6 +95,8 @@
     <None Include="shader\minimap_vs.glsl" />
     <None Include="shader\model_fs.glsl" />
     <None Include="shader\model_vs.glsl" />
+    <None Include="shader\ray.frag" />
+    <None Include="shader\ray.vert" />
     <None Include="shader\ui.frag" />
     <None Include="shader\ui.vert" />
     <None Include="shader\voxel_fs.glsl" />

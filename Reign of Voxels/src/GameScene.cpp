@@ -130,6 +130,16 @@ void GameScene::RenderModel(Entity *entity)
 	glUniform3fv(glGetUniformLocation(shader, "lightPos"), 1, &light_pos[0]);
 	glUniform3fv(glGetUniformLocation(shader, "lightColor"), 1, &light_color[0]);
 
+	//color of entity
+
+	glm::vec3 ent_color;
+	if (entity->IsSelected())
+		ent_color = glm::vec3(1.0f, .2f, .2f);
+	else
+		ent_color = glm::vec3(.5f, 1.0f, .5f);
+
+	glUniform3fv(glGetUniformLocation(shader, "model_color"), 1, &ent_color[0]);
+
 	m_resrcMang->GetModel(entity->GetModelID())->Draw(shader);	 
 }
 
@@ -194,6 +204,15 @@ void GameScene::HandleInput(sf::Event event)
 			break;
 		}
 	}
+	else if (event.type == sf::Event::MouseButtonPressed)
+	{
+		sf::Vector2i mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
+		glm::vec3 world_pos = m_camera->MouseToWorldSpace(mouse_pos);
+		
+		std::cout << "world pos x " << world_pos.x << std::endl;
+		std::cout << "world pos y " << world_pos.y << std::endl;
+		std::cout << "world pos z " << world_pos.z << std::endl;
+	}
 	m_camera->HandleInput(event);
 }
 
@@ -206,6 +225,9 @@ void GameScene::CreateEntity()
 
 	int id = entity - m_entity_list;
 
-	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(64 * id,64, 64 * id));
+	//TODO move this to a json file
+	BBox bounds = { glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(64,64,64) };
+
+	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(64 * id,64, 64 * id), bounds);
 	entity->m_nextFree = NULL;
 }

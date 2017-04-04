@@ -238,5 +238,11 @@
     <None Include="shader\ui.vert">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shader\ray.vert">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\ray.frag">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

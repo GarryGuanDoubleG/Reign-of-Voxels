@@ -188,7 +188,6 @@ void Game::GameLoop()
 		g_delta_clock.restart();
 		m_sceneManager->SceneFrame();
 
-		std::cout << "Frame rate timer is " << frame_rate.getElapsedTime().asMilliseconds() << std::endl;
 	}
 	m_window->close();
 }

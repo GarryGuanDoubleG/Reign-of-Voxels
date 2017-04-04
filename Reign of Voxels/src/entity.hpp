@@ -14,11 +14,6 @@
 /**
 *@brief axis aligned bounding box
 */
-typedef struct 
-{
-	glm::vec3 start_offset; /*<offset from entity position to start bounding box*/
-	glm::vec3 size; /** dimensions of bounding box*/
-}BoundingBox;
 
 class Entity
 {
@@ -26,7 +21,7 @@ public:
 	Entity();
 	~Entity();
 
-	void Init(GLint modelID, glm::vec3 position);
+	void Init(GLint modelID, glm::vec3 position, BBox aabb);
 	void Destroy();
 
 	glm::vec3 GetPosition();
@@ -38,7 +33,7 @@ public:
 	
 
 	bool IsActive();
-
+	bool IsSelected();
 	Entity *m_nextFree;
 private:
 	void Think();
@@ -63,5 +58,5 @@ private:
 
 	float m_speed;
 
-	BoundingBox bounds;
+	BBox m_aabb;
 };
