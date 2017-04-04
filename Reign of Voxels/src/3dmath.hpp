@@ -40,6 +40,16 @@ typedef struct
 	int size;
 }CubeRegion;
 
+enum
+{
+	TOP = 0,
+	BOTTOM,
+	LEFT,
+	RIGHT,
+	BACK,
+	FRONT
+};
+
 /**
 * A macro used to detect 2D collision. Useful to see if mouse click is inside a widget's bounds
 */

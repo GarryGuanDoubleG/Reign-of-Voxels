@@ -61,7 +61,7 @@ void VoxelManager::GenerateVoxels()
 		//start building tree and voxel data
 		m_octreeRoot->InitializeOctree(heightmap, m_worldSize, this);
 		
-		CreatePlayerStartAreas();
+		//CreatePlayerStartAreas();
 
 		//start generating vertices
 		m_octreeRoot->GenerateWorldMesh();
@@ -103,6 +103,9 @@ VoxelOctree *VoxelManager::getRootNode()
 VoxelOctree *VoxelManager::getOctreeChild(VoxelOctree * currentNode, int child_index)
 {
 	//root node has children at index 1-8
+	if (child_index >= m_maxOctNodes)
+		return NULL;
+
 	if (currentNode == m_octreeRoot)
 		return &m_octreePool[child_index + 1];
 

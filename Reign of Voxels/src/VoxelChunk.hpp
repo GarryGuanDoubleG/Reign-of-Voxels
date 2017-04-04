@@ -25,6 +25,7 @@ typedef struct
 	sf::Uint8 uv[2]; /**< texture coordinates */
 }VoxelVertex;
 
+
 class VoxelChunk
 {
 	friend class VoxelManager;
@@ -42,22 +43,23 @@ public:
 	glm::vec3 getPosition();
 	glm::vec3 getSize();
 
-	bool isActive();
+	bool IsActive();
 	void SetActive(bool active);
 
-	void VoxelChunk::AddLeftFace(int x, int y, int z);
-	void VoxelChunk::AddBottomFace(int x, int y, int z);
-	void VoxelChunk::AddFrontFace(int x, int y, int z);
-	void VoxelChunk::AddRightFace(int x, int y, int z);
-	void VoxelChunk::AddTopFace(int x, int y, int z);
-	void VoxelChunk::AddBackFace(int x, int y, int z);
+	void AddLeftFace(int x, int y, int z);
+	void AddBottomFace(int x, int y, int z);
+	void AddFrontFace(int x, int y, int z);
+	void AddRightFace(int x, int y, int z);
+	void AddTopFace(int x, int y, int z);
+	void AddBackFace(int x, int y, int z);
+
+	void AssignNeighbor(VoxelChunk * neighbor, int side);
 
 	void GenerateMesh();
 	void ClearMeshData();
 	void BindMesh();
 
 	void InsertVoxelAtPos(int x, int y, int z);
-
 	void SetVoxelActive(int x, int y, int z);
 
 	void Render();
@@ -102,4 +104,6 @@ private:
 
 	sf::Uint8 m_flag;//bool for active
 	sf::Uint8 m_voxels[CHUNK_SIZE_CUBED];
+
+	VoxelChunk *m_neighbor[6];
 };

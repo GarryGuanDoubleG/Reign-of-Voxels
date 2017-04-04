@@ -124,8 +124,8 @@ void Camera::Update()
 	SetPlane(m_planes[BOTTOM], nearBL, nearBR, farBR);
 	SetPlane(m_planes[LEFT], nearTL, nearBL, farBL);
 	SetPlane(m_planes[RIGHT], nearBR, nearTR, farBR);
-	SetPlane(m_planes[NEARP], nearTL, nearTR, nearBR);
-	SetPlane(m_planes[FARP], farTR, farTL, farBL);
+	SetPlane(m_planes[BACK], nearTL, nearTR, nearBR);
+	SetPlane(m_planes[FRONT], farTR, farTL, farBL);
 }
 
 //checks if object is within frustum
@@ -192,7 +192,7 @@ bool Camera::AABBInCamera(CubeRegion &aabb)
 				for (int z = 0; z <= 1; z++)	
 				{
 					glm::vec3 point = aabb.position + glm::vec3(aabb.size * x, aabb.size * y, aabb.size * z);
-					if (DistanceToPlane(m_planes[i], point) > -128)
+					if (DistanceToPlane(m_planes[i], point) > -64)
 						inside = true;
 				}
 			}
@@ -237,31 +237,85 @@ void Camera::HandleInput(sf::Event event)
 
 	if (event.type == sf::Event::KeyPressed)
 	{
-		switch (event.key.code)
+		//for testing
+		//TODO remove use of m_lock_mouse after testing
+		if (Game::instance().m_lock_mouse)
 		{
-		case sf::Keyboard::W:
-			m_pos.z -= cam_speed;
-			break;
-		case sf::Keyboard::S:
-			m_pos.z += cam_speed;
-			break;
-		case sf::Keyboard::A:
-			m_pos.x -= cam_speed;
-			break;
-		case sf::Keyboard::D:
-			m_pos.x += cam_speed;
-			break;
-		default:
-			break;
+			switch (event.key.code)
+			{
+			case sf::Keyboard::W:
+				m_pos += cam_speed * m_forward;
+				break;
+			case sf::Keyboard::S:
+				m_pos -= cam_speed * m_forward;
+				break;
+			case sf::Keyboard::A:
+				m_pos -= m_right * cam_speed;
+				break;
+			case sf::Keyboard::D:
+				m_pos += m_right * cam_speed;
+				break;
+			default:
+				break;
+			}
 		}
+		else
+		{
+			switch (event.key.code)
+			{
+			case sf::Keyboard::W:
+				m_pos.z -= cam_speed;
+				break;
+			case sf::Keyboard::S:
+				m_pos.z += cam_speed;
+				break;
+			case sf::Keyboard::A:
+				m_pos.x -= cam_speed;
+				break;
+			case sf::Keyboard::D:
+				m_pos.x += cam_speed;
+				break;
+			default:
+				break;
+			}
+		}		
 
-		Update();
 	}
 	else if (event.type == sf::Event::MouseWheelMoved)
 	{
 		m_pos += (float)event.mouseWheel.delta * m_forward * cam_speed;
-		Update();
+	}
+	
+	//TODO remove after testing
+	else if (event.type == sf::Event::MouseMoved && Game::instance().m_lock_mouse)
+	{
+		GLfloat sensitivity = 0.05f; // mouse sensitivity
+		sf::Vector2i mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
+		sf::Vector2i center(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+		if (mouse_pos == center)
+			return;
+		sf::Vector2i offset = mouse_pos - center;
+
+		float xoffset = (float)offset.x * sensitivity;
+		float yoffset = (float)offset.y * sensitivity;
+
+		m_yaw += xoffset;
+		m_pitch -= yoffset;
+
+		if (m_pitch > 89.0f)
+			m_pitch = 89.0f;
+		else if (m_pitch < -89.0f)
+			m_pitch = -89.0f;
+
+		glm::vec3 front;
+		front.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+		front.y = sin(glm::radians(m_pitch));
+		front.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+
+		m_forward = glm::normalize(front);
+		m_right = glm::normalize(glm::cross(m_forward, m_up));
 	}
 
+	Update();
 	m_view_mat = glm::lookAt(m_pos, m_pos + m_forward, m_up);
 }

@@ -1,3 +1,4 @@
+#version 400 core
 out vec4 color;
 
 in vec2 UV;
@@ -9,9 +10,10 @@ uniform vec3 viewPos;
 uniform vec3 lightPos; 
 uniform vec3 lightColor;
 
+
 uniform vec3 model_color;
 
-void main(void)
+void main()
 {
 	//color = vec4((texture(texture_diffuse1, UV)) *lightColor);
 	vec3 lightDir = normalize(lightPos - FragPos); 
@@ -31,5 +33,4 @@ void main(void)
 
     vec3 result = (specular + ambient + diffuse) * model_color;
 	color = vec4(result, 1.0f);
-	//color = vec4(0.5, 0.5, 1.0, 1.0);
 }

@@ -55,9 +55,6 @@ public:
 	void DrawRay();
 
 private:
-	enum {
-		TOP = 0, BOTTOM, LEFT, RIGHT, NEARP, FARP
-	};
 
 	void Update();
 
