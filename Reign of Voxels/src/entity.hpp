@@ -25,6 +25,8 @@ public:
 	void Destroy();
 
 	glm::vec3 GetPosition();
+	BBox GetAABB();
+
 	GLuint GetModelID();
 
 	void Update();
@@ -33,7 +35,10 @@ public:
 	
 
 	bool IsActive();
+
+	void SetSelected(bool selected);
 	bool IsSelected();
+
 	Entity *m_nextFree;
 private:
 	void Think();

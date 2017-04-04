@@ -10,11 +10,11 @@ std::mutex g_free_chunk_guard;
 
 VoxelManager::VoxelManager()
 {
+	//TODO load voxel world from json
 	m_worldSize = 512;
 	
 	int worldSizeXZ = m_worldSize * m_worldSize;
 
-	m_cube = new Model("Resources\\models\\cube.obj");
 	//intialize chunkpool
 	int maxChunks = worldSizeXZ * (VoxelOctree::maxHeight * 2) / VoxelChunk::CHUNK_SIZE_CUBED;
 
@@ -30,8 +30,11 @@ VoxelManager::VoxelManager()
 		m_chunkPool[i].m_next = &m_chunkPool[i + 1];
 
 	//Allocate space for Octree. 2^(3h + 1) - 1 nodes
+
+	//TODO reduce nodes so those above max height aren't allocated
 	int maxOctree =  (int)log2(m_worldSize) - (int)log2(VoxelChunk::CHUNK_SIZE);
-		maxOctree = (2 << (3 * maxOctree)) - 1; //2^3 times for 8 child nodes
+		maxOctree = (2 << (3 * maxOctree) ) - 1; //2^3 times for 8 child nodes
+
 	m_maxOctNodes = maxOctree;
 
 	m_octreePool = new VoxelOctree[maxOctree];
@@ -44,6 +47,11 @@ VoxelManager::VoxelManager()
 VoxelManager::~VoxelManager()
 {
 
+}
+
+int VoxelManager::GetWorldSize()
+{
+	return m_worldSize;
 }
 
 void VoxelManager::GenerateVoxels()
@@ -197,8 +205,6 @@ void VoxelManager::RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &pos
 	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
 	{
 		glm::mat4 model = glm::mat4(1.0f);
-
-
 		
 		//scale down to minimap size
 		model = glm::scale(model, glm::vec3(scale.x, 1.0f, scale.y));

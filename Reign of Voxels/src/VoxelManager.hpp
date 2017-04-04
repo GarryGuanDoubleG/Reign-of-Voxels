@@ -10,6 +10,8 @@ public:
 	VoxelManager();
 	~VoxelManager();
 
+	int GetWorldSize();
+
 	void GenerateVoxels();
 
 	void RenderVoxels(Camera * player_cam);
@@ -20,13 +22,16 @@ public:
 
 	//gets the child of a node at a specific index
 	VoxelOctree *getRootNode();
+
+
 	VoxelOctree *getOctreeChild(VoxelOctree * currentNode, int child_index);
 	VoxelOctree *createOctreeChild(VoxelOctree * currentNode, int child_index, CubeRegion &region);
+
+
 	//free octree node
 	void		 destroyOctreeNode(VoxelOctree * node);
 
 	void CreatePlayerStartAreas();
-
 private:
 	int m_worldSize; //size of one side of cubic world region
 	int m_maxChunks;

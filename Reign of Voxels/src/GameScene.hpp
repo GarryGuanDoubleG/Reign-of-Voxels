@@ -66,6 +66,8 @@ private:
 
 	void RenderEntities();
 	void RenderModel(Entity *entity);
+
+	void RenderAABB(Entity *entity, GLuint shader);
 	/**
 	* @brief Renders a scaled down version of world
 	*/

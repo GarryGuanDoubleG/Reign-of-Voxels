@@ -107,6 +107,19 @@ void GameScene::Render()
 	Game::instance().getWindow()->display();	
 }
 
+void GameScene::RenderAABB(Entity *entity, GLuint shader)
+{
+	GLuint modelID = m_resrcMang->GetModelID("cube");
+	
+	glm::mat4 model;
+	model = glm::translate(glm::mat4(1.0f), entity->GetPosition() + entity->GetAABB().min);
+	model = glm::scale(model, entity->GetAABB().max);
+
+	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+
+	m_resrcMang->GetModel(modelID)->Draw(shader);
+}
+
 void GameScene::RenderModel(Entity *entity)
 {
 	GLuint shader = GetShader("model");
@@ -140,7 +153,9 @@ void GameScene::RenderModel(Entity *entity)
 
 	glUniform3fv(glGetUniformLocation(shader, "model_color"), 1, &ent_color[0]);
 
-	m_resrcMang->GetModel(entity->GetModelID())->Draw(shader);	 
+	m_resrcMang->GetModel(entity->GetModelID())->Draw(shader);
+	
+	RenderAABB(entity,shader);
 }
 
 void GameScene::RenderWorld()
@@ -207,11 +222,34 @@ void GameScene::HandleInput(sf::Event event)
 	else if (event.type == sf::Event::MouseButtonPressed)
 	{
 		sf::Vector2i mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
-		glm::vec3 world_pos = m_camera->MouseToWorldSpace(mouse_pos);
-		
-		std::cout << "world pos x " << world_pos.x << std::endl;
-		std::cout << "world pos y " << world_pos.y << std::endl;
-		std::cout << "world pos z " << world_pos.z << std::endl;
+
+		//TODO thread ray intersection
+		glm::vec3 ray_dir = m_camera->MouseCreateRay(mouse_pos);
+		glm::vec3 ray_end = ray_dir + m_camera->GetPosition() + ray_dir * 1000.0f;
+
+		std::cout << "world pos x " << ray_dir.x << std::endl;
+		std::cout << "world pos y " << ray_dir.y << std::endl;
+		std::cout << "world pos z " << ray_dir.z << std::endl;
+
+		for (int i = 0; i < MAX_ENTITES; i++)
+		{
+			if (m_entity_list[i].IsActive())
+			{
+				glm::vec3 intersection;
+				float t;
+				if (LineAABBIntersection(m_entity_list[i].GetPosition(), m_entity_list[i].GetAABB(), m_camera->GetPosition(), ray_end, intersection, t))
+				{
+					std::cout << "Hit! t = " << t << std::endl;
+					m_entity_list[i].SetSelected(true);
+				}
+				else
+				{
+					std::cout << "No hits\n";
+					m_entity_list[i].SetSelected(false);
+				}
+			}
+		}
+
 	}
 	m_camera->HandleInput(event);
 }
@@ -226,7 +264,7 @@ void GameScene::CreateEntity()
 	int id = entity - m_entity_list;
 
 	//TODO move this to a json file
-	BBox bounds = { glm::vec3(0.0f, 0.0f, 0.0f), glm::vec3(64,64,64) };
+	BBox bounds = { glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(64,64,64) };
 
 	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(64 * id,64, 64 * id), bounds);
 

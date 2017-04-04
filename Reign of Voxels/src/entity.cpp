@@ -22,7 +22,7 @@ void Entity::Init(GLint modelID, glm::vec3 position, BBox aabb)
 
 	m_aabb = aabb;
 
-	MoveTo(glm::vec3(256.0f, 256.0f, 256.0f));
+	//MoveTo(glm::vec3(256.0f, 256.0f, 256.0f));
 }
 
 void Entity::Destroy()
@@ -35,6 +35,12 @@ glm::vec3 Entity::GetPosition()
 {
 	return m_position;
 }
+
+BBox Entity::GetAABB()
+{
+	return m_aabb;
+}
+
 GLuint Entity::GetModelID()
 {
 	return m_modelID;
@@ -92,6 +98,14 @@ void Entity::MoveTo(glm::vec3 target_pos)
 bool Entity::IsActive()
 {
 	return m_flag & ENTITY_ACTIVE;
+}
+
+void Entity::SetSelected(bool selected)
+{
+	if (selected)
+		m_flag |= ENTITY_SELECTED;
+	else
+		m_flag &= ~ENTITY_SELECTED;
 }
 
 bool Entity::IsSelected()

@@ -163,8 +163,8 @@ bool Camera::AABBInCamera(BBox &aabb)
 			{
 				for (int z = 0; z <= 1; z++)
 				{
-					glm::vec3 point = aabb.position +
-						glm::vec3(aabb.size.x * x, aabb.size.y * y, aabb.size.z * z);
+					glm::vec3 point = aabb.max;
+
 					if (DistanceToPlane(m_planes[i], point) > 0)
 						inside = true;
 				}
@@ -205,22 +205,18 @@ bool Camera::AABBInCamera(CubeRegion &aabb)
 	return true;
 }
 
-glm::vec3 Camera::MouseToWorldSpace(sf::Vector2i mouse_pos)
+glm::vec3 Camera::MouseCreateRay(sf::Vector2i mouse_pos)
 {
-	glm::vec4 ray_clip = glm::vec4((mouse_pos.x * 2.0f / (float)SCREEN_WIDTH) - 1.0f,
+	//expensive ray casting
+	glm::vec4 screenPos = glm::vec4((mouse_pos.x * 2.0f / (float)SCREEN_WIDTH) - 1.0f,
 								   1.0f - (mouse_pos.y * 2.0f / (float)SCREEN_HEIGHT),
 									1.0f, 
 									 1.0f);
-	//unproject the ray to view space
-	glm::vec4 ray_eye_space = glm::inverse(m_perspect_proj) * ray_clip;
-	ray_eye_space = glm::vec4(ray_eye_space.x, ray_eye_space.y, 1.0f, 0.0f);
 
-	//unproject ray to world space
-	glm::vec4 ray_world = glm::inverse(m_view_mat) * ray_eye_space;
-
+	glm::mat4 inverse_VP = glm::inverse((m_perspect_proj * m_view_mat));
+	glm::vec4 worldPos = inverse_VP * screenPos;
 	
-	m_ray = glm::normalize(ray_world);
-	return m_ray;
+	return glm::normalize(glm::vec3(worldPos));
 }
 
 void Camera::DrawRay()

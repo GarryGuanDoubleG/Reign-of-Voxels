@@ -23,8 +23,8 @@ typedef struct
 //axis aligned bounding box
 typedef struct
 {
-	glm::vec3 position;
-	glm::vec3 size;
+	glm::vec3 min;
+	glm::vec3 max;
 }BBox;
 
 typedef struct
@@ -60,5 +60,11 @@ enum
 //sets 3 points of a plane
 #define SET_PLANE(pl, a, b, c) ((pl.p1 = a, pl.p2 = b, pl.p3 = c))
 
+#define MAX(a, b) (a >= b ? a : b)
+#define MIN(a, b) (a <= b ? a : b)
+
 void SetPlane(Plane &plane, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
 float DistanceToPlane(Plane plane, glm::vec3 point);
+
+bool ClipLine(const glm::vec3 &objPos, BBox aabb, const glm::vec3 &v0, const glm::vec3 &v1, float& fmin, float& fmax);
+bool LineAABBIntersection(const glm::vec3 &objPos, const BBox &aabb, glm::vec3 v0, glm::vec3 v1, glm::vec3 &outIntersect, float &t);

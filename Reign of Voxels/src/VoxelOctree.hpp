@@ -29,7 +29,7 @@ public:
 	void GenerateWorldMesh();
 
 	VoxelOctree * FindLeafNode(glm::vec3 pos);
-
+	VoxelChunk *  FindLeafChunk(glm::vec3 pos);
 
 	void		  SmoothTerrain(float scale, glm::vec3 pos);
 	void		  CreatePlayerStart(glm::vec3 pos);
