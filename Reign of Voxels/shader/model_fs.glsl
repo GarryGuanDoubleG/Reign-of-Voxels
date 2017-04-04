@@ -13,7 +13,6 @@ uniform vec3 viewPos;
 uniform vec3 lightPos; 
 uniform vec3 lightColor;
 
-
 void main(void)
 {
 	//color = vec4((texture(texture_diffuse1, UV)) *lightColor);
@@ -34,5 +33,4 @@ void main(void)
 
     vec3 result = (specular + ambient + diffuse) * vec3(.5f,.5f,.5f);
 	color = vec4(result, 1.0f);
-	//color = vec4(0.5, 0.5, 1.0, 1.0);
 }

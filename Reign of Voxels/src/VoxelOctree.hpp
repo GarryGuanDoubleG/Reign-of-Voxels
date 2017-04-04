@@ -22,6 +22,7 @@ public:
 	void InitializeOctree(sf::Image *heightmap, int size, VoxelManager *manager); // length of each side of the world
 	
 	bool BuildTree();
+	void AssignNeighbors();//assign neighbors to chunks
 
 	//create vertices for world
 	void GenerateMesh(int i, int length);
@@ -33,7 +34,7 @@ public:
 	void		  SmoothTerrain(float scale, glm::vec3 pos);
 	void		  CreatePlayerStart(glm::vec3 pos);
 
-	static const int maxHeight = 16;
+	static const int maxHeight = 32;
 	static std::vector<VoxelChunk *> render_list;//list of leaf nodes
 	static void SortRenderList(glm::vec3 camera_pos);//closest chunks render first
 	//leaf node

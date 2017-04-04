@@ -24,7 +24,7 @@ GameScene::GameScene()
 	m_hud = new HUD();
 
 	//main player camera
-	m_camera = new Camera(glm::vec3(256, 128, 256), glm::vec3(256, 0, 255));
+	m_camera = new Camera(glm::vec3(256, 64, 256), glm::vec3(256, 0, 255));
 	m_camera->SetToPersp();
 
 	//Generate vertice and types for voxels
@@ -61,7 +61,7 @@ void GameScene::InitMinimap()
 	m_minimap_cam->SetToOrtho(glm::ortho(-256.0f, 256.0f, -256.0f, 256.0f, 0.1f, 1000.0f));
 
 	//minimap resizing^
-	glm::vec2 minimap_size = glm::vec2(512.0f, 512.0f);
+	glm::vec2 minimap_size = glm::vec2(256.0f, 256.0f);
 
 	//put minimap on the bottom left
 	//m_minimap_pos = glm::vec2(0.0f, SCREEN_HEIGHT - (minimap_size.y / 2.0f));
@@ -206,6 +206,6 @@ void GameScene::CreateEntity()
 
 	int id = entity - m_entity_list;
 
-	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(64 * id,64, 64 * id));
+	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(64 * id,0, 64 * id));
 	entity->m_nextFree = NULL;
 }

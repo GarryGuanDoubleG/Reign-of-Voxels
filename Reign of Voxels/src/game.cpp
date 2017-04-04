@@ -45,11 +45,13 @@ void Game::GraphicsInit()
 	settings.antialiasingLevel = 4;
 	settings.majorVersion = 4;
 	settings.minorVersion = .0;
+
 	//Create context
 	m_window = new sf::RenderWindow(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Reign of Voxels", sf::Style::Default, settings);
-	Game::instance().getWindow()->setMouseCursorGrabbed(false);
-	Game::instance().getWindow()->setMouseCursorVisible(true);
-	m_window->setVerticalSyncEnabled(true);
+	m_window->setMouseCursorGrabbed(false);
+	m_window->setMouseCursorVisible(true);
+
+	m_window->setVerticalSyncEnabled(false);
 
 	if ((err = glewInit()) != GLEW_OK)
 	{

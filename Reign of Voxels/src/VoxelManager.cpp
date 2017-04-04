@@ -61,7 +61,7 @@ void VoxelManager::GenerateVoxels()
 		//start building tree and voxel data
 		m_octreeRoot->InitializeOctree(heightmap, m_worldSize, this);
 		
-		CreatePlayerStartAreas();
+		//CreatePlayerStartAreas();
 
 		//start generating vertices
 		m_octreeRoot->GenerateWorldMesh();

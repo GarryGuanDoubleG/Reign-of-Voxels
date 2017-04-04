@@ -17,6 +17,7 @@ void VoxelChunk::Init(glm::vec3 position)
 	m_position = position;
 
 	memset(m_voxels, VOXEL_TYPE_AIR, sizeof(m_voxels));
+	memset(m_neighbor, NULL, sizeof(m_neighbor));
 
 	std::vector<GLuint>empty_indices;
 	m_tri_indices  = empty_indices;
@@ -40,9 +41,9 @@ glm::vec3 VoxelChunk::getSize()
 	return glm::vec3(CHUNK_SIZE);
 }
 
-bool VoxelChunk::isActive()
+bool VoxelChunk::IsActive()
 {
-	return m_flag & CHUNK_FLAG_ACTIVE;
+	return m_flag & CHUNK_FLAG_ACTIVE != 0;
 }
 
 void VoxelChunk::SetActive(bool active)
@@ -292,40 +293,98 @@ glm::vec3 VoxelChunk::getPosition()
 
 void VoxelChunk::GenerateMesh()
 {
+	//generate mesh based on neighboring chunks first
+
 	//generate vertices for each face of the chunk
 	//loop through each face rather than each voxel
 	for (int x = 0; x < CHUNK_SIZE; x++)
 	{
-		for (int y = 0; y < CHUNK_SIZE; y++)
+		for (int z = 0; z < CHUNK_SIZE; z++)
 		{
-			for (int z = 0; z < CHUNK_SIZE; z++)
+			int y = CHUNK_SIZE - 1;
+
+			if (m_voxels[GetIndex(x, y, z)] & VOXEL_TYPE_AIR)
+				continue;
+
+			if (m_neighbor[TOP])
+			{
+				if (m_neighbor[TOP]->m_voxels[GetIndex(x, 0, z)] & VOXEL_TYPE_AIR)
+					AddTopFace(x, y, z);
+			}
+			else
+			{
+				AddTopFace(x, y, z);
+			}
+		}
+	}
+
+	int max = CHUNK_SIZE - 1;
+
+	for (int x = 0; x <= max; x++)
+	{
+		for (int y = 0; y <= max; y++)
+		{
+			for (int z = 0; z <= max; z++)
 			{
 				if (~m_voxels[GetIndex(x, y, z)] & VOXEL_TYPE_AIR)
 				{
-					if (x == 0 || m_voxels[GetIndex(x - 1, y, z)] & VOXEL_TYPE_AIR)
+					//check left neighbor
+					if (x == 0) // left most voxel
+					{
+						//get the right most voxel of left neighbor and compare
+						if (!m_neighbor[LEFT] || m_neighbor[LEFT]->m_voxels[GetIndex(max, y, z)] & VOXEL_TYPE_AIR)
+								AddLeftFace(x, y, z);
+					}
+					else if (m_voxels[GetIndex(x - 1, y, z)] & VOXEL_TYPE_AIR)
 					{
 						AddLeftFace(x, y, z);
 					}
 
-					if (x == CHUNK_SIZE - 1 || m_voxels[GetIndex(x + 1, y, z)] & VOXEL_TYPE_AIR)
+					if (x == max) // right most voxel
+					{
+						//compare to left voxel of right neighbor
+						if (!m_neighbor[RIGHT] || m_neighbor[RIGHT]->m_voxels[GetIndex(0, y, z)] & VOXEL_TYPE_AIR)
+							AddRightFace(x, y, z);
+					}
+					else if (m_voxels[GetIndex(x + 1, y, z)] & VOXEL_TYPE_AIR)
 					{
 						AddRightFace(x, y, z);
 					}
 
-					if (y == 0 || m_voxels[GetIndex(x, y - 1, z)] & VOXEL_TYPE_AIR)
+					if (m_voxels[GetIndex(x, y - 1, z)] & VOXEL_TYPE_AIR)
 					{
 						AddBottomFace(x, y, z);
 					}
-					if (y == CHUNK_SIZE - 1 || m_voxels[GetIndex(x, y + 1, z)] & VOXEL_TYPE_AIR)
+
+					if (y  == max)
+					{
+						//compare bottom voxel of above neighbor	
+						if (!m_neighbor[TOP] || m_neighbor[TOP]->m_voxels[GetIndex(x, 0, z)] & VOXEL_TYPE_AIR)
+							AddTopFace(x, y, z);
+					}
+					else if(m_voxels[GetIndex(x, y + 1, z)] & VOXEL_TYPE_AIR)
 					{
 						AddTopFace(x, y, z);
 					}
 
-					if (z == 0 || m_voxels[GetIndex(x, y, z - 1)] & VOXEL_TYPE_AIR)
+					//back
+					if (z == 0)
+					{
+						if (!m_neighbor[BACK] || (m_neighbor[BACK]->m_voxels[GetIndex(x, y, max)] & VOXEL_TYPE_AIR))
+							AddBackFace(x, y, z);
+					}
+					else if ( m_voxels[GetIndex(x, y, z - 1)] & VOXEL_TYPE_AIR)
 					{
 						AddBackFace(x, y, z);
 					}
-					if (z == CHUNK_SIZE - 1 || m_voxels[GetIndex(x, y, z + 1)] & VOXEL_TYPE_AIR)
+
+					//front
+					if (z == max)
+					{
+						if (!m_neighbor[FRONT] || (m_neighbor[FRONT]->m_voxels[GetIndex(x, y, 0)] & VOXEL_TYPE_AIR))
+							AddFrontFace(x, y, z);
+					}
+					else if (m_voxels[GetIndex(x, y, z + 1)] & VOXEL_TYPE_AIR)
 					{
 						AddFrontFace(x, y, z);
 					}
@@ -346,6 +405,11 @@ void VoxelChunk::ClearMeshData()
 
 	std::vector<GLuint>().swap(m_tri_indices);
 	std::vector<GLuint>().swap(m_mp_indices);	
+}
+
+void VoxelChunk::AssignNeighbor(VoxelChunk * neighbor, int side)
+{
+	m_neighbor[side] = neighbor;
 }
 
 void VoxelChunk::ClearPlayerStart(float height)
