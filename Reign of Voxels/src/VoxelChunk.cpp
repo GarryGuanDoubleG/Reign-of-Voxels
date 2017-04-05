@@ -56,7 +56,10 @@ void VoxelChunk::AddTrianglesIndices()
 void VoxelChunk::BindMesh()
 {
 	if ((m_vertices.size() == 0) || m_tri_indices.size() == 0)
+	{
+		this->m_active = false;
 		return;
+	}
 	glBindVertexArray(m_vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -213,7 +216,6 @@ void VoxelChunk::GenerateMesh()
 					m_vertices.push_back(vertex);
 					AddTrianglesIndices();
 				}
-
 			}
 		}
 	}
