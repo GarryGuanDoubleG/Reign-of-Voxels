@@ -9,6 +9,10 @@
 #include "sceneManager.hpp"
 #include "Gui\Menu.hpp"
 #include "client.hpp"
+
+#define SCREEN_WIDTH 1280 /**<width of the window */ 
+#define SCREEN_HEIGHT 720 /**<height of the window */ 
+
 /**
 * Singleton Game class
 * Handles game loops and stores all managers & systems
@@ -16,6 +20,8 @@
 class Game
 {
 public:
+	bool				m_lock_mouse;
+
 	static sf::Clock g_delta_clock; /**<timer that tracks time since last iteration of game loop*/  
 	static sf::Clock g_clock;/**<tracks total time since ininitation of gamescene*/  
 
@@ -52,6 +58,8 @@ public:
 	* @return pointer to RenderWindow
 	*/
 	sf::RenderWindow*		getWindow();
+
+	void HandleInput();
 private:
 	/*
 	* @brief Initializes sfml window and glew
@@ -74,7 +82,6 @@ private:
 	bool					m_in_game; /**<flag if game already initiatd */  
 	bool					m_running; /**<flag for whether or not to run gameloop*/  
 	bool					m_initialized; /**< flag for whether initialized or not*/
-	bool					m_lock_mouse;
 };
 
 #endif

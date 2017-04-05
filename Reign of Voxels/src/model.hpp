@@ -11,6 +11,11 @@ public:
 	* Loads model data using Assimp
 	*/
 	Model(GLchar * filepath);
+	/** Constructor
+	* Loads model data using Assimp
+	*/
+	Model(std::string &filepath);
+
 	/** Destructor
 	*
 	*/
@@ -22,6 +27,12 @@ public:
 	* @param amount number of times to instance
 	*/
 	void SetInstanceRendering(GLuint buffer, GLuint amount);
+
+	/**
+	* @brief returns the meshes that this model contains
+	* @return vector container of this model's meshes
+	*/
+	std::vector<Mesh> *GetMesh();
 
 	/**
 	* @brief renders all the meshes of this model

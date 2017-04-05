@@ -1,21 +1,48 @@
+#include <fstream>
+#include <map>
+
+#include "game.hpp"
+#include "model.hpp"
 #include "GameScene.hpp"
 #include "simple_logger.h"
+
+
+#define MODEL_PATH "Resources/models/models.json"
+
+
 /**
 * constructor
 * Subscribes to event system and sets up a camera and loads models
-*/#
+*/
 GameScene::GameScene()
 {
-	std::cout << "Init Game \n";
+	//load models, textures, fonts, etc.
+	m_resrcMang = new ResourceManager();
+	m_resrcMang->LoadResources();
 
-	m_camera = new Camera();	
-	
-	//m_model = new Model("Resources\\models\\nanosuit\\nanosuit.obj");
-	m_model = new Model("Resources\\models\\sphere.obj");
-	m_light = new LightSource(); 
-	m_light->m_model = m_model;// use the same model for the lighitng for now
+	//hud handler
+	m_hud = new HUD();
+
+	//main player camera
+	m_camera = new Camera(glm::vec3(256, 64, 256), glm::vec3(256, 0, 255));
+	m_camera->SetToPersp();
+
+	//Generate vertice and types for voxels
 	m_voxelManager = new VoxelManager();
 	m_voxelManager->GenerateVoxels();
+
+	InitMinimap();
+
+	//allocate memeory for all entities
+	m_entity_list = new Entity[MAX_ENTITES];
+
+	//set free list
+	for (int i = 0; i < MAX_ENTITES - 1; i++)
+		m_entity_list[i].m_nextFree = &m_entity_list[i + 1];
+
+	//head of free list
+	m_next_free_entity = m_entity_list;
+
 	Game::instance().getEventSystem().addObserver(this);
 }
 /**
@@ -26,59 +53,142 @@ GameScene::~GameScene()
 {
 	Game::instance().getEventSystem().removeObserver(this);
 }
+
+void GameScene::InitMinimap()
+{
+	//minimap cam
+	m_minimap_cam = new Camera(glm::vec3(256, 256, 512), glm::vec3(255, 0, 255));
+	m_minimap_cam->SetToOrtho(glm::ortho(-256.0f, 256.0f, -256.0f, 256.0f, 0.1f, 1000.0f));
+
+	//minimap resizing^
+	glm::vec2 minimap_size = glm::vec2(256.0f, 256.0f);
+
+	//put minimap on the bottom left
+	//m_minimap_pos = glm::vec2(0.0f, SCREEN_HEIGHT - (minimap_size.y / 2.0f));
+	m_minimap_pos = glm::vec2(-5.0f, -256.0f);
+	m_minimap_scale = glm::vec2(minimap_size.x / (float)SCREEN_WIDTH, minimap_size.y / (float)SCREEN_HEIGHT);
+}
+
 /**
 *@brief code to run every frame of game loop
 */
 void GameScene::SceneFrame()
 {
+	Update();
 	Render();
 }
+
+void GameScene::Update()
+{
+	for (int i = 0; i < MAX_ENTITES; i++)
+	{
+		if (m_entity_list[i].IsActive())
+			m_entity_list[i].Update();
+	}
+}
+
+
 /**
 *@brief Handles drawing the game scene
 */
 void GameScene::Render()
 {
-	Mat4 model(1.0f);
-	GLuint model_shader, light_shader;
-	GLuint model_loc, view_loc, proj_loc, light_loc, obj_loc, light_pos_loc, view_pos_loc;
-	GLfloat bg_color[] = { 0.1f, 0.1f, 0.1f, 0.3f };
+	GLfloat bg_color[] = { 0.3f, 0.3f, 0.3f, 0.3f };
 
  	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
  	glClearBufferfv(GL_COLOR, 0, bg_color);
-	//model_shader = GetShader("model");
-	//glUseProgram(model_shader);
 
-	//model_loc = glGetUniformLocation(model_shader, "model");
-	//view_loc = glGetUniformLocation(model_shader, "view");
-	//proj_loc = glGetUniformLocation(model_shader, "projection");
-	//light_loc = glGetUniformLocation(model_shader, "lightColor");
-	//obj_loc = glGetUniformLocation(model_shader, "objectColor");
-	/*light_pos_loc = glGetUniformLocation(model_shader, "lightPos");
-	view_pos_loc = glGetUniformLocation(model_shader, "viewPos");
-*/
-//	model = glm::translate(model, Vec3(0.0f, 0.0f, -2.0f));
-//	glUniformMatrix4fv(model_loc, 1, GL_FALSE, &model[0][0]);
-//	glUniformMatrix4fv(view_loc, 1, GL_FALSE, glm::value_ptr(m_camera->GetViewMat()));
-//	glUniformMatrix4fv(proj_loc, 1, GL_FALSE, glm::value_ptr(m_camera->GetProj()));
-//
-//	Vec3 obj_color(0.6f, 1.0f, 0.3f);
-//	glUniform3fv(light_pos_loc, 1, &m_light->getPosition()[0]);
-//	glUniform3fv(light_loc, 1, &m_light->getColor()[0]);
-//	glUniform3fv(obj_loc, 1, &obj_color[0]);
-//	glUniform3fv(view_pos_loc, 1, &m_camera->getPosition()[0]);
-///*
-	/*m_model->Draw(model_shader);*/
-	m_light->Draw(m_camera->GetViewMat(), m_camera->GetProj());
-	//slog("hi3");
+	RenderWorld();
+	RenderMinimap();
+	RenderEntities();
+	m_hud->Render();
 
-	if(wire_frame)
+
+	Game::instance().getWindow()->display();	
+}
+
+void GameScene::RenderAABB(Entity *entity, GLuint shader)
+{
+	GLuint modelID = m_resrcMang->GetModelID("cube");
+	
+	glm::mat4 model;
+	model = glm::translate(glm::mat4(1.0f), entity->GetPosition() + entity->GetAABB().min);
+	model = glm::scale(model, entity->GetAABB().max);
+
+	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+
+	m_resrcMang->GetModel(modelID)->Draw(shader);
+}
+
+void GameScene::RenderModel(Entity *entity)
+{
+	GLuint shader = GetShader("model");
+
+	glUseProgram(shader);
+
+	glm::mat4 model;
+	model = glm::translate(glm::mat4(1.0f), entity->GetPosition());
+	model = glm::scale(model, glm::vec3(64.0f, 64.0f, 64.0f));
+
+	glm::vec3 light_pos(256, 512.0f, 256);
+	glm::vec3 light_color(1.0f, 1.0f, 1.0f);
+
+	//mvp matrices
+	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
+
+	//lighting
+	glUniform3fv(glGetUniformLocation(shader, "viewPos"), 1, &m_camera->GetPosition()[0]);
+	glUniform3fv(glGetUniformLocation(shader, "lightPos"), 1, &light_pos[0]);
+	glUniform3fv(glGetUniformLocation(shader, "lightColor"), 1, &light_color[0]);
+
+	//color of entity
+
+	glm::vec3 ent_color;
+	if (entity->IsSelected())
+		ent_color = glm::vec3(1.0f, .2f, .2f);
+	else
+		ent_color = glm::vec3(.5f, 1.0f, .5f);
+
+	glUniform3fv(glGetUniformLocation(shader, "model_color"), 1, &ent_color[0]);
+
+	m_resrcMang->GetModel(entity->GetModelID())->Draw(shader);
+	
+	RenderAABB(entity,shader);
+}
+
+void GameScene::RenderWorld()
+{
+	if (wire_frame)
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
 	m_voxelManager->RenderVoxels(m_camera);
-	
-	Game::instance().getWindow()->display();
 }
+
+void GameScene::RenderEntities()
+{
+	for (int i = 0; i < MAX_ENTITES; i++)
+	{
+		if (m_entity_list[i].IsActive())
+			RenderModel(&m_entity_list[i]);
+	}
+}
+
+void GameScene::RenderMinimap()
+{
+	GLuint shader = GetShader("minimap");
+
+	glUseProgram(shader);
+
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_minimap_cam->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_minimap_cam->GetProj()[0][0]);
+
+	m_voxelManager->RenderMinimap(shader, m_minimap_scale, m_minimap_pos);
+}
+
 /**
 *@brief Listens to user input events and handles it
 *@param event type of user input event
@@ -95,6 +205,7 @@ void GameScene::onNotify(Event event, sf::Event &input)
 */
 void GameScene::HandleInput(sf::Event event)
 {
+
 	if (event.type == sf::Event::KeyPressed)
 	{
 		switch (event.key.code)
@@ -102,9 +213,60 @@ void GameScene::HandleInput(sf::Event event)
 		case sf::Keyboard::Insert:
 			wire_frame = !wire_frame;
 			break;
+		case sf::Keyboard::R:
+			CreateEntity();
 		default:
 			break;
 		}
 	}
+	else if (event.type == sf::Event::MouseButtonPressed)
+	{
+		sf::Vector2i mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
+
+		//TODO thread ray intersection
+		glm::vec3 ray_dir = m_camera->MouseCreateRay(mouse_pos);
+		glm::vec3 ray_end = ray_dir + m_camera->GetPosition() + ray_dir * 1000.0f;
+
+		std::cout << "world pos x " << ray_dir.x << std::endl;
+		std::cout << "world pos y " << ray_dir.y << std::endl;
+		std::cout << "world pos z " << ray_dir.z << std::endl;
+
+		for (int i = 0; i < MAX_ENTITES; i++)
+		{
+			if (m_entity_list[i].IsActive())
+			{
+				glm::vec3 intersection;
+				float t;
+				if (LineAABBIntersection(m_entity_list[i].GetPosition(), m_entity_list[i].GetAABB(), m_camera->GetPosition(), ray_end, intersection, t))
+				{
+					std::cout << "Hit! t = " << t << std::endl;
+					m_entity_list[i].SetSelected(true);
+				}
+				else
+				{
+					std::cout << "No hits\n";
+					m_entity_list[i].SetSelected(false);
+				}
+			}
+		}
+
+	}
 	m_camera->HandleInput(event);
+}
+
+
+void GameScene::CreateEntity()
+{
+	Entity *entity = m_next_free_entity;
+
+	m_next_free_entity = entity->m_nextFree;
+
+	int id = entity - m_entity_list;
+
+	//TODO move this to a json file
+	BBox bounds = { glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(64,64,64) };
+
+	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(64 * id,64, 64 * id), bounds);
+
+	entity->m_nextFree = NULL;
 }

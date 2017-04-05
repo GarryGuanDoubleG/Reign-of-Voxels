@@ -8,7 +8,7 @@
 #include <GL/glew.h>
 #include <SFML/Graphics.hpp>
 #include <SFML/OpenGL.hpp>
-#include "glm.hpp"
+#include "3dmath.hpp"
 #include "texture.hpp"
 
 

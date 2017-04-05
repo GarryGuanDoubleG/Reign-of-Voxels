@@ -5,10 +5,13 @@ in vec2 UV;
 in vec3 vs_normal;
 in vec3 FragPos;
 
+
 uniform vec3 viewPos;
 uniform vec3 lightPos; 
 uniform vec3 lightColor;
-uniform vec3 objectColor;
+uniform vec3 voxelColor;
+
+uniform int chunkID;
 
 void main(void)
 {
@@ -27,7 +30,13 @@ void main(void)
 	float ambientStrength = 0.1f;
 	vec3 ambient = ambientStrength * lightColor;
 
-    vec3 result = (specular + ambient + diffuse)* objectColor;
+    vec3 result = (specular + ambient + diffuse) * voxelColor;
+	//vec3 result = vec3(chunkID * 257  % 256 / 256.0,
+	//					chunkID * 359 % 256 / 256.0,
+	//					chunkID * 501 % 256 / 256.0 );
+
 	color = vec4(result, 1.0f);
-	//color = vec4(0, 1, 0, 1.0);
+
+	//float intensity =  500.0 - FragPos .z / 1000.0;
+	//color = vec4(intensity, 1, intensity, 1.0);
 }

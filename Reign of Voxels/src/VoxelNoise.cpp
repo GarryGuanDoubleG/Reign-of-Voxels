@@ -1,8 +1,7 @@
 #include <noise/noise.h>
 #include "noiseutils.h"
 #include "VoxelNoise.hpp"
-#include <noise/noise.h>
-#include "noiseutils.h"
+
 using namespace noise;
 utils::NoiseMap heightMap;
 
@@ -11,9 +10,13 @@ std::string GenerateTerrainMap(int resolution)
 	std::string filename = "Resources/heightmap/terrain_heightmap.bmp";
 
 	module::Perlin perlin_mod;
+	perlin_mod.SetOctaveCount(6);
+	/*perlin_mod.SetFrequency(.5f);*/
+	//perlin_mod.SetPersistence(.5f);
 
 	utils::NoiseMap heightMap;
 	utils::NoiseMapBuilderPlane heightMapBuilder;
+
 	heightMapBuilder.SetSourceModule(perlin_mod);
 	heightMapBuilder.SetDestNoiseMap(heightMap);
 	heightMapBuilder.SetDestSize(resolution, resolution);

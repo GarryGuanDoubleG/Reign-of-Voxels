@@ -1,129 +1,91 @@
 #include <thread>
+#include <mutex>
+#include <math.h>
+
 #include "VoxelOctree.hpp"
-#include "glm.hpp"
+#include "VoxelManager.hpp"
+#include "3dmath.hpp"
 #include "simple_logger.h"
 
 static sf::Image *g_heightMap;
 static const sf::Uint8 *g_heightarray;//array of pixel values
+
 static unsigned int vox_count = 0;
-unsigned int VoxelOctree::m_chunkCount = 0;
-std::vector<VoxelChunk *> VoxelOctree::render_list; //list of leaf nodes
 int leaf_count = 0;
-unsigned long long iterations = 0;
 
-VoxelOctree::VoxelOctree(VoxelOctree * parent)
+unsigned int VoxelOctree::m_chunkCount = 0;
+
+std::vector<VoxelChunk *> VoxelOctree::render_list; //list of leaf nodes
+static std::mutex g_render_list_mutex;
+
+VoxelManager * VoxelOctree::voxelManager;
+
+
+VoxelOctree::VoxelOctree()
+	: m_flag(0),
+	m_childMask(0)
 {
-	m_parent = parent;
+}
+
+
+void VoxelOctree::InitNode(CubeRegion region)
+{
+	if (m_flag & OCTREE_INUSE)
+		std::cout << "Already using node ?" << std::endl;
+	m_flag |= OCTREE_INUSE;
+
 	m_childMask = 0;
-	m_chunkCount = 0;
+	m_region = region;
+
+	m_chunk = NULL;
 }
 
-VoxelOctree::~VoxelOctree()
+void VoxelOctree::DestroyNode()
 {
+	m_flag = 0;
 	if(m_chunk)
-		delete m_chunk;
+		m_chunk->Destroy();
+
 }
 
-void VoxelOctree::GenerateMesh(int i, int length)
-{
-	sf::Clock timer;
-	std::cout << "i is " << i << " len is " << length << std::endl;
 
-	for (int j = i * length; j < i * length + length; j++)
-	{
-		render_list[j]->GenerateMesh();
-	}
-	std::cout << "Time for i: " << i << " is " << timer.getElapsedTime().asSeconds() << std::endl;
+void VoxelOctree::SortRenderList(glm::vec3 camera_pos)
+{
+	//update chunk's dist to cam
+	int threads = 8;
+
+	for (int i = 0; i < render_list.size(); i++)
+		render_list[i]->distToCam = glm::distance(camera_pos, render_list[i]->getPosition());
+
+	//sort by distance
+	std::sort(render_list.begin(), render_list.end());
 }
 
-void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize)
+void VoxelOctree::InitializeOctree(sf::Image *heightmap, int worldSize, VoxelManager *manager)
 {
+	voxelManager = manager;
+
 	g_heightMap = heightmap;
 	g_heightarray = g_heightMap->getPixelsPtr();
 
-	m_boundingRegion.position = Vec3(0, 0, 0);
-	m_boundingRegion.size = worldSize;
-	
-	sf::Clock build_time;
-	BuildNode();
+	sf::Clock build_time; //profiling
 
-	//for (int x = 0; x < worldSize; x++)
-	//{
-	//	for (int z = 0; z < worldSize; z++)
-	//	{
-	//		int height = g_heightMap->getPixel(x, z).r;
-	//		InsertVoxelAtHeight(x, height, z);
-	//	}
-	//}
+
+	this->BuildTree();
+	this->AssignNeighbors();
 
 	std::cout << "Build time is " << build_time.getElapsedTime().asSeconds() << std::endl;
 	std::cout << "Childnode calls is " << vox_count << std::endl;
 	std::cout << "leaf nodes " << leaf_count << std::endl;
-	std::cout << "Iterations " << iterations << std::endl;
-	
+
 	build_time.restart();
-	long long vertices = 0;
-	int thread_count = 16;
-	int length = render_list.size() / thread_count;
-	std::vector<std::thread> threads;
-	for (int i = 0; i < thread_count; i++)
-	{
-		threads.push_back(std::thread(&VoxelOctree::GenerateMesh, this, i, length));
-		/*render_list[i]->GenerateMesh();
-		vertices += render_list[i]->m_vertices.size();*/
-	}
-	std::cout << "waiting on threads" << std::endl;
-	for (auto& t : threads)
-	{
-		t.join();
-	}
-
-	for (int i = 0; i < render_list.size(); i++)
-	{
-		sf::Clock timer2;
-		render_list[i]->BindMesh();
-		std::cout << "Bind mesh time is " << timer2.getElapsedTime().asMilliseconds() << std::endl;
-	}
-
-	std::cout << "Generate Mesh time is " << build_time.getElapsedTime().asSeconds() << std::endl;
-	std::cout << "Vertices: " << vertices << std::endl;
 }
 
-bool VoxelOctree::BuildNode()
+void VoxelOctree::InitializeChildren()
 {
-	int size = m_boundingRegion.size;
-	Vec3 pos = m_boundingRegion.position;
-	bool active = false;
-
 	int i = 0;
-	vox_count++;
-	
-	if (size <= VoxelChunk::chunkSize)
-	{
-		if(!m_chunk)
-			m_chunk = new VoxelChunk(m_boundingRegion.position);
 
-		for (int x = m_boundingRegion.position.x; x < m_boundingRegion.position.x + size; x++)
-		{
-			for (int z = m_boundingRegion.position.z; z < m_boundingRegion.position.z + size; z++)
-			{
-				float height = g_heightMap->getPixel(x, z).r;
-				if (height >= pos.y)
-				{
-					active = true;
-					m_leaf = true;
-				}
-				m_chunk->InsertVoxelAtPos(x, height,z);
-			}
-		}
-		if (active)
-		{
-			m_chunk->SetActive(active);
-			leaf_count++;
-			render_list.push_back(m_chunk);
-		}
-		return active;
-	}
+	int childSize = m_region.size / 2;
 
 	for (float x = 0; x < 2; x++)
 	{
@@ -131,112 +93,262 @@ bool VoxelOctree::BuildNode()
 		{
 			for (float z = 0; z < 2; z++)
 			{
-				int childSize = m_boundingRegion.size / 2;
+				CubeRegion childRegion = { m_region.position + glm::vec3(x * childSize, y * childSize, z * childSize),
+					childSize };
 
-				m_childNodes[i] = new VoxelOctree(this);
-				m_childNodes[i]->m_boundingRegion.position = m_boundingRegion.position + Vec3(x * childSize, y * childSize, z * childSize);
-				m_childNodes[i]->m_boundingRegion.size = childSize;
-
-				if (m_childNodes[i]->BuildNode())
-				{
-					m_childMask |= 1 << i;
-					m_active = true;
-				}
-				else
-				{
-					m_childMask &= ~(1 << i);
-					delete m_childNodes[i];
-				}
+				voxelManager->createOctreeChild(this, i, childRegion);
+				i++;
 			}
 		}
 	}
+}
+
+bool VoxelOctree::BuildTree()
+{
+	int size = m_region.size;
+	bool active = false;
+
+	int i = 0;
+	
+	//base case
+	//region matches chunk size
+	if (m_region.size <= VoxelChunk::CHUNK_SIZE)
+	{
+		//initialize chunk
+		if (!m_chunk)
+			m_chunk = voxelManager->CreateChunk(m_region.position);
+
+		//apply scale factor for max height
+		float scale = (float)VoxelOctree::maxHeight / 256.0f;
+
+		//go through respective pixels on heightmap and set it as height
+		//activate voxels at or below height
+		for (int x = m_region.position.x; x < m_region.position.x + size; x++)
+		{
+			for (int z = m_region.position.z; z < m_region.position.z + size; z++)
+			{
+				float height = g_heightMap->getPixel(x, z).r;
+				
+				height *= scale;
+
+				if (height >= m_region.position.y)
+					active = true;
+
+				m_chunk->InsertVoxelAtPos(x, height, z);
+			}
+		}
+
+		if (active)
+		{
+			//lock global
+			g_render_list_mutex.lock();
+
+			m_chunk->SetActive(active);
+			
+			m_flag |= OCTREE_ACTIVE;
+			m_flag |= OCTREE_LEAF;
+
+			++leaf_count;
+			//push chunk
+			render_list.push_back(m_chunk);
+
+			//unlock global
+			g_render_list_mutex.unlock();
+		}
+		else
+			voxelManager->destroyChunk(m_chunk);
+
+		return active;
+	}
+
+	//activate 8 children
+	InitializeChildren();
+
+	//recursively descend tree to find the active nodes
+	for (int i = 0; i < 8; i++)
+	{
+		VoxelOctree *child = voxelManager->getOctreeChild(this, i);
+		
+		//skip nodes above the max world height
+		if (child->m_region.position.y <= VoxelOctree::maxHeight 
+			 && child->BuildTree())
+		{
+			m_childMask |= 1 << i;
+			m_flag |= OCTREE_ACTIVE;//if at least one child is active, then active
+		}
+		else
+		{
+			m_childMask &= ~(1 << i);
+			child->m_flag &= ~(OCTREE_ACTIVE);
+		}
+	}
+
 	return m_childMask;
 }
 
-bool inline RegionContains(Vec3 region_pos, int region_size, Vec3 object_pos)
+void VoxelOctree::AssignNeighbors()
 {
-	if ((object_pos.x >= region_pos.x && object_pos.x < region_pos.x + region_size)
-		&& (object_pos.y >= region_pos.y && object_pos.y < region_pos.y + region_size)
-		&& (object_pos.z >= region_pos.z && object_pos.z < region_pos.z + region_size))
+	for (int i = 0; i < render_list.size(); i++)
 	{
-		return true;
-	}
+		glm::vec3 position = render_list[i]->getPosition();
+		
+		//find chunk above and below
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, VoxelChunk::CHUNK_SIZE, 0)), (int)TOP);
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, -VoxelChunk::CHUNK_SIZE, 0)), (int)BOTTOM);	
 
-	return false;
-}
+		//assign left and right chunks
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(-VoxelChunk::CHUNK_SIZE, 0, 0)), (int)LEFT);	
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(VoxelChunk::CHUNK_SIZE, 0, 0)), (int)RIGHT);
 
-void VoxelOctree::InsertVoxelAtHeight(int x, int height, int z)
-{
-	for (int y = 0; y <= height; y++)
-	{
-		VoxelOctree * node = (VoxelOctree *)this;
-		Vec3 position = Vec3(x, y, z);
-		bool is_leaf = false;
-		while (!is_leaf)
-		{
-			iterations++;
-			if (node->m_boundingRegion.size <= VoxelChunk::chunkSize)
-			{
-				is_leaf = true;
-				break;
-			}
-			int child_index = 0;
-			bool found_child = false;
-			
-			VoxelOctree * new_node = NULL;
-			for (int i = 0; i < 2 && !found_child; i++)
-			{
-				for (int j = 0; j < 2 && !found_child; j++)
-				{
-					for (int k = 0; k < 2 && !found_child; k++)
-					{						
-						VoxelOctree *child = node->m_childNodes[child_index];
-						if (!child)
-						{
-							child = new VoxelOctree(node);							
-							int size = node->m_boundingRegion.size / 2;
-
-							Vec3 child_pos = node->m_boundingRegion.position;
-							child_pos.x += i * size;
-							child_pos.y += j * size;
-							child_pos.z += k * size;
-
-							child->m_boundingRegion.position = child_pos;
-							child->m_boundingRegion.size = size;
-
-							node->m_childNodes[child_index] = child;
-						}
-
-						if (RegionContains(child->m_boundingRegion.position, child->m_boundingRegion.size, position))
-						{							
-							node = node->m_childNodes[child_index];
-							found_child = true;
-						}
-
-						child_index++;
-					}
-				}
-			}
-		}
-
-		node->m_leaf = true;
-		if (!node->m_chunk)
-		{
-			leaf_count++;
-			node->m_chunk = new VoxelChunk(node->m_boundingRegion.position);
-		}
-		node->m_chunk->SetVoxelActive(x, y, z);
-
-		vox_count++;
+		//back and front
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, 0, -VoxelChunk::CHUNK_SIZE)), (int)BACK);
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, 0, VoxelChunk::CHUNK_SIZE)), (int)FRONT);
 	}
 }
 
-void VoxelOctree::UpdateTree()
+VoxelChunk * VoxelOctree::FindLeafChunk(glm::vec3 pos)
 {
-
+	VoxelOctree * node = FindLeafNode(pos);
+	return node ? node->m_chunk : NULL;
 }
 
-void VoxelOctree::Render()
+VoxelOctree * VoxelOctree::FindLeafNode(glm::vec3 pos)
 {
-	m_chunk->Render();
+	//check if position is within world bounds
+	if (pos.x < 0 || pos.y < 0 || pos.z < 0 || 
+		pos.x >= voxelManager->GetWorldSize() || 
+		pos.y >= voxelManager->GetWorldSize() || 
+		pos.z >= voxelManager->GetWorldSize())
+	{
+		return NULL;
+	}
+
+	//iteratively find chunk that contains start position
+	VoxelOctree *node = voxelManager->getRootNode();
+
+	//traverse tree, find chunk
+	bool found = false;
+
+	while (!found)
+	{
+		int index = 0;
+
+		//check which child the next node is in 
+		float child_size = node->m_region.size * .5f;
+
+		//octal search
+		int x = pos.x >= node->m_region.position.x && pos.x < node->m_region.position.x + child_size ? 0 : 1;
+		int y = pos.y >= node->m_region.position.y && pos.y < node->m_region.position.y + child_size ? 0 : 1;
+		int z = pos.z >= node->m_region.position.z && pos.z < node->m_region.position.z + child_size ? 0 : 1;
+
+		//calculate index 
+		index = 4 * x + 2 * y + z;
+
+		node = voxelManager->getOctreeChild(node, index);
+
+		if (!node || ~node->m_flag & OCTREE_ACTIVE)
+			return NULL;
+
+		if (node->m_flag & OCTREE_LEAF)
+			found = true;
+	}
+
+	return node;
+}
+
+
+void VoxelOctree::CreatePlayerStart(glm::vec3 pos)
+{
+	VoxelOctree *node = FindLeafNode(pos);
+	
+	node->m_chunk->ClearPlayerStart(pos.y);
+
+	//find node above it and deactvate;
+	node = FindLeafNode(glm::vec3(pos.x, pos.y + (float)VoxelChunk::CHUNK_SIZE, pos.z));
+	
+	//center
+	glm::vec3 origin = node->m_region.position + glm::vec3(m_region.size / 2.0f);
+
+	//smooth terrain in each direction
+
+	//left
+	VoxelOctree *neighbor;
+	neighbor = FindLeafNode(glm::vec3(pos.x - VoxelChunk::CHUNK_SIZE, pos.y, pos.z));
+	neighbor->SmoothTerrain(4.0f, origin);
+
+	//right
+	neighbor = FindLeafNode(glm::vec3(pos.x + VoxelChunk::CHUNK_SIZE, pos.y, pos.z));
+	neighbor->SmoothTerrain(4.0f, origin);
+
+	//back
+	neighbor = FindLeafNode(glm::vec3(pos.x, pos.y, pos.z - VoxelChunk::CHUNK_SIZE));
+	neighbor->SmoothTerrain(4.0f, origin);
+
+	//front
+	neighbor = FindLeafNode(glm::vec3(pos.x, pos.y, pos.z + VoxelChunk::CHUNK_SIZE));
+	neighbor->SmoothTerrain(4.0f, origin);
+
+	if (node)
+		node->DestroyNode();
+}
+
+void VoxelOctree::SmoothTerrain(float scale, glm::vec3 origin)
+{
+	if (m_flag & OCTREE_LEAF)
+	{
+		m_chunk->SmoothTerrain(scale, origin);
+	}
+}
+
+void VoxelOctree::GenerateMesh(int portion, int portion_len)
+{
+	sf::Clock timer;
+
+	for (int j = portion * portion_len; j < portion * portion_len + portion_len; j++)
+	{
+		if (j < render_list.size())
+			render_list[j]->GenerateMesh();
+	}
+}
+
+void VoxelOctree::GenerateWorldMesh()
+{
+	int thread_count = 8;
+	std::vector<std::thread> threads;
+
+	int j = 0;
+	int length = render_list.size() / thread_count;
+
+	sf::Clock build_time;
+
+	//start threads to generate vertices
+	while (j * length < render_list.size())
+	{
+		threads.push_back(std::thread(&VoxelOctree::GenerateMesh, this, j, length));
+		++j;
+	}
+
+	//sync mesh gen threads
+	for (auto& t : threads)
+		t.join();
+
+	std::cout << "Generate Mesh time is " << build_time.getElapsedTime().asSeconds() << std::endl;
+
+	//send vertices to gpu
+	unsigned int vertices = 0;
+
+	for (int i = 0; i < render_list.size(); i++)
+	{
+		vertices += render_list[i]->m_vertices.size();
+		render_list[i]->BindMesh();
+	}
+
+	for (int i = 0; i < render_list.size(); i++)
+	{
+		render_list[i]->ClearMeshData();
+	}
+
+	//get binding time
+	std::cout << "Bind Mesh time is " << build_time.getElapsedTime().asSeconds() << std::endl;
+	std::cout << "Vertices: " << vertices << std::endl;
 }

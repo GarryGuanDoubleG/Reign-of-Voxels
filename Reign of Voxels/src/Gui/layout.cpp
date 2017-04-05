@@ -9,6 +9,7 @@
 #include "image.hpp"
 #include "simple_logger.h"
 
+#define MENU_PATH "Resources\\gui\\menu.json"
 /*
 * @brief loads menu layout from a Json file and generates widgets based on layout data
 * @param menu specifies which menu layout to load from file
@@ -17,16 +18,18 @@
 std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 {
 	Json layout;
-	std::string path = "Resources\\gui\\menu.json";
+	std::string path;
 	std::string menu_type = "";
 
 	switch (menu)
 	{
 	case LoginMenu:
 		menu_type = "login";
+		path = MENU_PATH;
 		break;
 	case LobbyMenu:
 		menu_type = "lobby";
+		path = MENU_PATH;
 		break;
 	case OptionsMenu:
 		break;
@@ -78,6 +81,10 @@ std::vector<Widget*> Layout::LoadMenuLayout(MenuLayouts menu)
 
 	return widget_list;
 }
+
+
+
+
 /*
 * @brief Loads widget position, size, textcolor, boxcolor, textsize, box size, trigger event, and id
 into newly allocated widget.
@@ -163,8 +170,7 @@ void Layout::LoadWidgetData(Json &data, Widget *widget)
 		widget->setTextColor(text_color);
 		widget->setBoxColor(box_color);
 	}
-	
-	
+		
 	//set widget text
 	if (data.find("string") != data.end())
 	{

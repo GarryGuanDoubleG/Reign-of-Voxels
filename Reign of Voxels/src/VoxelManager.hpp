@@ -10,17 +10,39 @@ public:
 	VoxelManager();
 	~VoxelManager();
 
+	int GetWorldSize();
+
 	void GenerateVoxels();
+
 	void RenderVoxels(Camera * player_cam);
+	void RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &position);
 
+	VoxelChunk *CreateChunk(glm::vec3 worldPosition);
+	void		destroyChunk(VoxelChunk * chunk);
+
+	//gets the child of a node at a specific index
+	VoxelOctree *getRootNode();
+
+
+	VoxelOctree *getOctreeChild(VoxelOctree * currentNode, int child_index);
+	VoxelOctree *createOctreeChild(VoxelOctree * currentNode, int child_index, CubeRegion &region);
+
+
+	//free octree node
+	void		 destroyOctreeNode(VoxelOctree * node);
+
+	void CreatePlayerStartAreas();
 private:
-	std::vector<VoxelChunk*> m_voxelChunks;
+	int m_worldSize; //size of one side of cubic world region
+	int m_maxChunks;
+	int m_maxOctNodes;
 
-	Model *m_voxelModel;
-	Mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
-	VoxelOctree *m_octree;
+	VoxelChunk * m_chunkPool;//array of chunks
+	VoxelChunk * m_freeChunkHead;//head ptr to free chunk list
 
-	int m_worldSize;
+	VoxelOctree *m_octreeRoot; // ptr to octree root node
 
-	void GenerateVoxelChunks(sf::Image *heightmap);
+	VoxelOctree * m_octreePool;//array of octrees
+
+	Model *m_cube;
 };

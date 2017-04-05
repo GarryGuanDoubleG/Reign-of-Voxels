@@ -9,10 +9,24 @@
 		"vs": "shader/voxel_vs.glsl",
 		"fs": "shader/voxel_fs.glsl"
 	},
-	"lighting":
-	{
-		"vs": "shader/lighting_vs.glsl",
-		"fs": "shader/lighting_fs.glsl"
-	}
+  "lighting": {
+    "vs": "shader/lighting_vs.glsl",
+    "fs": "shader/lighting_fs.glsl"
+  },
+
+  "minimap": {
+    "vs": "shader/minimap_vs.glsl",
+    "fs": "shader/minimap_fs.glsl"
+  },
+
+  "hud": {
+    "vs": "shader/ui.vert",
+    "fs": "shader/ui.frag"
+  },
+
+  "ray": {
+    "vs": "shader/ray.vert",
+    "fs": "shader/ray.frag"
+  }
 }
 

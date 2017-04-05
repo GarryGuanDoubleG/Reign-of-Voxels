@@ -115,17 +115,17 @@ void Menu::SceneFrame()
 void Menu::Render()
 {
 	//set background to black
-	Game::instance().getWindow()->clear(sf::Color::Black);
-	//save gl states
-	Game::instance().getWindow()->pushGLStates();
-	//draw text
-	for (int i = 0; i < m_widgets.size(); i++)
-	{
-		m_widgets[i]->draw(*Game::instance().getWindow(), sf::RenderStates::Default);
-	}
-	//restore the gl states
-	Game::instance().getWindow()->popGLStates();
-	Game::instance().getWindow()->display();
+	//Game::instance().getWindow()->clear(sf::Color::Black);
+	////save gl states
+	//Game::instance().getWindow()->pushGLStates();
+	////draw text
+	//for (int i = 0; i < m_widgets.size(); i++)
+	//{
+	//	m_widgets[i]->draw(*Game::instance().getWindow(), sf::RenderStates::Default);
+	//}
+	////restore the gl states
+	//Game::instance().getWindow()->popGLStates();
+	//Game::instance().getWindow()->display();
 }
 /**.
 * @brief Forwards input to widgets on the screen which may trigger a callback

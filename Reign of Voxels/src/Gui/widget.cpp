@@ -7,7 +7,7 @@
 */
 Widget::Widget()
 {
-
+	
 }
 /**
 * @brief sets the member id string to passed in string

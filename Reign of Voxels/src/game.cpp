@@ -7,8 +7,6 @@ sf::Clock Game::g_clock; /**<tracks total time since ininitation of gamescene*/
 
 Game Game::m_instance; /**<singleton instance of game */ 
 
-#define SCREEN_WIDTH 1280 /**<width of the window */ 
-#define SCREEN_HEIGHT 720 /**<height of the window */ 
 
 #define FPS_TIME 0.01666666666f /**<total time per frame in seconds. 60 dps */ 
 
@@ -47,11 +45,13 @@ void Game::GraphicsInit()
 	settings.antialiasingLevel = 4;
 	settings.majorVersion = 4;
 	settings.minorVersion = .0;
+
 	//Create context
 	m_window = new sf::RenderWindow(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Reign of Voxels", sf::Style::Default, settings);
-	Game::instance().getWindow()->setMouseCursorGrabbed(true);
-	Game::instance().getWindow()->setMouseCursorVisible(false);
-	m_window->setVerticalSyncEnabled(true);
+	m_window->setMouseCursorGrabbed(false);
+	m_window->setMouseCursorVisible(true);
+
+	m_window->setVerticalSyncEnabled(false);
 
 	if ((err = glewInit()) != GLEW_OK)
 	{
@@ -62,7 +62,13 @@ void Game::GraphicsInit()
 	glEnable(GL_DEPTH_TEST);
 	// Accept fragment if it closer to the camera than the former one
 	glDepthFunc(GL_LESS);
-	glFrontFace(GL_CW);
+
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
+	//glDisableClientState(GL_COLOR_ARRAY);
+	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
+
 }
 /*
 * @brief initializes the game from graphics to loading scene and managing client connection
@@ -78,7 +84,7 @@ void Game::Initialize()
 	m_instance.m_client = new Client();//managers communication with the server
 
 	m_initialized = true;
-	m_lock_mouse = true;
+	m_lock_mouse = false;
 }
 /*
 * @brief throws a close game event to start clean up process
@@ -90,6 +96,7 @@ void Game::GameClose()
 
 	m_running = false;
 	m_instance.getEventSystem().Notify(Event::Close, event);
+	exit(0);
 }
 /*
 * @brief returns a reference to the global game class
@@ -115,6 +122,48 @@ sf::RenderWindow*	Game::getWindow()
 { 
 	return m_window; 
 }
+
+void Game::HandleInput()
+{
+	sf::Event event;
+
+	//get user inputs
+	while (m_window->pollEvent(event))
+	{
+		if (event.type == sf::Event::KeyPressed)
+		{
+			switch (event.key.code)
+			{
+			case sf::Keyboard::Q:
+			{
+				m_lock_mouse = !m_lock_mouse;
+
+				if (m_lock_mouse)
+				{
+					Game::instance().getWindow()->setMouseCursorGrabbed(true);
+					Game::instance().getWindow()->setMouseCursorVisible(false);
+				}
+				else
+				{
+					Game::instance().getWindow()->setMouseCursorGrabbed(false);
+					Game::instance().getWindow()->setMouseCursorVisible(true);
+				}
+				break;
+			}
+			case sf::Keyboard::Escape:
+				GameClose();
+				break;
+			default:
+				break;
+			}
+
+		}
+
+
+		m_eventSystem->Notify(ClientInput, event);
+	}
+}
+
 /*
 * @brief Game loop that handles what happens every frame
 */
@@ -122,30 +171,25 @@ void Game::GameLoop()
 {
 	m_running = true;
 	g_clock.restart();
+	
+	//center mouse in window
 	sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
+	sf::Clock frame_rate;
+
 	while (m_running)
 	{
-		sf::Event event;
+		frame_rate.restart();
 
-		m_window->clear(sf::Color::Black);
-		
-		while (m_window->pollEvent(event))
-		{
-			/*if (event.key.code == sf::Keyboard::Escape)
-				GameClose();
-			else*/
-			m_eventSystem->Notify(ClientInput, event);
-			if (event.key.code == sf::Keyboard::Delete)
-				m_lock_mouse = false;
-		}
+		HandleInput();
+
 		if (m_lock_mouse)
 		{
 			sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
 		}
-			g_delta_clock.restart();
-			m_sceneManager->SceneFrame();
-		/*sf::Vector2i center = sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
-		sf::Mouse::setPosition(center);*/
+
+		g_delta_clock.restart();
+		m_sceneManager->SceneFrame();
+
 	}
 	m_window->close();
 }

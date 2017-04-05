@@ -5,8 +5,8 @@
 LightSource::LightSource()
 {
 	m_model = new Model("Resources\\models\\sphere.obj");
-	m_pos = Vec3(1, 1, 1);
-	m_color = Vec3(1.0f, 0.0f, 0.0f);
+	m_pos = glm::vec3(1, 1, 1);
+	m_color = glm::vec3(1.0f, 0.0f, 0.0f);
 
 	if (!m_model)
 	{
@@ -14,9 +14,9 @@ LightSource::LightSource()
 	}
 }
 
-void LightSource::Draw(Mat4 view, Mat4 proj)
+void LightSource::Draw(glm::mat4 view, glm::mat4 proj)
 {
-	Mat4 model(1.0f);
+	glm::mat4 model(1.0f);
 	GLuint model_loc, view_loc, proj_loc;
 	GLuint shader = GetShader("lighting");
 	
@@ -34,20 +34,20 @@ void LightSource::Draw(Mat4 view, Mat4 proj)
 	m_model->Draw(shader);
 }
 
-void LightSource::setPosition(Vec3 position)
+void LightSource::setPosition(glm::vec3 position)
 {
 	m_pos = position;
 }
 
-void LightSource::setColor(Vec3 color)
+void LightSource::setColor(glm::vec3 color)
 {
 	m_color = color;
 }
-Vec3 LightSource::getPosition()
+glm::vec3 LightSource::getPosition()
 {
 	return m_pos;
 }
-Vec3 LightSource::getColor()
+glm::vec3 LightSource::getColor()
 {
 	return m_color;
 }

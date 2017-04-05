@@ -1,11 +1,17 @@
 #pragma once
 #include "SFML\Graphics.hpp"
+
 #include "scene.hpp"
-#include "model.hpp"
 #include "LightSource.hpp"
+
+#include "ResourceManager.hpp"
+#include "entity.hpp"
 #include "camera.hpp"
-#include "game.hpp"
+#include "HUD.hpp"
 #include "VoxelManager.hpp"
+
+#define MAX_ENTITES 400
+
 /**
 * GameScene class that manages rendering the voxel world. Inherits from abstract class Scene
 */
@@ -22,34 +28,79 @@ public:
 	* unSubscribes from event system
 	*/
 	~GameScene();
+
 	/**
 	*@brief code to run every frame of game loop
 	*/
 	virtual void SceneFrame();
-	/**
-	*@brief Handles drawing the game scene 
-	*/
-	virtual void Render();
+
 	/**
 	*@brief Listens to user input events and handles it
 	*@param event type of user input event
 	*@param input the input from client or server
 	*/
 	virtual void onNotify(Event event, sf::Event &input);
+private:
+
+	void InitMinimap();
+
+	/**
+	*@brief Updates game world 
+	*/
+	void Update();
+
 	/**
 	*@brief Handles user input
 	*@param event the user input
 	*/
-	virtual void HandleInput(sf::Event event) ;
-private:
-	int m_size; /**<size of the voxel world. This is to test instance rendering */
-	Mat4 *m_modelMatrices;/**<array of matrix model positions for instance rendering */
+	virtual void HandleInput(sf::Event event);
 
-	Model *m_model; /**<pointer to model loaded */
-	LightSource *m_light;
+	/**
+	*@brief Handles drawing the game scene
+	*/
+	virtual void Render();
+	/**
+	* @brief Renders the voxel terrain
+	*/
+	void RenderWorld();
 
-	VoxelManager * m_voxelManager;
+	void RenderEntities();
+	void RenderModel(Entity *entity);
+
+	void RenderAABB(Entity *entity, GLuint shader);
+	/**
+	* @brief Renders a scaled down version of world
+	*/
+	void RenderMinimap();
+
+	/**
+	* @brief Loads model into global array
+	*/
+	void CreateEntity();
+
+	/***********************MEMBER VARIABLES ****************************/
+	ResourceManager *m_resrcMang;
+	//entites
+	Entity *m_entity_list;/**<object pool of entities. */
+	Entity *m_next_free_entity; /**<head of free list for entites*/
+	GLuint m_entity_count;
+
+
+	HUD * m_hud;/**<HUD handler class that managers hud inputs and rendering*/
+	
+	VoxelManager * m_voxelManager; /**<Handles Voxel Generation, rendering, and interaction*/
+
+	//main player camera
 	Camera *m_camera; /**<player camera*/  
+	
+	//minimap
+	Camera *m_minimap_cam; /**<camera used to display minimap*/
+
+	glm::vec2 m_minimap_size;//size to display minimap
+	glm::vec2 m_minimap_scale;
+	glm::vec2 m_minimap_pos;
+
+	Model * m_model; // test model, get rid of it once entities work
 
 	bool wire_frame = false;
 };

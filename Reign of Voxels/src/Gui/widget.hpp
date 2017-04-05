@@ -3,11 +3,9 @@
 #include <SFML\Graphics.hpp>
 #include <SFML\OpenGL.hpp>
 #include <SFML\Main.hpp>
+#include "3dmath.hpp"
 #include "Json.hpp"
-/**
-* A macro used to detect 2D collision. Useful to see if mouse click is inside a widget's bounds
-*/
-#define CHECKBOUNDS(x,y, bx,by,bw,bh) ((x >= bx && y >= by) && (x <= bx + bw && y <= by + bh))
+
 using Json = nlohmann::json; /**< convenience specified by nlohmann himself */  
 enum WidgetState
 {
@@ -16,6 +14,8 @@ enum WidgetState
 	StateActive/**< State if widget is currently selected */  
 };
 class Menu; /**<Forward declaring. Widgets Reference a Menu class as parent*/  
+class HUD;
+
 /**
 * Base class for all gui components that contains sfml text and rectangular shape classes
 * Handles user input and triggering callback to parent class
@@ -173,7 +173,10 @@ protected:
 	sf::Text m_text; /**< sfml text class that manages font size position and drawing */  
 	int m_max_text_len; /**< maximum length m_text is allowed to have */  
 
-	sf::RectangleShape m_box; /**< rectangular shape that stores position and color of widget*/  
 
-	Menu * m_parent; /**< menu to alert when callback triggerd*/  
+	sf::RectangleShape m_box; /**< rectangular shape that stores position and color of widget*/
+
+
+	Menu * m_parent; /**< menu to alert when callback triggerd*/
+
 };

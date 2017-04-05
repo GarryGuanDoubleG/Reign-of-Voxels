@@ -109,7 +109,7 @@ void Mesh::MeshSetInstance(GLuint instanceBuffer, GLuint amount)
 
 	glBindBuffer(GL_ARRAY_BUFFER, instanceBuffer);
 
-	GLsizei vec4Size = sizeof(Vec4);
+	GLsizei vec4Size = sizeof(glm::vec4);
 	glEnableVertexAttribArray(3);
 	glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 4 * vec4Size, (GLvoid*)0);
 	glEnableVertexAttribArray(4);
