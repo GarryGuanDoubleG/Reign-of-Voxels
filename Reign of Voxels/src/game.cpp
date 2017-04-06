@@ -158,8 +158,6 @@ void Game::HandleInput()
 			}
 
 		}
-
-
 		m_eventSystem->Notify(ClientInput, event);
 	}
 }

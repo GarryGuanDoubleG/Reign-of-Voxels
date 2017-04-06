@@ -34,6 +34,8 @@ public:
 	*/
 	void HandleInput(sf::Event event);
 
+	glm::vec3 GetRotation();
+
 	glm::vec3 GetPosition();
 	void SetPosition(glm::vec3 position);
 
@@ -53,6 +55,7 @@ public:
 	glm::vec3 MouseCreateRay(sf::Vector2i mouse_pos);
 
 	void DrawRay();
+
 
 private:
 

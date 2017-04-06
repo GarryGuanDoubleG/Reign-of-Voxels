@@ -185,10 +185,10 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 		glm::vec3 position = VoxelOctree::render_list[i]->getPosition();
 		CubeRegion chunkRegion = { position, VoxelChunk::CHUNK_SIZE };
 
-		if (!player_cam->AABBInCamera(chunkRegion))
-			continue;
-		else
-			++render_count;
+		//if (!player_cam->AABBInCamera(chunkRegion))
+		//	continue;
+		//else
+		//	++render_count;
 
 		glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
 		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));

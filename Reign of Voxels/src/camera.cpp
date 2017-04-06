@@ -64,6 +64,8 @@ void Camera::SetToPersp()
 
 	m_forward = glm::normalize(m_forward);
 
+	Update();
+
 	m_perspective = true;
 }
 
@@ -85,6 +87,11 @@ glm::vec3 Camera::GetPosition()
 void Camera::SetPosition(glm::vec3 position)
 {
 	m_pos = position;
+}
+
+glm::vec3 Camera::GetRotation()
+{
+	return glm::vec3(glm::radians(m_pitch), glm::radians(m_yaw), glm::radians(m_roll));
 }
 
 void Camera::Update()
@@ -209,14 +216,17 @@ glm::vec3 Camera::MouseCreateRay(sf::Vector2i mouse_pos)
 {
 	//expensive ray casting
 	glm::vec4 screenPos = glm::vec4((mouse_pos.x * 2.0f / (float)SCREEN_WIDTH) - 1.0f,
-								   1.0f - (mouse_pos.y * 2.0f / (float)SCREEN_HEIGHT),
+									1.0f - (mouse_pos.y * 2.0f / (float)SCREEN_HEIGHT),
 									1.0f, 
 									 1.0f);
-
+	//move cam to near plane
 	glm::mat4 inverse_VP = glm::inverse((m_perspect_proj * m_view_mat));
 	glm::vec4 worldPos = inverse_VP * screenPos;
-	
-	return glm::normalize(glm::vec3(worldPos));
+	worldPos /= worldPos.w;
+
+	glm::vec3 dir = glm::vec3(worldPos) - m_pos;
+
+	return glm::normalize(dir);
 }
 
 void Camera::DrawRay()

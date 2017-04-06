@@ -42,6 +42,7 @@ public:
 	virtual void onNotify(Event event, sf::Event &input);
 private:
 
+	void InitRayVertex();
 	void InitMinimap();
 
 	/**
@@ -66,8 +67,9 @@ private:
 
 	void RenderEntities();
 	void RenderModel(Entity *entity);
-
 	void RenderAABB(Entity *entity, GLuint shader);
+	void RenderRayCast();
+
 	/**
 	* @brief Renders a scaled down version of world
 	*/
@@ -85,6 +87,9 @@ private:
 	Entity *m_next_free_entity; /**<head of free list for entites*/
 	GLuint m_entity_count;
 
+	std::vector<Ray> m_rays;
+	GLuint m_vao,
+		m_vbo;
 
 	HUD * m_hud;/**<HUD handler class that managers hud inputs and rendering*/
 	

@@ -22,7 +22,7 @@ void Entity::Init(GLint modelID, glm::vec3 position, BBox aabb)
 
 	m_aabb = aabb;
 
-	//MoveTo(glm::vec3(256.0f, 256.0f, 256.0f));
+	//MoveTo(glm::vec3(256.0f, 32.0f, 256.0f));
 }
 
 void Entity::Destroy()
@@ -90,7 +90,8 @@ void Entity::MoveTo(glm::vec3 target_pos)
 	//	m_target = glm::vec3(target_pos.x, 0, target_pos.z);
 	//}
 
-	m_target = glm::vec3(target_pos.x, 0, target_pos.z);
+	m_target = glm::vec3(target_pos.x, 32, target_pos.z);
+	//m_target = target_pos;
 	m_flag |= ENTITY_MOVING;
 }
 

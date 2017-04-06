@@ -32,6 +32,7 @@ GameScene::GameScene()
 	m_voxelManager->GenerateVoxels();
 
 	InitMinimap();
+	InitRayVertex();
 
 	//allocate memeory for all entities
 	m_entity_list = new Entity[MAX_ENTITES];
@@ -52,6 +53,28 @@ GameScene::GameScene()
 GameScene::~GameScene()
 {
 	Game::instance().getEventSystem().removeObserver(this);
+}
+
+void GameScene::InitRayVertex()
+{
+	float verts[] = {
+		1.0f, 1.0f, 1.0f,
+		0.0f, 0.0f, 0.0f,
+		.0000001f,.0000001f,.0000001f
+	};
+
+	glGenVertexArrays(1, &m_vao);
+	glBindVertexArray(m_vao);
+
+	glGenBuffers(1, &m_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (GLvoid*)0);
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
 void GameScene::InitMinimap()
@@ -95,22 +118,24 @@ void GameScene::Render()
 {
 	GLfloat bg_color[] = { 0.3f, 0.3f, 0.3f, 0.3f };
 
- 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
- 	glClearBufferfv(GL_COLOR, 0, bg_color);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearBufferfv(GL_COLOR, 0, bg_color);
 
 	RenderWorld();
 	RenderMinimap();
 	RenderEntities();
+	RenderRayCast();
+
 	m_hud->Render();
 
 
-	Game::instance().getWindow()->display();	
+	Game::instance().getWindow()->display();
 }
 
 void GameScene::RenderAABB(Entity *entity, GLuint shader)
 {
 	GLuint modelID = m_resrcMang->GetModelID("cube");
-	
+
 	glm::mat4 model;
 	model = glm::translate(glm::mat4(1.0f), entity->GetPosition() + entity->GetAABB().min);
 	model = glm::scale(model, entity->GetAABB().max);
@@ -128,7 +153,8 @@ void GameScene::RenderModel(Entity *entity)
 
 	glm::mat4 model;
 	model = glm::translate(glm::mat4(1.0f), entity->GetPosition());
-	model = glm::scale(model, glm::vec3(64.0f, 64.0f, 64.0f));
+	//model = glm::scale(model, glm::vec3(64.0f, 64.0f, 64.0f));
+	model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
 
 	glm::vec3 light_pos(256, 512.0f, 256);
 	glm::vec3 light_color(1.0f, 1.0f, 1.0f);
@@ -154,8 +180,8 @@ void GameScene::RenderModel(Entity *entity)
 	glUniform3fv(glGetUniformLocation(shader, "model_color"), 1, &ent_color[0]);
 
 	m_resrcMang->GetModel(entity->GetModelID())->Draw(shader);
-	
-	RenderAABB(entity,shader);
+
+	RenderAABB(entity, shader);
 }
 
 void GameScene::RenderWorld()
@@ -189,6 +215,32 @@ void GameScene::RenderMinimap()
 	m_voxelManager->RenderMinimap(shader, m_minimap_scale, m_minimap_pos);
 }
 
+void GameScene::RenderRayCast()
+{
+	GLuint shader = GetShader("ray");
+	glUseProgram(shader);
+
+	glBindVertexArray(m_vao);
+
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
+
+	for (int i = 0; i < m_rays.size(); i++)
+	{
+		glm::mat4 model(1.0f);	
+		model = glm::translate(model, m_rays[i].start);
+		model = glm::scale(model, 1000.0f * (m_rays[i].dir));
+
+		glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+
+
+		glDrawArrays(GL_LINES, 0, 2);
+
+		CheckGLError();
+	}
+	glBindVertexArray(0);
+}
+
 /**
 *@brief Listens to user input events and handles it
 *@param event type of user input event
@@ -197,7 +249,7 @@ void GameScene::RenderMinimap()
 void GameScene::onNotify(Event event, sf::Event &input)
 {
 	/*if (event == ServerInput)*/
-		HandleInput(input); 
+	HandleInput(input);
 }
 /**
 *@brief Handles user input
@@ -205,6 +257,7 @@ void GameScene::onNotify(Event event, sf::Event &input)
 */
 void GameScene::HandleInput(sf::Event event)
 {
+	m_camera->HandleInput(event);
 
 	if (event.type == sf::Event::KeyPressed)
 	{
@@ -215,43 +268,52 @@ void GameScene::HandleInput(sf::Event event)
 			break;
 		case sf::Keyboard::R:
 			CreateEntity();
+			break;
+		case sf::Keyboard::T:
+			m_rays.clear();
+			break;
 		default:
 			break;
 		}
 	}
 	else if (event.type == sf::Event::MouseButtonPressed)
 	{
-		sf::Vector2i mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
+		sf::Vector2i mouse_pos(event.mouseButton.x, event.mouseButton.y);
 
 		//TODO thread ray intersection
 		glm::vec3 ray_dir = m_camera->MouseCreateRay(mouse_pos);
-		glm::vec3 ray_end = ray_dir + m_camera->GetPosition() + ray_dir * 1000.0f;
 
-		std::cout << "world pos x " << ray_dir.x << std::endl;
-		std::cout << "world pos y " << ray_dir.y << std::endl;
-		std::cout << "world pos z " << ray_dir.z << std::endl;
-
-		for (int i = 0; i < MAX_ENTITES; i++)
+		if (event.mouseButton.button == sf::Mouse::Left)
 		{
-			if (m_entity_list[i].IsActive())
+			Ray ray = { m_camera->GetPosition(), ray_dir };
+			m_rays.push_back(ray);
+
+			for (int i = 0; i < MAX_ENTITES; i++)
 			{
+				if (!m_entity_list[i].IsActive())
+					continue;
+
 				glm::vec3 intersection;
 				float t;
-				if (LineAABBIntersection(m_entity_list[i].GetPosition(), m_entity_list[i].GetAABB(), m_camera->GetPosition(), ray_end, intersection, t))
-				{
-					std::cout << "Hit! t = " << t << std::endl;
+
+				if (LineAABBIntersection(m_entity_list[i].GetPosition(), m_entity_list[i].GetAABB(), m_camera->GetPosition(), m_camera->GetPosition() + ray_dir * 1000.0f, intersection, t))
 					m_entity_list[i].SetSelected(true);
-				}
 				else
-				{
-					std::cout << "No hits\n";
-					m_entity_list[i].SetSelected(false);
-				}
+					m_entity_list[i].SetSelected(false);			
 			}
 		}
-
+		else // right click
+		{
+			for (int i = 0; i < MAX_ENTITES; i++)
+			{
+				if (!m_entity_list[i].IsActive() || 
+					!m_entity_list[i].IsSelected())
+					continue;
+				m_entity_list[i].MoveTo(m_camera->GetPosition() + ray_dir * 64.0f);
+				
+			}
+		}
 	}
-	m_camera->HandleInput(event);
 }
 
 
@@ -264,9 +326,9 @@ void GameScene::CreateEntity()
 	int id = entity - m_entity_list;
 
 	//TODO move this to a json file
-	BBox bounds = { glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(64,64,64) };
+	BBox bounds = { glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(6,12,6) };
 
-	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(64 * id,64, 64 * id), bounds);
+	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(6*id, 64, 6*id), bounds);
 
 	entity->m_nextFree = NULL;
 }

@@ -9,6 +9,12 @@
 
 typedef struct
 {
+	glm::vec3 start;
+	glm::vec3 dir;
+}Ray;
+
+typedef struct
+{
 	glm::vec3 position; /**< vertex postion in ndc */
 	glm::vec3 normal; /**< normal value of vertex */
 	glm::vec2 uv; /**< texture coordinates */
