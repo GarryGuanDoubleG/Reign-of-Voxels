@@ -52,10 +52,7 @@ public:
 	bool AABBInCamera(BBox &aabb);
 	bool AABBInCamera(CubeRegion &aabb);
 
-	glm::vec3 MouseCreateRay(sf::Vector2i mouse_pos);
-
 	void DrawRay();
-
 
 private:
 

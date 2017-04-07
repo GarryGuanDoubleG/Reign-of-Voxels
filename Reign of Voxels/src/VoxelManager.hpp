@@ -32,7 +32,9 @@ public:
 	void		 destroyOctreeNode(VoxelOctree * node);
 
 	void CreatePlayerStartAreas();
+
 private:
+
 	int m_worldSize; //size of one side of cubic world region
 	int m_maxChunks;
 	int m_maxOctNodes;
@@ -41,7 +43,6 @@ private:
 	VoxelChunk * m_freeChunkHead;//head ptr to free chunk list
 
 	VoxelOctree *m_octreeRoot; // ptr to octree root node
-
 	VoxelOctree * m_octreePool;//array of octrees
 
 	Model *m_cube;

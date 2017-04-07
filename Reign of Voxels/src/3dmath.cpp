@@ -1,4 +1,9 @@
+#include <utility>
+#include <algorithm>
+
 #include "3dmath.hpp"
+
+
 
 void SetPlane(Plane &plane, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3)
 {
@@ -24,26 +29,23 @@ bool ClipLine(const glm::vec3 &objPos, BBox aabb, const glm::vec3 &v0, const glm
 {
 	// f_low and f_high are the results from all clipping so far. We'll write our results back out to those parameters.
 
-
 	float f_dim_low, f_dim_high;
-
+	BBox worldSpaceBBox = aabb;
 	//translate box to world pos
-	aabb.min += objPos;
-	aabb.max += objPos;
+	worldSpaceBBox.min += objPos;
+	worldSpaceBBox.max += objPos;
 
 	for (int i = 0; i < 3; i++)
 	{
 		// Find the point of intersection in current dimension
-		f_dim_low = (aabb.min[i] - v0[i]) / (v1[i] - v0[i]);
-		f_dim_high = (aabb.max[i] - v0[i]) / (v1[i] - v0[i]);
+		f_dim_low = (worldSpaceBBox.min[i] - v0[i]) / (v1[i] - v0[i]);
+		f_dim_high = (worldSpaceBBox.max[i] - v0[i]) / (v1[i] - v0[i]);
 
 		// Make sure low is less than high
 		if (f_dim_high < f_dim_low)
 		{
 			//swap
-			float swap = f_dim_high;
-			f_dim_high = f_dim_low;
-			f_dim_low = swap;
+			std::swap(f_dim_high, f_dim_low);
 		}
 
 		//definite miss
@@ -54,8 +56,8 @@ bool ClipLine(const glm::vec3 &objPos, BBox aabb, const glm::vec3 &v0, const glm
 		if (f_dim_low > fmax)
 			return false;
 
-		fmin = MAX(f_dim_low, fmin);
-		fmax = MIN(f_dim_high, fmax);
+		fmin = std::max(f_dim_low, fmin);
+		fmax = std::min(f_dim_high, fmax);
 		
 		if (fmin > fmax)
 			return false;
@@ -63,6 +65,7 @@ bool ClipLine(const glm::vec3 &objPos, BBox aabb, const glm::vec3 &v0, const glm
 
 	return true;
 }
+
 bool LineAABBIntersection(const glm::vec3 &objPos, const BBox &aabb, glm::vec3 v0, glm::vec3 v1, glm::vec3 &outIntersect, float &t)
 {
 	float fmin = 0;
@@ -78,3 +81,4 @@ bool LineAABBIntersection(const glm::vec3 &objPos, const BBox &aabb, glm::vec3 v
 
 	return true;
 }
+

@@ -5,7 +5,7 @@
 #include "model.hpp"
 #include "GameScene.hpp"
 #include "simple_logger.h"
-
+#include "PhysicsUtil.hpp"
 
 #define MODEL_PATH "Resources/models/models.json"
 
@@ -153,8 +153,7 @@ void GameScene::RenderModel(Entity *entity)
 
 	glm::mat4 model;
 	model = glm::translate(glm::mat4(1.0f), entity->GetPosition());
-	//model = glm::scale(model, glm::vec3(64.0f, 64.0f, 64.0f));
-	model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
+	model = glm::scale(model, glm::vec3(64.0f, 64.0f, 64.0f));
 
 	glm::vec3 light_pos(256, 512.0f, 256);
 	glm::vec3 light_color(1.0f, 1.0f, 1.0f);
@@ -179,7 +178,7 @@ void GameScene::RenderModel(Entity *entity)
 
 	glUniform3fv(glGetUniformLocation(shader, "model_color"), 1, &ent_color[0]);
 
-	m_resrcMang->GetModel(entity->GetModelID())->Draw(shader);
+	//m_resrcMang->GetModel(entity->GetModelID())->Draw(shader);
 
 	RenderAABB(entity, shader);
 }
@@ -278,28 +277,36 @@ void GameScene::HandleInput(sf::Event event)
 	}
 	else if (event.type == sf::Event::MouseButtonPressed)
 	{
+		Ray ray;
 		sf::Vector2i mouse_pos(event.mouseButton.x, event.mouseButton.y);
 
-		//TODO thread ray intersection
-		glm::vec3 ray_dir = m_camera->MouseCreateRay(mouse_pos);
+		PhysicsUtil::ScreenPosToWorldRay(m_camera->GetPosition(), mouse_pos, 
+										 glm::vec2((float)SCREEN_WIDTH, (float)SCREEN_HEIGHT), 
+										 m_camera->GetViewMat(), m_camera->GetProj(), 
+										 ray);
 
+		m_rays.push_back(ray);
+
+		//TODO thread ray intersection
 		if (event.mouseButton.button == sf::Mouse::Left)
 		{
-			Ray ray = { m_camera->GetPosition(), ray_dir };
-			m_rays.push_back(ray);
-
 			for (int i = 0; i < MAX_ENTITES; i++)
 			{
 				if (!m_entity_list[i].IsActive())
 					continue;
 
 				glm::vec3 intersection;
-				float t;
+				float t = 0.0f;
 
-				if (LineAABBIntersection(m_entity_list[i].GetPosition(), m_entity_list[i].GetAABB(), m_camera->GetPosition(), m_camera->GetPosition() + ray_dir * 1000.0f, intersection, t))
+				if (LineAABBIntersection(m_entity_list[i].GetPosition(), m_entity_list[i].GetAABB(),
+					ray.start, ray.start + ray.dir * 1000.0f, intersection, t))
+				{
 					m_entity_list[i].SetSelected(true);
+				}
 				else
-					m_entity_list[i].SetSelected(false);			
+				{
+					m_entity_list[i].SetSelected(false);
+				}
 			}
 		}
 		else // right click
@@ -309,7 +316,7 @@ void GameScene::HandleInput(sf::Event event)
 				if (!m_entity_list[i].IsActive() || 
 					!m_entity_list[i].IsSelected())
 					continue;
-				m_entity_list[i].MoveTo(m_camera->GetPosition() + ray_dir * 64.0f);
+				m_entity_list[i].MoveTo(m_camera->GetPosition() + ray.dir * 64.0f);
 				
 			}
 		}
@@ -326,7 +333,7 @@ void GameScene::CreateEntity()
 	int id = entity - m_entity_list;
 
 	//TODO move this to a json file
-	BBox bounds = { glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(6,12,6) };
+	BBox bounds = { glm::vec3(0.0f), glm::vec3(1,1,1) };
 
 	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(6*id, 64, 6*id), bounds);
 
