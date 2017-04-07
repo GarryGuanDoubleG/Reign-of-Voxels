@@ -105,6 +105,9 @@
     <ClCompile Include="src\3dmath.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="src\PhysicsUtil.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actor.hpp">
@@ -201,6 +204,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\3dmath.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\PhysicsUtil.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

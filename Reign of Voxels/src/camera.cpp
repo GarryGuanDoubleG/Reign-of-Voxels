@@ -212,23 +212,6 @@ bool Camera::AABBInCamera(CubeRegion &aabb)
 	return true;
 }
 
-glm::vec3 Camera::MouseCreateRay(sf::Vector2i mouse_pos)
-{
-	//expensive ray casting
-	glm::vec4 screenPos = glm::vec4((mouse_pos.x * 2.0f / (float)SCREEN_WIDTH) - 1.0f,
-									1.0f - (mouse_pos.y * 2.0f / (float)SCREEN_HEIGHT),
-									1.0f, 
-									 1.0f);
-	//move cam to near plane
-	glm::mat4 inverse_VP = glm::inverse((m_perspect_proj * m_view_mat));
-	glm::vec4 worldPos = inverse_VP * screenPos;
-	worldPos /= worldPos.w;
-
-	glm::vec3 dir = glm::vec3(worldPos) - m_pos;
-
-	return glm::normalize(dir);
-}
-
 void Camera::DrawRay()
 {
 	GetShader("ray");
