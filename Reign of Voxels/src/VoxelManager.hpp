@@ -33,6 +33,8 @@ public:
 
 	void CreatePlayerStartAreas();
 
+	bool BlockWorldPosActive(glm::vec3 world_pos);
+
 private:
 
 	int m_worldSize; //size of one side of cubic world region

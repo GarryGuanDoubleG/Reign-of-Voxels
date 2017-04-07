@@ -90,17 +90,13 @@ void VoxelChunk::BindMesh()
 {
 	if ((m_vertices.size() == 0) || m_tri_indices.size() == 0)
 	{
-		this->m_active = false;
 		return;
-<<<<<<< HEAD
 	}
-=======
 
 	glGenVertexArrays(1, &this->m_vao);
 	glGenBuffers(1, &this->m_vbo);
 	glGenBuffers(1, &this->m_ebo);
 
->>>>>>> a836ba3bb4d918439661e3eb9e28b86164de1ea9
 	glBindVertexArray(m_vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
@@ -256,11 +252,6 @@ void VoxelChunk::AddBackFace(int x, int y, int z)
 	vertex.position = glm::vec3(x, y, z);
 	m_vertices.push_back(vertex);
 
-<<<<<<< HEAD
-					vertex.position = Vec3(x - 0.5f, y - 0.5f, z + 0.5f);
-					m_vertices.push_back(vertex);
-					AddTrianglesIndices();
-=======
 	vertex.position = glm::vec3(x, y + 1.0f, z);
 	m_vertices.push_back(vertex);
 	vertex.position = glm::vec3(x + 1.0f, y + 1.0f, z);
@@ -385,7 +376,6 @@ void VoxelChunk::GenerateMesh()
 					{
 						AddFrontFace(x, y, z);
 					}
->>>>>>> a836ba3bb4d918439661e3eb9e28b86164de1ea9
 				}
 			}
 		}
@@ -448,6 +438,11 @@ void VoxelChunk::SmoothTerrain(float scale, glm::vec3 origin)
 		}
 	}
 
+}
+
+sf::Uint8 VoxelChunk::GetVoxel(glm::ivec3 local_pos)
+{
+	return m_voxels[local_pos.x, local_pos.y, local_pos.z];
 }
 
 void VoxelChunk::Render()

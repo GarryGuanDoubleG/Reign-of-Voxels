@@ -82,3 +82,9 @@ bool LineAABBIntersection(const glm::vec3 &objPos, const BBox &aabb, glm::vec3 v
 	return true;
 }
 
+
+//return signed value of signum
+int signum(int in)
+{
+	return in < 0 ? -1 : in > 0 ? 1 : 0;
+}

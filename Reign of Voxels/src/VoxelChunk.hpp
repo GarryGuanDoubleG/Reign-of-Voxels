@@ -46,13 +46,6 @@ public:
 	bool IsActive();
 	void SetActive(bool active);
 
-	void AddLeftFace(int x, int y, int z);
-	void AddBottomFace(int x, int y, int z);
-	void AddFrontFace(int x, int y, int z);
-	void AddRightFace(int x, int y, int z);
-	void AddTopFace(int x, int y, int z);
-	void AddBackFace(int x, int y, int z);
-
 	void AssignNeighbor(VoxelChunk * neighbor, int side);
 
 	void GenerateMesh();
@@ -64,6 +57,8 @@ public:
 
 	void Render();
 	void RenderMinimap();
+
+	sf::Uint8 GetVoxel(glm::ivec3 local_pos);
 
 	void ClearPlayerStart(float height);
 	void SmoothTerrain(float scale, glm::vec3 origin);
@@ -82,6 +77,13 @@ public:
 private:
 	void AddTrianglesIndices();
 	void AddMinimapIndices();
+
+	void AddLeftFace(int x, int y, int z);
+	void AddBottomFace(int x, int y, int z);
+	void AddFrontFace(int x, int y, int z);
+	void AddRightFace(int x, int y, int z);
+	void AddTopFace(int x, int y, int z);
+	void AddBackFace(int x, int y, int z);
 
 	int GetIndex(int x, int y, int z);
 

@@ -141,7 +141,6 @@ VoxelOctree *VoxelManager::createOctreeChild(VoxelOctree *currentNode, int child
 }
 
 
-
 void VoxelManager::destroyOctreeNode(VoxelOctree * node)
 {
 	node->DestroyNode(); //clears minimal data for reuse
@@ -228,4 +227,21 @@ void VoxelManager::CreatePlayerStartAreas()
 	m_octreeRoot->CreatePlayerStart(glm::vec3(VoxelChunk::CHUNK_SIZE * 3, 8, VoxelChunk::CHUNK_SIZE * 3));
 
 	//TODO multiple players 2 3 4
+}
+
+bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
+{
+	VoxelChunk * chunk;
+
+	chunk = m_octreeRoot->FindLeafChunk(world_pos);
+
+	if (!chunk)
+		return false;
+
+	glm::ivec3 local_pos = world_pos - chunk->getPosition();
+
+	if (~chunk->GetVoxel(local_pos) & VOXEL_TYPE_AIR)
+		return false;
+	
+	return true;
 }

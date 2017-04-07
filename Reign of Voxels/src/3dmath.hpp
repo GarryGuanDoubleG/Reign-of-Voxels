@@ -75,3 +75,5 @@ float DistanceToPlane(Plane plane, glm::vec3 point);
 //bool ClipLine(const glm::vec3 &objPos, BBox aabb, const glm::vec3 &v0, const glm::vec3 &v1, float& fmin, float& fmax);
 //bool ClipLine(int d, const glm::vec3 &objPos, BBox aabb, const glm::vec3 &v0, const glm::vec3 &v1, float& f_low, float& f_high);
 bool LineAABBIntersection(const glm::vec3 &objPos, const BBox &aabb, glm::vec3 v0, glm::vec3 v1, glm::vec3 &outIntersect, float &t);
+
+int signum(int in);
