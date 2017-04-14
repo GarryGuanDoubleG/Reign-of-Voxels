@@ -54,28 +54,33 @@ void PhysicsUtil::ScreenPosToWorldRay(const glm::vec3& camera_pos, const sf::Vec
 	worldPos /= worldPos.w;
 
 	out_ray.start = camera_pos;
-	out_ray.dir = glm::vec3(worldPos) - camera_pos;
+	out_ray.dir = glm::normalize(glm::vec3(worldPos) - camera_pos);
 }
 
 bool BoundContains(const glm::vec3 & pos, const glm::dvec3& min, const glm::dvec3& max)
 {
-	return !(pos.x < min.x || pos.y < min.y || pos.z < min.z || pos.x > max.x || pos.y > max.y || pos.z > max.z);
+	return pos.x >= min.x && pos.y >= min.y && pos.z >= min.z && 
+			 pos.x < max.x && pos.y < max.y && pos.z < max.z;
 }
 
 
 //Based on the paper "A Fast Voxel Travseal Algorithm"
 //http://www.cse.yorku.ca/~amana/research/grid.pdf
 
-glm::vec3 PhysicsUtil::WorldRayCast(VoxelManager * voxelManager,
-							   const Ray &ray, const float& length)
+
+void PhysicsUtil::WorldRayCast(VoxelManager * voxelManager, const Ray &ray, 
+								const float& length, glm::vec3 &outHit)
 {
 	//0 leads to an infinite loop
-	if (ray.dir == glm::vec3(0))
+	//returning negative if outside world
+	if (ray.dir == glm::vec3(-1))
+	{
 		return;
+	}
 
 	const glm::ivec3 step(glm::sign(ray.dir));
 
-	glm::vec3 cube_pos = ray.start;//floor the ray origin by casting to int
+	glm::ivec3 cube_pos = ray.start;//floor the ray origin by casting to int
 
 	glm::vec3 tMax = intbounds(ray.start, ray.dir);
 	glm::vec3 tDelta = delta(ray.dir);
@@ -90,26 +95,38 @@ glm::vec3 PhysicsUtil::WorldRayCast(VoxelManager * voxelManager,
 		(step.y > 0 ? cube_pos.y < max.y : cube_pos.y > min.y) &&
 		(step.z > 0 ? cube_pos.z < max.z : cube_pos.z > min.z))
 	{
-		if (BoundContains(cube_pos, min, max) && (voxelManager->BlockWorldPosActive(cube_pos)))
+		if (voxelManager->BlockWorldPosActive(cube_pos))
 		{
-			return cube_pos + .5f;
+			std::cout << "Face : " << face.x << " " << face.y << " " << face.z << std::endl;
+			outHit = cube_pos + face;
+			return;
+		}
+		else if(!BoundContains(cube_pos, min, max))
+		{
+			break;
 		}
 		// tMax.x stores the t-value at which we cross a cube boundary along the
 		// X axis, and similarly for Y and Z. Therefore, choosing the least tMax
 		// chooses the closest cube boundary.
+
 		sf::Uint8 i = (tMax.x < tMax.y) ? 0 : 1;
+				
 		if (tMax.z < tMax[i])
 		{
 			i = 2;
 		}
+
 		cube_pos[i] += step[i];
-		// Adjust tMaxX to the next X-oriented boundary crossing.
+		// Adjust tMax to the next axis oriented boundary crossing.
+
 		tMax[i] += tDelta[i];
+
 		// Record the normal vector of the cube face we entered.
 		face.x = face.y = face.z = 0;
 		face[i] = -step[i];
 	}
+	
+	outHit = glm::vec3(-1);
 	// there is no cube in range
 	return;
-
 }

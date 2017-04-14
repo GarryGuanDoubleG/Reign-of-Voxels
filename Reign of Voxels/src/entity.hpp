@@ -21,11 +21,11 @@ public:
 	Entity();
 	~Entity();
 
-	void Init(GLint modelID, glm::vec3 position, BBox aabb);
+	void Init(GLint modelID, glm::vec3 position, AABB aabb);
 	void Destroy();
 
 	glm::vec3 GetPosition();
-	BBox GetAABB();
+	AABB GetAABB();
 
 	GLuint GetModelID();
 
@@ -63,5 +63,5 @@ private:
 
 	float m_speed;
 
-	BBox m_aabb;
+	AABB m_aabb;
 };

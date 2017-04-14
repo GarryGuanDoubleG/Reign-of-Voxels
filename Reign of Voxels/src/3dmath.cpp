@@ -1,5 +1,6 @@
 #include <utility>
 #include <algorithm>
+#include <iostream>
 
 #include "3dmath.hpp"
 
@@ -25,66 +26,141 @@ float DistanceToPlane(Plane plane, glm::vec3 point)
 	return glm::dot(plane.normal, point) + plane.D; // signed distance from plane to point
 }
 
-bool ClipLine(const glm::vec3 &objPos, BBox aabb, const glm::vec3 &v0, const glm::vec3 &v1, float& fmin, float& fmax)
+void GetAABBPlane(Plane &out, const AABB &aabb, Side side, float D)
 {
-	// f_low and f_high are the results from all clipping so far. We'll write our results back out to those parameters.
+	out.D = D;
 
-	float f_dim_low, f_dim_high;
-	BBox worldSpaceBBox = aabb;
-	//translate box to world pos
-	worldSpaceBBox.min += objPos;
-	worldSpaceBBox.max += objPos;
+	switch (side)
+	{
+	case TOP:
+		out.normal = glm::vec3(0.0f, 1.0f, 0.0f);
+		break;
+	case BOTTOM:
+		out.normal = glm::vec3(0.0f, -1.0f, 0.0f);
+		break;
+	case LEFT:
+		out.normal = glm::vec3(-1.0f, 0.0f, 0.0f);
+		break;
+	case RIGHT:
+		out.normal = glm::vec3(1.0f, 0.0f, 0.0f);
+		break;
+	case BACK:
+		out.normal = glm::vec3(0.0f, 0.0f, -1.0f);
+		break;
+	case FRONT:
+		out.normal = glm::vec3(0.0f, 0.0f, 1.0f);
+		break;
+	}
+}
 
+bool RayInPlane(const Ray &ray, const Plane &plane, glm::vec3 &intersect)
+{
+	float denom, t;
+
+	denom = glm::dot(ray.dir, plane.normal);
+	
+	if (denom == 0) return 0;
+
+	t = -((glm::dot(ray.start, plane.normal) + plane.D) / denom);
+
+	intersect = ray.start + ray.dir * t;
+
+	if ((t > 0) && (t <= 1000))
+		return true;
+
+	return false;
+}
+
+bool LineAABBIntersection(const glm::vec3 &objPos, const AABB &aabb, const Ray &ray,
+							glm::vec3 &outIntersect, float &out_t)
+{
+	Plane planes[3]; //check 3 visible planes
+
+	AABB worldAABB = aabb;//aabb in world space
+	worldAABB.min += objPos;
+	worldAABB.max += objPos;
+
+	float distance = glm::distance(ray.start, objPos);
+	std::cout << "Distance " << distance << std::endl;
+
+	if (objPos.x <= ray.start.x)
+		GetAABBPlane(planes[0], aabb, RIGHT, worldAABB.max.x);
+	else
+		GetAABBPlane(planes[0], aabb, LEFT, worldAABB.min.x);
+
+	if (objPos.y <= ray.start.y)
+		GetAABBPlane(planes[1], aabb, TOP, worldAABB.max.y);
+	else
+		GetAABBPlane(planes[1], aabb, BOTTOM, worldAABB.min.y);
+
+	if (objPos.z <= ray.start.z)
+		GetAABBPlane(planes[2], aabb, FRONT, worldAABB.max.z);
+	else
+		GetAABBPlane(planes[2], aabb, BACK, worldAABB.min.z);
+
+	//check for ray intersections with 3 visible faces
 	for (int i = 0; i < 3; i++)
 	{
-		// Find the point of intersection in current dimension
-		f_dim_low = (worldSpaceBBox.min[i] - v0[i]) / (v1[i] - v0[i]);
-		f_dim_high = (worldSpaceBBox.max[i] - v0[i]) / (v1[i] - v0[i]);
-
-		// Make sure low is less than high
-		if (f_dim_high < f_dim_low)
-		{
-			//swap
-			std::swap(f_dim_high, f_dim_low);
-		}
-
-		//definite miss
-		if (f_dim_high < fmin)
-			return false;
-
-		//definite miss
-		if (f_dim_low > fmax)
-			return false;
-
-		fmin = std::max(f_dim_low, fmin);
-		fmax = std::min(f_dim_high, fmax);
+		float t;
+		glm::vec3 intersect(0.0f);
 		
-		if (fmin > fmax)
-			return false;
+		if (!RayInPlane(ray, planes[i], intersect))
+			continue;
+
+		if (AABBCONTAINS(intersect, worldAABB))
+		{
+			outIntersect = intersect;
+			return true;
+		}
+		//TODO check if bounds of the rectangle of plane
 	}
 
-	return true;
+	out_t = -1;
+	outIntersect = glm::vec3(-1.0f);
+	return false;
 }
 
-bool LineAABBIntersection(const glm::vec3 &objPos, const BBox &aabb, glm::vec3 v0, glm::vec3 v1, glm::vec3 &outIntersect, float &t)
+bool AABBRayIntersection(const glm::vec3 &objPos, const AABB &aabb, const Ray &r)
 {
-	float fmin = 0;
-	float fmax = 1;
+ 	AABB worldAABB = aabb;
+	worldAABB.min += objPos;
+	worldAABB.max += objPos;
 
-	if (!ClipLine(objPos, aabb, v0, v1, fmin, fmax))
+	float tmin = (worldAABB.min.x - r.start.x) / r.dir.x;
+	float tmax = (worldAABB.max.x - r.start.x) / r.dir.x;
+
+	if (tmin > tmax) 
+		std::swap(tmin, tmax);
+
+	float tymin = (worldAABB.min.y - r.start.y) / r.dir.y;
+	float tymax = (worldAABB.max.y - r.start.y) / r.dir.y;
+
+	if (tymin > tymax) 
+		std::swap(tymin, tymax);
+
+	if ((tmin > tymax) || (tymin > tmax))
 		return false;
 
-	glm::vec3 ray = v1 - v0;
-	glm::vec3 intersect = v0 + ray * fmin;
+	if (tymin > tmin)
+		tmin = tymin;
 
-	t = fmin;
+	if (tymax < tmax)
+		tmax = tymax;
+
+	float tzmin = (worldAABB.min.z - r.start.z) / r.dir.z;
+	float tzmax = (worldAABB.max.z - r.start.z) / r.dir.z;
+
+	if (tzmin > tzmax) 
+		std::swap(tzmin, tzmax);
+
+	if ((tmin > tzmax) || (tzmin > tmax))
+		return false;
+
+	if (tzmin > tmin)
+		tmin = tzmin;
+
+	if (tzmax < tmax)
+		tmax = tzmax;
 
 	return true;
-}
-
-
-//return signed value of signum
-int signum(int in)
-{
-	return in < 0 ? -1 : in > 0 ? 1 : 0;
 }

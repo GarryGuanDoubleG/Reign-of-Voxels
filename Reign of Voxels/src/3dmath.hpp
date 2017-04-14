@@ -1,3 +1,4 @@
+
 #pragma once
 #include <glm/glm.hpp>
 #include <glm/vec3.hpp> // glm::vec3
@@ -31,7 +32,7 @@ typedef struct
 {
 	glm::vec3 min;
 	glm::vec3 max;
-}BBox;
+}AABB;
 
 typedef struct
 {
@@ -46,7 +47,7 @@ typedef struct
 	int size;
 }CubeRegion;
 
-enum
+enum Side
 {
 	TOP = 0,
 	BOTTOM,
@@ -62,6 +63,8 @@ enum
 #define BOUNDCONTAINS2D(x,y, bx,by,bw,bh) ((x >= bx && y >= by) && (x <= bx + bw && y <= by + bh))
 #define BOUNDCONTAINS3D(x,y,z, bx,by,bz,  bw,bh,bl) ((x >= bx && y >= by && z >= bz) \
 					   && (x <= bx + bw && y <= by + bh && z <= bz + bl))
+#define AABBCONTAINS(p1, aabb) ((p1.x >= aabb.min.x) && (p1.y >= aabb.min.y) && (p1.z >= aabb.min.z) \
+								&& (p1.x <= aabb.max.x) && (p1.y <= aabb.max.y) && (p1.z <= aabb.max.z))
 
 //sets 3 points of a plane
 #define SET_PLANE(pl, a, b, c) ((pl.p1 = a, pl.p2 = b, pl.p3 = c))
@@ -72,8 +75,9 @@ enum
 void SetPlane(Plane &plane, glm::vec3 p1, glm::vec3 p2, glm::vec3 p3);
 float DistanceToPlane(Plane plane, glm::vec3 point);
 
-//bool ClipLine(const glm::vec3 &objPos, BBox aabb, const glm::vec3 &v0, const glm::vec3 &v1, float& fmin, float& fmax);
-//bool ClipLine(int d, const glm::vec3 &objPos, BBox aabb, const glm::vec3 &v0, const glm::vec3 &v1, float& f_low, float& f_high);
-bool LineAABBIntersection(const glm::vec3 &objPos, const BBox &aabb, glm::vec3 v0, glm::vec3 v1, glm::vec3 &outIntersect, float &t);
+//bool ClipLine(const glm::vec3 &objPos, AABB aabb, const glm::vec3 &v0, const glm::vec3 &v1, float& fmin, float& fmax);
+//bool ClipLine(int d, const glm::vec3 &objPos, AABB aabb, const glm::vec3 &v0, const glm::vec3 &v1, float& f_low, float& f_high);
+bool LineAABBIntersection(const glm::vec3 &objPos, const AABB &aabb, const Ray &ray,
+							glm::vec3 &outIntersect, float &out_t);
 
-int signum(int in);
+bool AABBRayIntersection(const glm::vec3 &objPos, const AABB &aabb, const Ray &r);

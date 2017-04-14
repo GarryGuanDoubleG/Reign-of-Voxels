@@ -10,7 +10,7 @@ Entity::~Entity()
 
 }
 
-void Entity::Init(GLint modelID, glm::vec3 position, BBox aabb)
+void Entity::Init(GLint modelID, glm::vec3 position, AABB aabb)
 {
 	m_flag = 0;
 	m_flag |= ENTITY_ACTIVE;
@@ -36,7 +36,7 @@ glm::vec3 Entity::GetPosition()
 	return m_position;
 }
 
-BBox Entity::GetAABB()
+AABB Entity::GetAABB()
 {
 	return m_aabb;
 }
@@ -49,15 +49,16 @@ GLuint Entity::GetModelID()
 
 void Entity::Update()
 {
-	if ((m_flag & ENTITY_MOVING) == ENTITY_MOVING)
+	if (m_flag & ENTITY_MOVING)
 	{
 		m_velocity = glm::normalize(m_target - m_position) * m_speed;
-		if (glm::distance(m_position, m_target) > 3.0f)
+		if (glm::distance(m_position, m_target) > 1.0f)
 		{
 			m_position += m_velocity;
 		}			
 		else
 		{
+			m_position = m_target;
 			m_flag &= ~ENTITY_MOVING;
 		}
 	}
@@ -79,19 +80,7 @@ void Entity::Think()
 
 void Entity::MoveTo(glm::vec3 target_pos)
 {
-	//if (m_flag & ENTITY_AIR)
-	//{
-	//	m_velocity = glm::normalize(target_pos - m_position) * m_speed;
-	//	m_target = target_pos;
-	//}
-	//else
-	//{
-	//	m_velocity = glm::normalize(target_pos - m_position) * m_speed;
-	//	m_target = glm::vec3(target_pos.x, 0, target_pos.z);
-	//}
-
-	m_target = glm::vec3(target_pos.x, 32, target_pos.z);
-	//m_target = target_pos;
+	m_target = target_pos;
 	m_flag |= ENTITY_MOVING;
 }
 

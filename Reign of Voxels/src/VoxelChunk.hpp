@@ -33,7 +33,7 @@ public:
 	VoxelChunk();
 
 	//dimensions of chunk
-	static const int CHUNK_SIZE = 16;
+	static const int CHUNK_SIZE = 32;
 	static const int CHUNK_SIZE_SQ = CHUNK_SIZE * CHUNK_SIZE;
 	static const int CHUNK_SIZE_CUBED = CHUNK_SIZE_SQ * CHUNK_SIZE;
 

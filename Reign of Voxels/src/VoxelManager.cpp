@@ -238,9 +238,10 @@ bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
 	if (!chunk)
 		return false;
 
+	//get voxel in chunk object space
 	glm::ivec3 local_pos = world_pos - chunk->getPosition();
 
-	if (~chunk->GetVoxel(local_pos) & VOXEL_TYPE_AIR)
+	if (chunk->GetVoxel(local_pos) & VOXEL_TYPE_AIR)
 		return false;
 	
 	return true;

@@ -1,7 +1,6 @@
 {
   "worker": {
-    "path": "Resources\\models\\worker2.obj",
-    "mtl": "Resources\\models\\worker2.mtl"
+    "path": "Resources\\models\\worker\\worker.fbx"
   },
 
   "cube": {

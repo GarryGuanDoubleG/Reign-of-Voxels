@@ -9,12 +9,16 @@
 
 #define MODEL_PATH "Resources/models/models.json"
 
+#define RAY_CAST_MODE 1
+#define AABB_MODE 2
 /**
 * constructor
 * Subscribes to event system and sets up a camera and loads models
 */
 GameScene::GameScene()
 {
+	m_flags = 0;
+
 	//load models, textures, fonts, etc.
 	m_resrcMang = new ResourceManager();
 	m_resrcMang->LoadResources();
@@ -125,13 +129,15 @@ void GameScene::Render()
 	RenderWorld();
 	RenderMinimap();
 	RenderEntities();
-	RenderRayCast();
+
+	if(m_flags & RAY_CAST_MODE)
+		RenderRayCast();
 
 	m_hud->Render();
 
 	Game::instance().getWindow()->display();
 
-	std::cout << "FPS " << 1000.0f * timer.getElapsedTime().asSeconds() << std::endl;
+	//std::cout << "FPS " << timer.getElapsedTime().asSeconds() << std::endl;
 }
 
 void GameScene::RenderAABB(Entity *entity, GLuint shader)
@@ -140,7 +146,7 @@ void GameScene::RenderAABB(Entity *entity, GLuint shader)
 
 	glm::mat4 model;
 	model = glm::translate(glm::mat4(1.0f), entity->GetPosition() + entity->GetAABB().min);
-	model = glm::scale(model, entity->GetAABB().max);
+	model = glm::scale(model, entity->GetAABB().max - entity->GetAABB().min);
 
 	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
 
@@ -156,7 +162,7 @@ void GameScene::RenderModel(Entity *entity)
 	glm::mat4 model;
 	model = glm::translate(glm::mat4(1.0f), entity->GetPosition());
 	//model = glm::scale(model, glm::vec3(64.0f, 64.0f, 64.0f));
-	model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
+	//model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
 
 	glm::vec3 light_pos(256, 512.0f, 256);
 	glm::vec3 light_color(1.0f, 1.0f, 1.0f);
@@ -183,7 +189,8 @@ void GameScene::RenderModel(Entity *entity)
 
 	m_resrcMang->GetModel(entity->GetModelID())->Draw(shader);
 
-	RenderAABB(entity, shader);
+	if(m_flags & AABB_MODE)
+		RenderAABB(entity, shader);
 }
 
 void GameScene::RenderWorld()
@@ -274,6 +281,12 @@ void GameScene::HandleInput(sf::Event event)
 		case sf::Keyboard::T:
 			m_rays.clear();
 			break;
+		case sf::Keyboard::Y:
+			m_flags ^= RAY_CAST_MODE;
+			break;
+		case sf::Keyboard::U:
+			m_flags ^= AABB_MODE;
+			break;
 		default:
 			break;
 		}
@@ -301,27 +314,41 @@ void GameScene::HandleInput(sf::Event event)
 				glm::vec3 intersection;
 				float t;
 
-				if (LineAABBIntersection(m_entity_list[i].GetPosition(), m_entity_list[i].GetAABB(), m_camera->GetPosition(), m_camera->GetPosition() + ray.dir * 1000.0f, intersection, t))
-					m_entity_list[i].SetSelected(true);
-				else
-					m_entity_list[i].SetSelected(false);			
+				bool hit = AABBRayIntersection(m_entity_list[i].GetPosition(), m_entity_list[i].GetAABB(), ray);
+
+				m_entity_list[i].SetSelected(hit);	
 			}
 		}
 		else // right click
 		{
+			glm::vec3 hit;
+
+			PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit);
+			
+			if (hit.y < 0)
+			{
+				slog("No hit");
+				return; //no hit if underneath world
+			}
+			else
+			{
+				std::cout << "Hit.x " << hit.x << std::endl;
+				std::cout << "Hit.y " << hit.y << std::endl;
+				std::cout << "Hit.z " << hit.z << std::endl;
+
+			}
+
 			for (int i = 0; i < MAX_ENTITES; i++)
 			{
 				if (!m_entity_list[i].IsActive() || 
 					!m_entity_list[i].IsSelected())
 					continue;
-				m_entity_list[i].MoveTo(m_camera->GetPosition() + ray.dir * 128.0f);
-				
+
+				m_entity_list[i].MoveTo(hit);				
 			}
 		}
 	}
 }
-
-
 
 void GameScene::CreateEntity()
 {
@@ -331,10 +358,12 @@ void GameScene::CreateEntity()
 
 	int id = entity - m_entity_list;
 
-	//TODO move this to a json file
-	BBox bounds = { glm::vec3(-1.0f, -1.0f, -1.0f), glm::vec3(6,12,6) };
+	int size = 1;
 
-	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(6*id, 64, 6*id), bounds);
+	//TODO move this to a json file
+	AABB bounds = { glm::vec3(0.0f), glm::vec3(size) };
+
+	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(size*id, 64, size*id), bounds);
 
 	entity->m_nextFree = NULL;
 }

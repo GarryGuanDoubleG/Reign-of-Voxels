@@ -49,7 +49,7 @@ public:
 	//checks if object is within frustum
 	bool PointInCamera(glm::vec3 &point);
 	bool SphereInCamera(glm::vec3 &point, float radius);
-	bool AABBInCamera(BBox &aabb);
+	bool AABBInCamera(AABB &aabb);
 	bool AABBInCamera(CubeRegion &aabb);
 
 	void DrawRay();

@@ -157,7 +157,7 @@ bool Camera::SphereInCamera(glm::vec3 &point, float radius)
 	return true;
 }
 
-bool Camera::AABBInCamera(BBox &aabb)
+bool Camera::AABBInCamera(AABB &aabb)
 {
 	for (int i = 0; i < 6; i++)
 	{

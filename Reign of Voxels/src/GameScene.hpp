@@ -81,6 +81,9 @@ private:
 	void CreateEntity();
 
 	/***********************MEMBER VARIABLES ****************************/
+
+	sf::Uint16 m_flags;
+
 	ResourceManager *m_resrcMang;
 	//entites
 	Entity *m_entity_list;/**<object pool of entities. */
