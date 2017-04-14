@@ -3,7 +3,7 @@
 * Constructor
 * stores a reference to vertex, index, and texture containers
 */
-Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<GLuint> &indices, std::vector<Texture> &textures)
+Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<GLuint> &indices, std::vector<GLuint> &textures)
 {
 	this->vertices = vertices;
 	this->indices = indices;
@@ -19,26 +19,18 @@ Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<GLuint> &indices, std::vec
 */
 void Mesh::Draw(GLuint shader) const
 {
-	// Bind appropriate textures
-	GLuint diffuseNr = 1;
-	GLuint specularNr = 1;
-	
 	for (GLuint i = 0; i < this->textures.size(); i++)
 	{
 		glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding
 										  // Retrieve texture number (the N in diffuse_textureN)
-		std::stringstream ss;
-		std::string number;
-		std::string name = this->textures[i].type;
-		if (name == "texture_diffuse")
-			ss << diffuseNr++; // Transfer GLuint to stream
-		else if (name == "texture_specular")
-			ss << specularNr++; // Transfer GLuint to stream
-		number = ss.str();
+
+		std::string textUniform = "texture_diffuse" + std::to_string(i);
+
+		GLuint location = glGetUniformLocation(shader, textUniform.c_str());
 		// Now set the sampler to the correct texture unit
-		glUniform1i(glGetUniformLocation(shader, (name + number).c_str()), i);
+		glUniform1i(location, i);
 		// And finally bind the texture
-		glBindTexture(GL_TEXTURE_2D, this->textures[i].id);
+		glBindTexture(GL_TEXTURE_2D, this->textures[i]);
 	}
 
 	// Also set each mesh's shininess property to a default value (if you want you could extend this to another mesh property and possibly change this value)
@@ -48,7 +40,7 @@ void Mesh::Draw(GLuint shader) const
 	glBindVertexArray(this->m_vao);
 	if (m_instanced)
 	{
-		glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, m_amount);
+		glDrawElementsInstanced(GL_TRIANGLES, indices.size(), GL_UNSIGNED_INT, 0, m_instanceCount);
 	}
 	else
 	{
@@ -102,7 +94,7 @@ void Mesh::MeshInit()
 */
 void Mesh::MeshSetInstance(GLuint instanceBuffer, GLuint amount)
 {
-	m_amount = amount;
+	m_instanceCount = amount;
 	m_instanced = GL_TRUE;
 
 	glBindVertexArray(m_vao);

@@ -40,9 +40,7 @@ public:
 	*/
 	void Draw(GLuint shader);
 private:
-	std::vector<Texture>textures_loaded; /**<vector of loaded textures */  
-	std::vector<Mesh> meshes; /**<container for all meshes in model */  
-	std::string directory;/**< the file directory of model*/  
+	std::vector<Mesh> m_meshes; /**<container for all meshes in model */  
 
 	/**
 	*@brief Reads model file using assimp to get root node of model.
@@ -54,18 +52,18 @@ private:
 	* @param node node to traverse and load meshes
 	* @oaram scene root assimp node
 	*/
-	void ProcessNode(aiNode * node, const aiScene* scene);
+	void ProcessNode(aiNode * node, const aiScene* scene, std::string directory);
 	/**
 	* @brief initializes new mesh and stores textures in model class
 	* @param mesh assimp class that stores mesh verts, normals, textures, and uv coordinates
 	* @oaram scene root assimp node
 	*/
-	Mesh ProcessMesh(aiMesh * mesh, const aiScene* scene);
+	Mesh ProcessMesh(aiMesh * mesh, const aiScene* scene, std::string directory);
 	/**
 	* @brief loads texture data from file
 	* @param mat assimp material type with texture data
 	* @param type assimp texture type (diffuse / specular)
 	* @param type_name string name of texture type
 	*/
-	std::vector<Texture> LoadMaterials(aiMaterial *mat, aiTextureType type, std::string type_name);
+	std::vector<GLuint> LoadMaterials(aiMaterial *mat, aiTextureType type, std::string type_name, std::string directory);
 };

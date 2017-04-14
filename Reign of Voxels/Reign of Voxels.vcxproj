@@ -80,6 +80,7 @@
     <ClInclude Include="src\scene.hpp" />
     <ClInclude Include="src\sceneManager.hpp" />
     <ClInclude Include="src\shader.hpp" />
+    <ClInclude Include="src\simple_logger.h" />
     <ClInclude Include="src\texture.hpp" />
     <ClInclude Include="src\VoxelChunk.hpp" />
     <ClInclude Include="src\VoxelManager.hpp" />

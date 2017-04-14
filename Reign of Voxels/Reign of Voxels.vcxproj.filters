@@ -209,6 +209,9 @@
     <ClInclude Include="src\PhysicsUtil.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="src\simple_logger.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />

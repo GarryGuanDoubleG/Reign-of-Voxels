@@ -10,8 +10,8 @@ uniform vec3 viewPos;
 uniform vec3 lightPos; 
 uniform vec3 lightColor;
 
-
-uniform vec3 model_color;
+uniform sampler2D texture_diffuse0;
+uniform sampler2D texture_diffuse1;
 
 void main()
 {
@@ -31,6 +31,8 @@ void main()
 	float ambientStrength = 0.1f;
 	vec3 ambient = ambientStrength * lightColor;
 
-    vec3 result = (specular + ambient + diffuse) * model_color;
-	color = vec4(result, 1.0f);
+	vec4 model_color = vec4(texture(texture_diffuse0, UV));
+
+    vec3 result = (specular + ambient + diffuse);
+	color = vec4(result, 1.0f) * model_color;
 }

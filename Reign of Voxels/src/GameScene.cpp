@@ -180,12 +180,11 @@ void GameScene::RenderModel(Entity *entity)
 	//color of entity
 
 	glm::vec3 ent_color;
+
 	if (entity->IsSelected())
 		ent_color = glm::vec3(1.0f, .2f, .2f);
 	else
 		ent_color = glm::vec3(.5f, 1.0f, .5f);
-
-	glUniform3fv(glGetUniformLocation(shader, "model_color"), 1, &ent_color[0]);
 
 	m_resrcMang->GetModel(entity->GetModelID())->Draw(shader);
 
