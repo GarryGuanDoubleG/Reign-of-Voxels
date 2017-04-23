@@ -1,9 +1,12 @@
 {
-	"model":
-	{
-		"fs": "shader/model_fs.glsl",
-		"vs": "shader/model_vs.glsl"
-	},
+  "model": {
+    "fs": "shader/model_fs.glsl",
+    "vs": "shader/model_vs.glsl"
+  },
+  "object": {
+    "fs": "shader/object_fs.glsl",
+    "vs": "shader/object_vs.glsl"
+  },
 	"voxel":
 	{
 		"vs": "shader/voxel_vs.glsl",

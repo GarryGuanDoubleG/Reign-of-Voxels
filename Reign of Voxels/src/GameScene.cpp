@@ -155,7 +155,14 @@ void GameScene::RenderAABB(Entity *entity, GLuint shader)
 
 void GameScene::RenderModel(Entity *entity)
 {
-	GLuint shader = GetShader("model");
+	Model *ent_model = m_resrcMang->GetModel(entity->GetModelID());
+	
+	GLuint shader;
+
+	if (ent_model->IsRigged())
+		shader = GetShader("model");
+	else
+		shader = GetShader("object");
 
 	glUseProgram(shader);
 
@@ -186,7 +193,10 @@ void GameScene::RenderModel(Entity *entity)
 	else
 		ent_color = glm::vec3(.5f, 1.0f, .5f);
 
-	m_resrcMang->GetModel(entity->GetModelID())->Draw(shader);
+	if (ent_model->IsRigged())
+		ent_model->Draw(shader, Game::instance().g_clock.getElapsedTime().asSeconds());
+	else
+		ent_model->Draw(shader);
 
 	if(m_flags & AABB_MODE)
 		RenderAABB(entity, shader);

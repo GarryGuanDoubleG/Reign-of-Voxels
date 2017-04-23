@@ -7,6 +7,10 @@
 #include <glm/gtc/matrix_transform.hpp> // glm::translate, glm::rotate, glm::scale, glm::perspective
 #include <glm/gtc/constants.hpp> // glm::pi
 #include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/quaternion.hpp>
+#include <glm/gtx/quaternion.hpp>
+
+#include <assimp/postprocess.h>//assimp to glm conversion
 
 typedef struct
 {
@@ -20,6 +24,16 @@ typedef struct
 	glm::vec3 normal; /**< normal value of vertex */
 	glm::vec2 uv; /**< texture coordinates */
 }Vertex;
+
+typedef struct
+{
+	glm::vec3 position; /**< vertex postion in ndc */
+	glm::vec3 normal; /**< normal value of vertex */
+	glm::vec2 uv; /**< texture coordinates */
+	glm::ivec4 boneIds;
+	glm::vec4 weights;
+}BoneVertex;
+
 
 typedef struct
 {
@@ -81,3 +95,5 @@ bool LineAABBIntersection(const glm::vec3 &objPos, const AABB &aabb, const Ray &
 							glm::vec3 &outIntersect, float &out_t);
 
 bool AABBRayIntersection(const glm::vec3 &objPos, const AABB &aabb, const Ray &r);
+
+void assimpToGLMMat4(const aiMatrix4x4 *from, glm::mat4 &to);

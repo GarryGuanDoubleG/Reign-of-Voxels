@@ -59,10 +59,25 @@ void ResourceManager::LoadModels(Json data)
 		Json model = *it;
 
 		std::string path = model["path"];
+		std::vector<std::string> animPaths;
+		std::vector<std::string> animNames;
 
-		m_models.push_back(new Model(path));
+		if (model.find("anim") != model.end())
+		{
+			for (Json::iterator it_anim = model["anim"].begin(); it_anim != model["anim"].end(); ++it_anim)
+			{
+				animPaths.push_back(it_anim.value());
+				animNames.push_back(it_anim.key());
+			}
+
+			m_models.push_back(new Model(path, animPaths, animNames));
+		}
+		else
+		{
+			m_models.push_back(new Model(path));
+		}
+
 		m_model_keys.insert(std::pair<std::string, int>(it.key(), i));
-
 		++i;
 	}
 }

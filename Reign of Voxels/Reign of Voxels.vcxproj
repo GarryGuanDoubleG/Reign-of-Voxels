@@ -20,6 +20,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\3dmath.cpp" />
+    <ClCompile Include="src\AnimationController.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\entity.cpp" />
@@ -54,6 +55,7 @@
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actor.hpp" />
+    <ClInclude Include="src\AnimationController.hpp" />
     <ClInclude Include="src\camera.hpp" />
     <ClInclude Include="src\client.hpp" />
     <ClInclude Include="src\entity.hpp" />
@@ -70,6 +72,7 @@
     <ClInclude Include="src\Gui\textbox.hpp" />
     <ClInclude Include="src\Gui\widget.hpp" />
     <ClInclude Include="src\HUD.hpp" />
+    <ClInclude Include="src\joint.hpp" />
     <ClInclude Include="src\LightSource.hpp" />
     <ClInclude Include="src\mesh.hpp" />
     <ClInclude Include="src\model.hpp" />
@@ -90,6 +93,10 @@
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
+    <None Include="Resources\gui\HUD.json" />
+    <None Include="Resources\gui\menu.json" />
+    <None Include="Resources\models\models.json" />
+    <None Include="Resources\resources.json" />
     <None Include="shader\hud_fs.glsl" />
     <None Include="shader\hud_vs.glsl" />
     <None Include="shader\lighting_fs.glsl" />
@@ -98,8 +105,11 @@
     <None Include="shader\minimap_vs.glsl" />
     <None Include="shader\model_fs.glsl" />
     <None Include="shader\model_vs.glsl" />
+    <None Include="shader\object_fs.glsl" />
+    <None Include="shader\object_vs.glsl" />
     <None Include="shader\ray.frag" />
     <None Include="shader\ray.vert" />
+    <None Include="shader\shader.json" />
     <None Include="shader\ui.frag" />
     <None Include="shader\ui.vert" />
     <None Include="shader\voxel_fs.glsl" />

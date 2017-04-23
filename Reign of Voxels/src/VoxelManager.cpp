@@ -110,25 +110,18 @@ VoxelOctree *VoxelManager::getRootNode()
 
 VoxelOctree *VoxelManager::getOctreeChild(VoxelOctree * currentNode, int child_index)
 {
-	//root node has children at index 1-8
-	if (child_index >= m_maxOctNodes)
-		return NULL;
-
-	if (currentNode == m_octreeRoot)
-		return &m_octreePool[child_index + 1];
-
-	//bound child_index
-	if (child_index > 7 || child_index < 0)
-		slog("Error child index is from 0-7");
-
 	//get index of current node
-	int index = currentNode - m_octreePool;
+	int curr = currentNode - m_octreePool;
+	int child = 8 * curr + child_index + 1; //child: 8i + (1 to 8)
 
-	if (8 * index + child_index + 1 >= m_maxOctNodes)
+	if (child >= m_maxOctNodes)
+	{
 		std::cout << "Too many octree nodes" << std::endl;
+		return NULL;
+	}
 
 	//in-array octree, return child at given index
-	return &m_octreePool[8 * index + child_index + 1];
+	return &m_octreePool[child];
 }
 
 VoxelOctree *VoxelManager::createOctreeChild(VoxelOctree *currentNode, int child_index, CubeRegion &region)

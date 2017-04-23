@@ -1,8 +1,13 @@
 {
   "worker": {
-    "path": "Resources\\models\\worker\\worker.fbx"
+    "path": "Resources\\models\\worker\\chr_knight.fbx",
+    "anim":
+    {
+      "hook_punch": "Resources\\models\\worker\\hook_punch.fbx",
+      "walking": "Resources\\models\\worker\\walking.fbx",
+      "jogging": "Resources\\models\\worker\\jogging.fbx"
+    }
   },
-
   "cube": {
     "path": "Resources\\models\\cube.obj"
   },

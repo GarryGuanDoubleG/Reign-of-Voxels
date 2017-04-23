@@ -5,12 +5,24 @@
 */
 Mesh::Mesh(std::vector<Vertex> &vertices, std::vector<GLuint> &indices, std::vector<GLuint> &textures)
 {
-	this->vertices = vertices;
+	this->m_vertices = vertices;
 	this->indices = indices;
 	this->textures = textures;
 
 	this->MeshInit();
 	
+	this->m_instanced = GL_FALSE;
+}
+
+Mesh::Mesh(std::vector<BoneVertex> &vertices, std::vector<GLuint> &indices, std::vector<GLuint> &textures)
+{
+	this->m_boneVertices = vertices;
+	this->indices = indices;
+	this->textures = textures;
+
+
+	this->MeshInitRigged();
+
 	this->m_instanced = GL_FALSE;
 }
 /**
@@ -32,9 +44,6 @@ void Mesh::Draw(GLuint shader) const
 		// And finally bind the texture
 		glBindTexture(GL_TEXTURE_2D, this->textures[i]);
 	}
-
-	// Also set each mesh's shininess property to a default value (if you want you could extend this to another mesh property and possibly change this value)
-	glUniform1f(glGetUniformLocation(shader, "material.shininess"), 16.0f);
 
 	// Draw mesh
 	glBindVertexArray(this->m_vao);
@@ -67,7 +76,7 @@ void Mesh::MeshInit()
 	glBindVertexArray(this->m_vao);
 
 	glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, this->vertices.size() * sizeof(Vertex), &this->vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, this->m_vertices.size() * sizeof(Vertex), &this->m_vertices[0], GL_STATIC_DRAW);
 
 	//setup for indices drawing
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_ebo);
@@ -82,6 +91,42 @@ void Mesh::MeshInit()
 	//now textures
 	glEnableVertexAttribArray(2);
 	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+}
+
+void Mesh::MeshInitRigged()
+{
+	glGenVertexArrays(1, &this->m_vao);
+	glGenBuffers(1, &this->m_vbo);
+	glGenBuffers(1, &this->m_ebo);
+
+	glBindVertexArray(this->m_vao);
+
+	glBindBuffer(GL_ARRAY_BUFFER, this->m_vbo);
+	glBufferData(GL_ARRAY_BUFFER, this->m_boneVertices.size() * sizeof(BoneVertex), &this->m_boneVertices[0], GL_STATIC_DRAW);
+
+	//setup for indices drawing
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, this->m_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, this->indices.size() * sizeof(GLuint), &this->indices[0], GL_STATIC_DRAW);
+
+	//location 0 should be verts
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(BoneVertex), (GLvoid*)0);
+	//now normals
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(BoneVertex), (GLvoid*)offsetof(BoneVertex, normal));
+	//now textures
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(BoneVertex), (GLvoid*)offsetof(BoneVertex, uv));
+
+	glEnableVertexAttribArray(3);
+	glVertexAttribIPointer(3, 4, GL_INT, sizeof(BoneVertex), (GLvoid*)offsetof(BoneVertex, boneIds));
+
+	glEnableVertexAttribArray(4);
+	glVertexAttribPointer(4, 4, GL_FLOAT, GL_FALSE, sizeof(BoneVertex), (GLvoid*)offsetof(BoneVertex, weights));
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
