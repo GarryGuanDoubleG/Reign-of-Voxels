@@ -248,6 +248,9 @@
     <ClInclude Include="src\svd.hpp">
       <Filter>Headers\Voxel</Filter>
     </ClInclude>
+    <ClInclude Include="src\States.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -316,6 +319,12 @@
     </None>
     <None Include="Resources\textures\texture.json">
       <Filter>Json</Filter>
+    </None>
+    <None Include="shader\voxelTex_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\voxelTex_vs.glsl">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

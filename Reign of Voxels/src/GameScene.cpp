@@ -206,9 +206,13 @@ void GameScene::RenderModel(Entity *entity)
 	glm::vec3 ent_color;
 
 	if (entity->IsSelected())
-		ent_color = glm::vec3(1.0f, .2f, .2f);
+		ent_color = glm::vec3(1.0f, .5f, .5f);
 	else
-		ent_color = glm::vec3(.5f, 1.0f, .5f);
+		ent_color = glm::vec3(1.0f);
+
+	int location = glGetUniformLocation(shader, "colorMod");
+
+	glUniform3fv(glGetUniformLocation(shader, "colorMod"), 1, &ent_color[0]);
 
 	if (ent_model->IsRigged())
 		ent_model->Draw(shader, Game::instance().g_clock.getElapsedTime().asSeconds());
@@ -226,7 +230,7 @@ void GameScene::RenderWorld()
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	m_voxelManager->RenderVoxels(m_camera);
+	m_voxelManager->RenderVoxels(draw_textured, m_camera);
 }
 
 void GameScene::RenderEntities()
@@ -312,6 +316,12 @@ void GameScene::HandleInput(sf::Event event)
 			break;
 		case sf::Keyboard::U:
 			m_flags ^= AABB_MODE;
+			break;
+		case sf::Keyboard::Num1:
+			draw_textured = false;
+			break;
+		case sf::Keyboard::Num2:
+			draw_textured = true;
 			break;
 		default:
 			break;

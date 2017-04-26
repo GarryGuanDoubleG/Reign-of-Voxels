@@ -62,6 +62,7 @@ private:
 	glm::vec3 m_velocity;
 
 	float m_speed;
+	float m_animStart;
 
 	AABB m_aabb;
 };

@@ -74,7 +74,6 @@ void VoxelManager::GenerateVoxels()
 	delete heightmap;
 }
 
-
 VoxelChunk * VoxelManager::CreateChunk(glm::vec3 worldPosition)
 {
 	if (m_freeChunkHead == m_freeChunkHead->m_next)
@@ -135,9 +134,48 @@ void VoxelManager::destroyOctreeNode(VoxelOctree * node)
 	node->DestroyNode(); //clears minimal data for reuse
 }
 
-void VoxelManager::RenderVoxels(Camera * player_cam)
+void VoxelManager::RenderVoxels(bool draw_textured, Camera * player_cam)
 {
+	if (draw_textured)
+	{
+		RenderVoxelTextured(player_cam);
+		return;
+	}
+
 	GLuint voxel_shader = GetShader("voxel");
+	GLuint model_loc;
+
+	glUseProgram(voxel_shader);
+
+	glm::vec3 light_pos = glm::vec3(256, 512, 256);
+	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	glm::mat4 view = player_cam->GetViewMat();
+	glm::mat4 proj = player_cam->GetProj();
+	glm::mat4 model(1.0f);
+
+	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "model"), 1, GL_FALSE, &model[0][0]);
+
+	glm::vec3 voxel_color(0.6f, 1.0f, 0.3f);
+
+	//lighting
+	glUniform3fv(glGetUniformLocation(voxel_shader, "viewPos"), 1, &player_cam->GetPosition()[0]);
+	glUniform3fv(glGetUniformLocation(voxel_shader, "lightPos"), 1, &light_pos[0]);
+	glUniform3fv(glGetUniformLocation(voxel_shader, "lightColor"), 1, &light_color[0]);
+
+	//voxels
+	glUniform3fv(glGetUniformLocation(voxel_shader, "voxelColor"), 1, &voxel_color[0]);
+
+
+	m_octreeRoot->Draw();
+
+}
+
+void VoxelManager::RenderVoxelTextured(Camera *player_cam)
+{
+	GLuint voxel_shader = GetShader("voxelTex");
 
 	glUseProgram(voxel_shader);
 
@@ -162,21 +200,30 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 
 
 	// Now set the sampler to the correct texture unit
-	glUniform1i(glGetUniformLocation(voxel_shader, "voxel_texture"), 0);
-	glUniform1i(glGetUniformLocation(voxel_shader, "normalMap"), 0);
+	
 	// And finally bind the texture
 	//textures
-	GLuint texture = GetTextureID("grass");
-	GLuint normalMap = GetNormalMapID("grass");
+	GLuint grass = GetTextureID("grass");
+	GLuint water = GetTextureID("water");
+	GLuint snow = GetTextureID("snow");
+
 
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, texture);
+	glBindTexture(GL_TEXTURE_2D, grass);
 
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, normalMap);
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, water);
+
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, snow);
+
+	glActiveTexture(GL_TEXTURE0);
+
+	GLint samplers[3] = { 0, 1, 2 };
+	int loc = glGetUniformLocation(voxel_shader, "voxelTexture");
+	glUniform1iv(glGetUniformLocation(voxel_shader, "voxelTexture"), 3, &samplers[0]);
 
 	m_octreeRoot->Draw();
-
 }
 
 void VoxelManager::RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &position)

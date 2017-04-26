@@ -10,6 +10,10 @@
 #define OCTREE_ACTIVE 2
 #define OCTREE_LEAF 4
 
+#define GRASS 0
+#define WATER 1
+#define SNOW 2
+
 enum OctreeNodeType
 {
 	Node_None,
@@ -18,13 +22,16 @@ enum OctreeNodeType
 	Node_Leaf,
 };
 
+
 typedef struct VoxelVertex_S
 {
 	VoxelVertex_S() {};
 	VoxelVertex_S(glm::vec3 pos, glm::vec3 norm) : position(pos), normal(norm) {};
+	VoxelVertex_S(glm::vec3 pos, glm::vec3 norm, int type) : position(pos), normal(norm), textureID(type) {};
 
 	glm::vec3 position;
 	glm::vec3 normal;
+	GLint textureID;
 }VoxelVertex;
 
 
@@ -38,6 +45,7 @@ struct OctreeDrawInfo
 
 	int				index;
 	int				corners;
+	GLint			type;
 	glm::vec3		position;
 	glm::vec3		averageNormal;
 	svd::QefData	qef;

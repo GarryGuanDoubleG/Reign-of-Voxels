@@ -13,6 +13,9 @@ uniform vec3 lightColor;
 uniform sampler2D texture_diffuse0;
 uniform sampler2D texture_diffuse1;
 
+uniform vec4 colorMod;
+
+
 void main()
 {
 	//color = vec4((texture(texture_diffuse1, UV)) *lightColor);
@@ -31,8 +34,6 @@ void main()
 	float ambientStrength = 0.1f;
 	vec3 ambient = ambientStrength * lightColor;
 
-	vec4 model_color = vec4(texture(texture_diffuse0, UV));
-
     vec3 result = (specular + ambient + diffuse);
-	color = vec4(result, 1.0f) * model_color;
+	color = vec4(result, 1.0f) * colorMod;
 }

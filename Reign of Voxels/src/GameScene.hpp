@@ -111,4 +111,5 @@ private:
 	Model * m_model; // test model, get rid of it once entities work
 
 	bool wire_frame = false;
+	bool draw_textured = false;
 };

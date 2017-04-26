@@ -9,6 +9,8 @@ in vec3 FragPos;
 uniform vec3 viewPos;
 uniform vec3 lightPos; 
 uniform vec3 lightColor;
+uniform vec3 colorMod;
+
 
 uniform sampler2D texture_diffuse0;
 uniform sampler2D texture_diffuse1;
@@ -34,5 +36,8 @@ void main()
 	vec4 model_color = vec4(texture(texture_diffuse0, UV));
 
     vec3 result = (specular + ambient + diffuse);
+	//color = vec4(colorMod * result, 1.0f) * model_color;
 	color = vec4(result, 1.0f) * model_color;
+	color = color * vec4(colorMod, 1.0f);
+
 }

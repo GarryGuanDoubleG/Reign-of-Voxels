@@ -4,6 +4,7 @@
 
 #include "VoxelOctree.hpp"
 #include "VoxelManager.hpp"
+#include "VoxelNoise.hpp"
 
 #include "density.hpp"
 #include "qef.hpp"
@@ -257,6 +258,18 @@ bool VoxelOctree::BuildLeafNode()
 	drawInfo->averageNormal = glm::normalize(averageNormal / (float)edgeCount);
 	drawInfo->corners = corners;
 
+	GLint type = GRASS;
+	sf::Color terrainColor = GetPerlinColorValue(drawInfo->position.x, drawInfo->position.z);
+
+	if (terrainColor.r > 200)
+		type = SNOW;
+	else if (terrainColor.g > terrainColor.b)
+		type = GRASS;
+	else if (terrainColor.b > terrainColor.g)
+		type = WATER;
+
+	drawInfo->type = type;
+
 
 	m_type = Node_Leaf;
 	m_drawInfo = drawInfo;
@@ -446,8 +459,9 @@ void VoxelOctree::GenerateVertexIndices()
 			exit(EXIT_FAILURE);
 		}
 
+
 		m_drawInfo->index = g_terrainVertices.size();
-		g_terrainVertices.push_back(VoxelVertex(m_drawInfo->position, m_drawInfo->averageNormal));
+		g_terrainVertices.push_back(VoxelVertex(m_drawInfo->position, m_drawInfo->averageNormal, m_drawInfo->type));
 	}
 
 }
@@ -701,6 +715,10 @@ void VoxelOctree::UploadMesh()
 	//now normals
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, normal));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, textureID));
+	
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);

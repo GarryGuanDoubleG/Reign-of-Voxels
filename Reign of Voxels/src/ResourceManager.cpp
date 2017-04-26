@@ -104,8 +104,11 @@ void ResourceManager::LoadTextures(Json &data)
 		std::string path = obj["path"];
 		m_textures.insert(std::pair<std::string, GLuint>(it.key(), LoadTexture(path.c_str())));
 
-		std::string normal = obj["normal"];
-		m_normalMaps.insert(std::pair<std::string, GLuint>(it.key(), LoadTexture(normal.c_str())));
+		if (obj.find("normal") != obj.end())
+		{
+			std::string normal = obj["normal"];
+			m_normalMaps.insert(std::pair<std::string, GLuint>(it.key(), LoadTexture(normal.c_str())));
+		}
 	}
 }
 

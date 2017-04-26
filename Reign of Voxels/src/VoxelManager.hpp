@@ -15,8 +15,9 @@ public:
 
 	void GenerateVoxels();
 
-	void RenderVoxels(Camera * player_cam);
+	void RenderVoxels(bool draw_textured, Camera * player_cam);
 	void RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &position);
+	void RenderVoxelTextured(Camera *player_cam);
 
 	VoxelChunk *CreateChunk(glm::vec3 worldPosition);
 	void		destroyChunk(VoxelChunk * chunk);

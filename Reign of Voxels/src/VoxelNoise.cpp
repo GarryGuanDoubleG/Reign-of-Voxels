@@ -8,17 +8,20 @@ utils::NoiseMap heightMap;
 
 static module::Perlin g_perlinMod;
 static sf::Image *g_heightMap;
+static sf::Image *g_colorMap;
 
 std::string GenerateTerrainMap(int resolution)
 {
-	std::string filename = "Resources/heightmap/terrain_heightmap.bmp";
+	std::string heightMapName = "Resources/heightmap/terrain_heightmap.bmp";
+	std::string colorMapName = "Resources/heightmap/terrain_colormap.bmp";
 
 	int mapResolution = resolution + 1;
 
-	g_perlinMod.SetOctaveCount(6);
-	g_perlinMod.SetFrequency(.4f);
-	g_perlinMod.SetLacunarity(1.8324f);
-	g_perlinMod.SetPersistence(0.6324f);
+	g_perlinMod.SetSeed(rand() % resolution);
+	g_perlinMod.SetOctaveCount(4);
+	g_perlinMod.SetFrequency(.5f);
+	g_perlinMod.SetLacunarity(1.9524f);
+	g_perlinMod.SetPersistence(0.68324f);
 
 	utils::NoiseMap heightMap;
 	utils::NoiseMapBuilderPlane heightMapBuilder;
@@ -31,27 +34,53 @@ std::string GenerateTerrainMap(int resolution)
 
 
 	utils::RendererImage renderer;
-	utils::Image image;
-	
+	utils::Image heightMapImage;
+	utils::Image colorMapImage;
+
 	renderer.SetSourceNoiseMap(heightMap);
-	renderer.SetDestImage(image);
+	renderer.SetDestImage(heightMapImage);
 	renderer.Render();
 
 	utils::WriterBMP writer;
-	writer.SetSourceImage(image);
-	writer.SetDestFilename(filename);
+	writer.SetSourceImage(heightMapImage);
+	writer.SetDestFilename(heightMapName);
+	writer.WriteDestFile();
+
+
+	renderer.SetDestImage(colorMapImage);
+	renderer.ClearGradient();
+	renderer.AddGradientPoint(-1.0000, utils::Color(0, 0, 255, 255)); // deeps
+	renderer.AddGradientPoint(-0.5000, utils::Color(0, 255, 0, 255)); // shore
+	renderer.AddGradientPoint(0.0625, utils::Color(0, 255, 0, 255)); // sand
+	renderer.AddGradientPoint(0.250, utils::Color(0, 255, 0, 255)); // grass
+	renderer.AddGradientPoint(1.0000, utils::Color(255, 0, 0, 255)); // snow
+
+	renderer.Render();
+
+	writer.SetSourceImage(colorMapImage);
+	writer.SetDestFilename(colorMapName);
 	writer.WriteDestFile();
 
 	g_heightMap = new sf::Image();
-	if (!g_heightMap->loadFromFile(filename.c_str()))
+	if (!g_heightMap->loadFromFile(heightMapName.c_str()))
 	{
 		return 0;
 	}
 
-	return filename;
+	g_colorMap = new sf::Image();
+	if (!g_colorMap->loadFromFile(colorMapName.c_str()))
+	{
+		return 0;
+	}
+	return heightMapName;
 }
 
 float GetPerlinMapValue(float x, float z)
 {
 	return (float)g_heightMap->getPixel(x, z).r;
+}
+
+sf::Color GetPerlinColorValue(float x, float z)
+{
+	return g_colorMap->getPixel(x, z);
 }

@@ -7,10 +7,14 @@
     "fs": "shader/object_fs.glsl",
     "vs": "shader/object_vs.glsl"
   },
-	"voxel":
+  "voxel": {
+    "vs": "shader/voxel_vs.glsl",
+    "fs": "shader/voxel_fs.glsl"
+  },
+  "voxelTex":
 	{
-		"vs": "shader/voxel_vs.glsl",
-		"fs": "shader/voxel_fs.glsl"
+		"vs": "shader/voxelTex_vs.glsl",
+		"fs": "shader/voxelTex_fs.glsl"
 	},
   "lighting": {
     "vs": "shader/lighting_vs.glsl",
