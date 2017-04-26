@@ -1,5 +1,5 @@
 #include <mutex>
-
+#include "ResourceManager.hpp"
 #include "VoxelManager.hpp"
 #include "VoxelNoise.hpp"
 #include "texture.hpp"
@@ -11,9 +11,9 @@ std::mutex g_free_chunk_guard;
 VoxelManager::VoxelManager()
 {
 	//TODO load voxel world from json
-	m_worldSize = 512;
+	m_resolution = 256;
 	
-	int worldSizeXZ = m_worldSize * m_worldSize;
+	int worldSizeXZ = m_resolution * m_resolution;
 
 	//intialize chunkpool
 	int maxChunks = worldSizeXZ * (VoxelOctree::maxHeight * 2) / VoxelChunk::CHUNK_SIZE_CUBED;
@@ -32,12 +32,12 @@ VoxelManager::VoxelManager()
 	//Allocate space for Octree. 2^(3h + 1) - 1 nodes
 
 	//TODO reduce nodes so those above max height aren't allocated
-	int maxOctree =  (int)log2(m_worldSize);
+	int maxOctree =  (int)log2(m_resolution);
 		maxOctree = (1 << (3 * maxOctree) ) ; //2^3 times for 8 child nodes
 
 	m_maxOctNodes = maxOctree;
 	sizeof(VoxelOctree);
-	sizeof(OctreeDrawInfo*);
+
 	m_octreePool = new VoxelOctree[maxOctree];
 	m_octreeRoot = &m_octreePool[0];
 }
@@ -49,23 +49,23 @@ VoxelManager::~VoxelManager()
 
 int VoxelManager::GetWorldSize()
 {
-	return m_worldSize;
+	return m_resolution;
 }
 
 void VoxelManager::GenerateVoxels()
 {
 	sf::Image *heightmap = new sf::Image();
 
-	if (!heightmap->loadFromFile(GenerateTerrainMap(m_worldSize)))
+	if (!heightmap->loadFromFile(GenerateTerrainMap(m_resolution)))
 		slog("Failed to Load or Generate HeightMap");
 	else
 	{
 		glm::ivec3 rootMinPos(0.0f);
 
-		m_octreeRoot->InitNode(rootMinPos, m_worldSize);//activate root octree node
+		m_octreeRoot->InitNode(rootMinPos, m_resolution);//activate root octree node
 		
 		//start building tree and voxel data
-		m_octreeRoot->InitOctree(m_worldSize, this);
+		m_octreeRoot->InitOctree(m_resolution, this);
 
 		//start generating vertices
 		m_octreeRoot->GenerateWorldMesh();
@@ -138,7 +138,6 @@ void VoxelManager::destroyOctreeNode(VoxelOctree * node)
 void VoxelManager::RenderVoxels(Camera * player_cam)
 {
 	GLuint voxel_shader = GetShader("voxel");
-	GLuint model_loc;
 
 	glUseProgram(voxel_shader);
 
@@ -148,6 +147,7 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 	glm::mat4 view = player_cam->GetViewMat();
 	glm::mat4 proj = player_cam->GetProj();
 	glm::mat4 model(1.0f);
+	//glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 2.0f, 4.0f));
 
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
@@ -160,28 +160,22 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 	glUniform3fv(glGetUniformLocation(voxel_shader, "lightPos"), 1, &light_pos[0]);
 	glUniform3fv(glGetUniformLocation(voxel_shader, "lightColor"), 1, &light_color[0]);
 
-	//voxels
-	glUniform3fv(glGetUniformLocation(voxel_shader, "voxelColor"), 1, &voxel_color[0]);
 
+	// Now set the sampler to the correct texture unit
+	glUniform1i(glGetUniformLocation(voxel_shader, "voxel_texture"), 0);
+	glUniform1i(glGetUniformLocation(voxel_shader, "normalMap"), 0);
+	// And finally bind the texture
+	//textures
+	GLuint texture = GetTextureID("grass");
+	GLuint normalMap = GetNormalMapID("grass");
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, normalMap);
 
 	m_octreeRoot->Draw();
-
-	//VoxelOctree::SortRenderList(player_cam->GetPosition());
-
-	//for (int i = 0; i < VoxelOctree::render_list.size(); i++)
-	//{
-	//	glm::vec3 position = VoxelOctree::render_list[i]->getPosition();
-
-	///*	if (!player_cam->AABBInCamera(chunkRegion))
-	//		continue;
-	//	else
-	//		++render_count;*/
-
-	//	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
-	//	glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
-
-	//	VoxelOctree::render_list[i]->Render();
-	//}
 
 }
 
@@ -210,17 +204,9 @@ void VoxelManager::RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &pos
 
 bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
 {
-	VoxelChunk * chunk;
+	VoxelOctree * node = m_octreeRoot->FindLeafNode(world_pos);
 
-	chunk = m_octreeRoot->FindLeafChunk(world_pos);
-
-	if (!chunk)
-		return false;
-
-	//get voxel in chunk object space
-	glm::ivec3 local_pos = world_pos - chunk->getPosition();
-
-	if (chunk->GetVoxel(local_pos) & VOXEL_TYPE_AIR)
+	if (!node)
 		return false;
 	
 	return true;

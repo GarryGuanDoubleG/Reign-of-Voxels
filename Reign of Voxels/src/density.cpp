@@ -50,7 +50,7 @@ float Density_Func(const glm::vec3& worldPosition)
 {
 	const float MAX_HEIGHT = 32.0f;
 	const float heightScale = 1.0f / MAX_HEIGHT;
-	const float perlinMapVal = GetPerlinMapValue(worldPosition.x, worldPosition.z) / 256.0f + .01f;
+	const float perlinMapVal = GetPerlinMapValue(worldPosition.x, worldPosition.z) / 256.0f + .5f;
 
 	const float terrain = worldPosition.y - (perlinMapVal * MAX_HEIGHT);
 

@@ -18,6 +18,16 @@ enum OctreeNodeType
 	Node_Leaf,
 };
 
+typedef struct VoxelVertex_S
+{
+	VoxelVertex_S() {};
+	VoxelVertex_S(glm::vec3 pos, glm::vec3 norm) : position(pos), normal(norm) {};
+
+	glm::vec3 position;
+	glm::vec3 normal;
+}VoxelVertex;
+
+
 struct OctreeDrawInfo
 {
 	OctreeDrawInfo()
@@ -30,7 +40,6 @@ struct OctreeDrawInfo
 	int				corners;
 	glm::vec3		position;
 	glm::vec3		averageNormal;
-	glm::vec2		uv;
 	svd::QefData	qef;
 };
 
@@ -51,7 +60,13 @@ private:
 	glm::ivec3 m_min;
 	int m_size;
 
+	//leaf node
+	VoxelChunk	*m_chunk;
+	OctreeNodeType m_type;
+
 	OctreeDrawInfo * m_drawInfo;
+
+	//GLuint m_vao, m_vbo, m_ebo;
 public:
 	VoxelOctree();
 	

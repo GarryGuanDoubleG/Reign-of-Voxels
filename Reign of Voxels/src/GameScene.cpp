@@ -386,7 +386,7 @@ void GameScene::CreateEntity()
 
 	int size = 1;
 	//TODO move this to a json file
-	AABB bounds = { glm::vec3(0.0f), glm::vec3(1.0f, 2.5f, 1.0f) };
+	AABB bounds = { glm::vec3(-4.0f, 0.0f, -4.0f), glm::vec3(3.0f, 12.5f, 3.0f) };
 
 	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(size*id, 64, size*id), bounds);
 

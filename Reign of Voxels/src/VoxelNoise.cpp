@@ -13,17 +13,19 @@ std::string GenerateTerrainMap(int resolution)
 {
 	std::string filename = "Resources/heightmap/terrain_heightmap.bmp";
 
-	g_perlinMod.SetOctaveCount(4);
-	g_perlinMod.SetFrequency(.5f);
-	g_perlinMod.SetLacunarity(2.2324f);
-	g_perlinMod.SetPersistence(0.68324f);
+	int mapResolution = resolution + 1;
+
+	g_perlinMod.SetOctaveCount(6);
+	g_perlinMod.SetFrequency(.4f);
+	g_perlinMod.SetLacunarity(1.8324f);
+	g_perlinMod.SetPersistence(0.6324f);
 
 	utils::NoiseMap heightMap;
 	utils::NoiseMapBuilderPlane heightMapBuilder;
 
 	heightMapBuilder.SetSourceModule(g_perlinMod);
 	heightMapBuilder.SetDestNoiseMap(heightMap);
-	heightMapBuilder.SetDestSize(resolution, resolution);
+	heightMapBuilder.SetDestSize(mapResolution, mapResolution);
 	heightMapBuilder.SetBounds(2.0, 6.0, 1.0, 5.0);
 	heightMapBuilder.Build();
 

@@ -51,7 +51,7 @@ void Game::GraphicsInit()
 	m_window->setMouseCursorGrabbed(false);
 	m_window->setMouseCursorVisible(true);
 
-	m_window->setVerticalSyncEnabled(false);
+	m_window->setVerticalSyncEnabled(true);
 
 	if ((err = glewInit()) != GLEW_OK)
 	{

@@ -314,5 +314,8 @@
     <None Include="shader\hud_vs.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Resources\textures\texture.json">
+      <Filter>Json</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -26,12 +26,17 @@ public:
 	Model * GetModel(GLint id);
 
 	GLuint GetTextureID(std::string name);
-
+	GLuint GetNormalMapID(std::string name);
 private:
 	std::map<std::string, GLint> m_model_keys; //map of model names to their id
 	std::vector<Model *> m_models; //vector of models
 	
 	std::map<std::string, GLuint> m_textures;
-
+	std::map<std::string, GLuint> m_normalMaps;
 	size_t m_totalMemory;
 };
+
+GLuint GetTextureID(std::string name);
+GLuint GetNormalMapID(std::string name);
+GLint GetModelID(std::string name);
+Model * GetModel(GLint id);

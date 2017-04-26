@@ -1,0 +1,6 @@
+{
+  "grass": {
+    "path": "Resources\\textures\\grass\\0206 060x2 gld01.png",
+    "normal": "Resources\\textures\\grass\\grass_lush_daisies_01_N.png"
+  }
+}

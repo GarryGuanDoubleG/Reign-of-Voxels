@@ -3,9 +3,11 @@
 
 #define RESOURCE_PATH "Resources\\resources.json"
 
+static ResourceManager *g_resourceManager;
+
 ResourceManager::ResourceManager()
 {
-
+	g_resourceManager = this;
 }
 
 ResourceManager::~ResourceManager()
@@ -24,19 +26,31 @@ void ResourceManager::LoadResources()
 		in >> resources;
 	in.close();
 
-	Json model_data;
+	Json data;
 
 	//load models json
-	std::string path = resources["models"];
-	in.open(path);
+	std::string json_path = resources["models"];
+	in.open(json_path);
 	
 	if (in.is_open())
 	{
-		in >> model_data;
-		LoadModels(model_data);
+		in >> data;
+		LoadModels(data);
+		in.close();
 	}
 
-	in.close();
+	std::string texture_path = resources["textures"];
+	in.open(texture_path);
+
+	if (in.is_open())
+	{
+		data.clear();
+		in >> data;
+		LoadTextures(data);
+		in.close();
+	}
+
+
 }
 
 GLint ResourceManager::GetModelID(std::string name)
@@ -84,9 +98,47 @@ void ResourceManager::LoadModels(Json data)
 
 void ResourceManager::LoadTextures(Json &data)
 {
+	for (Json::iterator it = data.begin(); it != data.end(); ++it)
+	{
+		Json obj = *it;
+		std::string path = obj["path"];
+		m_textures.insert(std::pair<std::string, GLuint>(it.key(), LoadTexture(path.c_str())));
 
+		std::string normal = obj["normal"];
+		m_normalMaps.insert(std::pair<std::string, GLuint>(it.key(), LoadTexture(normal.c_str())));
+	}
 }
+
+GLuint ResourceManager::GetTextureID(std::string name)
+{
+	return m_textures[name];
+}
+
+GLuint ResourceManager::GetNormalMapID(std::string name)
+{
+	return m_normalMaps[name];
+}
+
+
 void ResourceManager::LoadFonts(Json &data)
 {
 
+}
+
+GLuint GetTextureID(std::string name)
+{
+	return g_resourceManager->GetTextureID(name);
+}
+GLuint GetNormalMapID(std::string name)
+{
+	return g_resourceManager->GetNormalMapID(name);
+}
+GLint GetModelID(std::string name)
+{
+	return g_resourceManager->GetModelID(name);
+}
+
+Model * GetModel(GLint id)
+{
+	return g_resourceManager->GetModel(id);
 }

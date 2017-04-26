@@ -4,6 +4,7 @@
 #include "camera.hpp"
 #include "model.hpp"
 
+
 class VoxelManager
 {
 public:
@@ -31,13 +32,11 @@ public:
 	//free octree node
 	void		 destroyOctreeNode(VoxelOctree * node);
 
-	void CreatePlayerStartAreas();
-
 	bool BlockWorldPosActive(glm::vec3 world_pos);
 
 private:
 
-	int m_worldSize; //size of one side of cubic world region
+	int m_resolution; //size of one side of cubic world region
 	int m_maxChunks;
 	int m_maxOctNodes;
 

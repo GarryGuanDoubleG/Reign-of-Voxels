@@ -16,7 +16,7 @@ static std::mutex g_render_list_mutex;
 
 VoxelManager * VoxelOctree::voxelManager;
 
-std::vector<Vertex> g_terrainVertices;
+std::vector<VoxelVertex> g_terrainVertices;
 std::vector<int> g_terrainIndices;
 
 const int MATERIAL_AIR = 0;
@@ -105,7 +105,7 @@ void VoxelOctree::InitNode(glm::ivec3 minPos, int size)
 	m_min = minPos;
 	m_size = size;
 
-m_chunk = NULL;
+	m_chunk = NULL;
 }
 
 void VoxelOctree::DestroyNode()
@@ -256,9 +256,7 @@ bool VoxelOctree::BuildLeafNode()
 
 	drawInfo->averageNormal = glm::normalize(averageNormal / (float)edgeCount);
 	drawInfo->corners = corners;
-	
-	//TODO generate uv
-	drawInfo->uv = glm::vec3(.5f);
+
 
 	m_type = Node_Leaf;
 	m_drawInfo = drawInfo;
@@ -400,7 +398,12 @@ void VoxelOctree::GenerateWorldMesh()
 
 glm::vec3 VoxelOctree::CalculateSurfaceNormal(const glm::vec3 &pos)
 {
-	const float H = 0.001f;
+	const float H = 0.05f;
+
+	if (pos.y <= 1.0f)
+	{
+		return glm::vec3(0.0f, 1.0f, 0.0f);
+	}
 
 	//finite difference method to get partial derivatives
 
@@ -444,7 +447,7 @@ void VoxelOctree::GenerateVertexIndices()
 		}
 
 		m_drawInfo->index = g_terrainVertices.size();
-		g_terrainVertices.push_back(Vertex(m_drawInfo->position, m_drawInfo->averageNormal, m_drawInfo->uv));
+		g_terrainVertices.push_back(VoxelVertex(m_drawInfo->position, m_drawInfo->averageNormal));
 	}
 
 }
@@ -686,7 +689,7 @@ void VoxelOctree::UploadMesh()
 
 	glGenBuffers(1, &m_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * g_terrainVertices.size(), &g_terrainVertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VoxelVertex) * g_terrainVertices.size(), &g_terrainVertices[0], GL_STATIC_DRAW);
 
 	glGenBuffers(1, &m_ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
@@ -694,13 +697,10 @@ void VoxelOctree::UploadMesh()
 
 	//location 0 should be verts
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)0);
 	//now normals
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-	//now textures
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, normal));
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
