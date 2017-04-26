@@ -25,7 +25,7 @@ public:
 
 
 	VoxelOctree *getOctreeChild(VoxelOctree * currentNode, int child_index);
-	VoxelOctree *createOctreeChild(VoxelOctree * currentNode, int child_index, CubeRegion &region);
+	VoxelOctree *createOctreeChild(VoxelOctree *currentNode, int child_index, glm::ivec3 minPos, int size);
 
 
 	//free octree node

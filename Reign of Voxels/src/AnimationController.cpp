@@ -27,10 +27,10 @@ void AnimationController::BoneTransform(float timeInSecs)
 {
 	glm::mat4 identity(1.0f);
 
-	float deltaTime = timeInSecs - m_playTime;
+	//float deltaTime = timeInSecs - m_playTime;
 	//assimp is row major, glm column major
 	float ticksPerSecond = m_scenes[m_currAnim]->mAnimations[0]->mTicksPerSecond;
-	float timeInTicks = deltaTime * ticksPerSecond;
+	float timeInTicks = timeInSecs * ticksPerSecond;
 	float animTime = fmod(timeInTicks, m_scenes[m_currAnim]->mAnimations[0]->mDuration);
 	
 	m_finalTransforms.resize(m_boneTransforms.size());

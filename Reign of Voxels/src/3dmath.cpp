@@ -101,7 +101,6 @@ bool LineAABBIntersection(const glm::vec3 &objPos, const AABB &aabb, const Ray &
 	//check for ray intersections with 3 visible faces
 	for (int i = 0; i < 3; i++)
 	{
-		float t;
 		glm::vec3 intersect(0.0f);
 		
 		if (!RayInPlane(ray, planes[i], intersect))
@@ -175,4 +174,9 @@ void assimpToGLMMat4(const aiMatrix4x4 *from, glm::mat4 &to)
 	to[2][2] = from->c3; to[3][2] = from->c4;
 	to[0][3] = from->d1; to[1][3] = from->d2;
 	to[2][3] = from->d3; to[3][3] = from->d4;
+}
+
+float SignedDistFunc(const glm::vec3 &from, const glm::vec3 &to)
+{
+
 }

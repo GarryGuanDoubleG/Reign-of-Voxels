@@ -13,12 +13,9 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
-uniform vec2 minimap_pos; 
-uniform vec2 window_size;
-
 void main(void)
 {
-	gl_Position = projection * view * model * vec4(verts,1.0f);
+	gl_Position = projection * view * vec4(verts,1.0f);
 
 	vs_normal = mat3(transpose(inverse(model))) * normal;	
 	FragPos = vec3(model * vec4(verts,1.0f));

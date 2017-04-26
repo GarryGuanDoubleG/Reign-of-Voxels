@@ -32,16 +32,14 @@ VoxelManager::VoxelManager()
 	//Allocate space for Octree. 2^(3h + 1) - 1 nodes
 
 	//TODO reduce nodes so those above max height aren't allocated
-	int maxOctree =  (int)log2(m_worldSize) - (int)log2(VoxelChunk::CHUNK_SIZE);
-		maxOctree = (2 << (3 * maxOctree) ) - 1; //2^3 times for 8 child nodes
+	int maxOctree =  (int)log2(m_worldSize);
+		maxOctree = (1 << (3 * maxOctree) ) ; //2^3 times for 8 child nodes
 
 	m_maxOctNodes = maxOctree;
-
+	sizeof(VoxelOctree);
+	sizeof(OctreeDrawInfo*);
 	m_octreePool = new VoxelOctree[maxOctree];
 	m_octreeRoot = &m_octreePool[0];
-
-	for (int i = 0; i < maxOctree; i++)
-		m_octreePool[i].index = i;
 }
 
 VoxelManager::~VoxelManager()
@@ -62,14 +60,12 @@ void VoxelManager::GenerateVoxels()
 		slog("Failed to Load or Generate HeightMap");
 	else
 	{
-		CubeRegion region = { glm::vec3(0.0), m_worldSize };
+		glm::ivec3 rootMinPos(0.0f);
 
-		m_octreeRoot->InitNode(region);//activate root octree node
+		m_octreeRoot->InitNode(rootMinPos, m_worldSize);//activate root octree node
 		
 		//start building tree and voxel data
-		m_octreeRoot->InitializeOctree(heightmap, m_worldSize, this);
-		
-		//CreatePlayerStartAreas();
+		m_octreeRoot->InitOctree(m_worldSize, this);
 
 		//start generating vertices
 		m_octreeRoot->GenerateWorldMesh();
@@ -124,11 +120,11 @@ VoxelOctree *VoxelManager::getOctreeChild(VoxelOctree * currentNode, int child_i
 	return &m_octreePool[child];
 }
 
-VoxelOctree *VoxelManager::createOctreeChild(VoxelOctree *currentNode, int child_index, CubeRegion &region)
+VoxelOctree *VoxelManager::createOctreeChild(VoxelOctree *currentNode, int child_index, glm::ivec3 minPos, int size)
 {
 	VoxelOctree *child = getOctreeChild(currentNode, child_index);
 
-	child->InitNode(region);
+	child->InitNode(minPos, size);
 
 	return child;
 }
@@ -151,9 +147,11 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 
 	glm::mat4 view = player_cam->GetViewMat();
 	glm::mat4 proj = player_cam->GetProj();
+	glm::mat4 model(1.0f);
 
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "model"), 1, GL_FALSE, &model[0][0]);
 
 	glm::vec3 voxel_color(0.6f, 1.0f, 0.3f);
 
@@ -165,28 +163,25 @@ void VoxelManager::RenderVoxels(Camera * player_cam)
 	//voxels
 	glUniform3fv(glGetUniformLocation(voxel_shader, "voxelColor"), 1, &voxel_color[0]);
 
-	model_loc = glGetUniformLocation(voxel_shader, "model");
 
-	int render_count = 0;
+	m_octreeRoot->Draw();
 
-	
-	VoxelOctree::SortRenderList(player_cam->GetPosition());
+	//VoxelOctree::SortRenderList(player_cam->GetPosition());
 
-	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
-	{
-		glm::vec3 position = VoxelOctree::render_list[i]->getPosition();
-		CubeRegion chunkRegion = { position, VoxelChunk::CHUNK_SIZE };
+	//for (int i = 0; i < VoxelOctree::render_list.size(); i++)
+	//{
+	//	glm::vec3 position = VoxelOctree::render_list[i]->getPosition();
 
-		//if (!player_cam->AABBInCamera(chunkRegion))
-		//	continue;
-		//else
-		//	++render_count;
+	///*	if (!player_cam->AABBInCamera(chunkRegion))
+	//		continue;
+	//	else
+	//		++render_count;*/
 
-		glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
-		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
+	//	glm::mat4 model = glm::translate(glm::mat4(1.0f), position);
+	//	glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));
 
-		VoxelOctree::render_list[i]->Render();
-	}
+	//	VoxelOctree::render_list[i]->Render();
+	//}
 
 }
 
@@ -211,15 +206,6 @@ void VoxelManager::RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &pos
 
 		VoxelOctree::render_list[i]->RenderMinimap();
 	}
-}
-
-//player start areas will flattened and set to voxel type air
-void VoxelManager::CreatePlayerStartAreas()
-{
-	//start with player 1
-	m_octreeRoot->CreatePlayerStart(glm::vec3(VoxelChunk::CHUNK_SIZE * 3, 8, VoxelChunk::CHUNK_SIZE * 3));
-
-	//TODO multiple players 2 3 4
 }
 
 bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)

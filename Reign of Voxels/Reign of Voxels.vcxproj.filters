@@ -19,6 +19,12 @@
     <Filter Include="Json">
       <UniqueIdentifier>{53152cb7-6ad7-493b-a8b7-6ca0efbfabe9}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headers\Voxel">
+      <UniqueIdentifier>{7ca0919f-053d-4e3e-b280-e07c27598d1d}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Voxel">
+      <UniqueIdentifier>{e3397b36-35ca-4dbe-8786-91e6b059e888}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="src\camera.cpp">
@@ -58,18 +64,6 @@
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\texture.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VoxelChunk.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VoxelManager.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VoxelNoise.cpp">
-      <Filter>Source</Filter>
-    </ClCompile>
-    <ClCompile Include="src\VoxelOctree.cpp">
       <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="src\Gui\button.cpp">
@@ -113,6 +107,27 @@
     </ClCompile>
     <ClCompile Include="src\AnimationController.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VoxelOctree.cpp">
+      <Filter>Source\Voxel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VoxelChunk.cpp">
+      <Filter>Source\Voxel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VoxelManager.cpp">
+      <Filter>Source\Voxel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\VoxelNoise.cpp">
+      <Filter>Source\Voxel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\density.cpp">
+      <Filter>Source\Voxel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\qef.cpp">
+      <Filter>Source\Voxel</Filter>
+    </ClCompile>
+    <ClCompile Include="src\svd.cpp">
+      <Filter>Source\Voxel</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -164,18 +179,6 @@
     <ClInclude Include="src\texture.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="src\VoxelChunk.hpp">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VoxelManager.hpp">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VoxelNoise.hpp">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VoxelOctree.hpp">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="src\Gui\button.hpp">
       <Filter>Headers\Gui</Filter>
     </ClInclude>
@@ -224,11 +227,30 @@
     <ClInclude Include="src\AnimationController.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="src\VoxelOctree.hpp">
+      <Filter>Headers\Voxel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VoxelChunk.hpp">
+      <Filter>Headers\Voxel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VoxelManager.hpp">
+      <Filter>Headers\Voxel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\VoxelNoise.hpp">
+      <Filter>Headers\Voxel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\qef.hpp">
+      <Filter>Headers\Voxel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\density.hpp">
+      <Filter>Headers\Voxel</Filter>
+    </ClInclude>
+    <ClInclude Include="src\svd.hpp">
+      <Filter>Headers\Voxel</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
-    <None Include="shader\hud_fs.glsl" />
-    <None Include="shader\hud_vs.glsl" />
     <None Include="shader\lighting_fs.glsl">
       <Filter>Shaders</Filter>
     </None>
@@ -285,6 +307,12 @@
     </None>
     <None Include="Resources\gui\menu.json">
       <Filter>Json</Filter>
+    </None>
+    <None Include="shader\hud_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\hud_vs.glsl">
+      <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
 </Project>

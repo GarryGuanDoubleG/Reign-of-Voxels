@@ -18,8 +18,11 @@ typedef struct
 	glm::vec3 dir;
 }Ray;
 
-typedef struct
+typedef struct Vertex_S
 {
+	Vertex_S() {};
+	Vertex_S(glm::vec3 pos, glm::vec3 norm, glm::vec2 texel)
+		: position(pos), normal(norm), uv(texel) {};
 	glm::vec3 position; /**< vertex postion in ndc */
 	glm::vec3 normal; /**< normal value of vertex */
 	glm::vec2 uv; /**< texture coordinates */
@@ -54,12 +57,6 @@ typedef struct
 	glm::vec3 point;
 	float D; //equation of plane: Ax +By + Cz + D = 0
 }Plane;
-
-typedef struct
-{
-	glm::vec3 position;
-	int size;
-}CubeRegion;
 
 enum Side
 {
@@ -97,3 +94,5 @@ bool LineAABBIntersection(const glm::vec3 &objPos, const AABB &aabb, const Ray &
 bool AABBRayIntersection(const glm::vec3 &objPos, const AABB &aabb, const Ray &r);
 
 void assimpToGLMMat4(const aiMatrix4x4 *from, glm::mat4 &to);
+
+float SignedDistFunc(const glm::vec3 &from, const glm::vec3 &to);

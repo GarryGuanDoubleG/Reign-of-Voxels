@@ -23,6 +23,7 @@
     <ClCompile Include="src\AnimationController.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\client.cpp" />
+    <ClCompile Include="src\density.cpp" />
     <ClCompile Include="src\entity.cpp" />
     <ClCompile Include="src\EventSystem.cpp" />
     <ClCompile Include="src\game.cpp">
@@ -42,10 +43,12 @@
     <ClCompile Include="src\mesh.cpp" />
     <ClCompile Include="src\model.cpp" />
     <ClCompile Include="src\PhysicsUtil.cpp" />
+    <ClCompile Include="src\qef.cpp" />
     <ClCompile Include="src\ResourceManager.cpp" />
     <ClCompile Include="src\sceneManager.cpp" />
     <ClCompile Include="src\shader.cpp" />
     <ClCompile Include="src\simple_logger.cpp" />
+    <ClCompile Include="src\svd.cpp" />
     <ClCompile Include="src\texture.cpp" />
     <ClCompile Include="src\VoxelChunk.cpp" />
     <ClCompile Include="src\VoxelManager.cpp" />
@@ -58,6 +61,7 @@
     <ClInclude Include="src\AnimationController.hpp" />
     <ClInclude Include="src\camera.hpp" />
     <ClInclude Include="src\client.hpp" />
+    <ClInclude Include="src\density.hpp" />
     <ClInclude Include="src\entity.hpp" />
     <ClInclude Include="src\events.hpp" />
     <ClInclude Include="src\eventSystem.hpp" />
@@ -79,11 +83,13 @@
     <ClInclude Include="src\observer.hpp" />
     <ClInclude Include="src\packet.hpp" />
     <ClInclude Include="src\PhysicsUtil.hpp" />
+    <ClInclude Include="src\qef.hpp" />
     <ClInclude Include="src\ResourceManager.hpp" />
     <ClInclude Include="src\scene.hpp" />
     <ClInclude Include="src\sceneManager.hpp" />
     <ClInclude Include="src\shader.hpp" />
     <ClInclude Include="src\simple_logger.h" />
+    <ClInclude Include="src\svd.hpp" />
     <ClInclude Include="src\texture.hpp" />
     <ClInclude Include="src\VoxelChunk.hpp" />
     <ClInclude Include="src\VoxelManager.hpp" />

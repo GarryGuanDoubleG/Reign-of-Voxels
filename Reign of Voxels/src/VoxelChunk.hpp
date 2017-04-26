@@ -6,7 +6,7 @@
 #include "model.hpp"
 #include "3dmath.hpp"
 
-#define VOXEL_TYPE_AIR 1
+#define VOXEL_TYPE_AIR 0
 #define VOXEL_TYPE_GRASS 2
 #define VOXEL_TYPE_DIRT 4
 #define VOXEL_TYPE_WOOD 8
@@ -17,13 +17,6 @@
 #define CHUNK_FLAG_INUSE 1
 #define CHUNK_FLAG_ACTIVE 2
 #define CHUNK_FLAG_FULL 4
-
-typedef struct
-{
-	sf::Uint8 position[3]; /**< vertex postion in ndc */
-	sf::Uint8 normal[3]; /**< normal value of vertex */
-	sf::Uint8 uv[2]; /**< texture coordinates */
-}VoxelVertex;
 
 
 class VoxelChunk
@@ -53,15 +46,12 @@ public:
 	void BindMesh();
 
 	void InsertVoxelAtPos(int x, int y, int z);
-	void SetVoxelActive(int x, int y, int z);
 
 	void Render();
 	void RenderMinimap();
 
 	sf::Uint8 GetVoxel(glm::ivec3 local_pos);
 
-	void ClearPlayerStart(float height);
-	void SmoothTerrain(float scale, glm::vec3 origin);
 
 	std::vector<Vertex> m_vertices;
 	std::vector<Vertex> m_top_verts;
@@ -77,13 +67,6 @@ public:
 private:
 	void AddTrianglesIndices();
 	void AddMinimapIndices();
-
-	void AddLeftFace(int x, int y, int z);
-	void AddBottomFace(int x, int y, int z);
-	void AddFrontFace(int x, int y, int z);
-	void AddRightFace(int x, int y, int z);
-	void AddTopFace(int x, int y, int z);
-	void AddBackFace(int x, int y, int z);
 
 	int GetIndex(int x, int y, int z);
 

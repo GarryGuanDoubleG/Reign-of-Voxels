@@ -185,7 +185,7 @@ bool Camera::AABBInCamera(AABB &aabb)
 	return true;
 }
 
-bool Camera::AABBInCamera(CubeRegion &aabb)
+bool Camera::AABBInCamera(glm::ivec3 minPos, int size)
 {
 	for (int i = 0; i < 6; i++)
 	{
@@ -198,7 +198,7 @@ bool Camera::AABBInCamera(CubeRegion &aabb)
 			{
 				for (int z = 0; z <= 1; z++)	
 				{
-					glm::vec3 point = aabb.position + glm::vec3(aabb.size * x, aabb.size * y, aabb.size * z);
+					glm::vec3 point = glm::vec3(minPos) + glm::vec3(size * x, size * y, size * z);
 					if (DistanceToPlane(m_planes[i], point) > -64)
 						inside = true;
 				}

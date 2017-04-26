@@ -142,6 +142,9 @@ void GameScene::Render()
 
 void GameScene::RenderAABB(Entity *entity, GLuint shader)
 {
+	shader = GetShader("object");
+	glUseProgram(shader);
+
 	GLuint modelID = m_resrcMang->GetModelID("cube");
 
 	glm::mat4 model;
@@ -149,6 +152,20 @@ void GameScene::RenderAABB(Entity *entity, GLuint shader)
 	model = glm::scale(model, entity->GetAABB().max - entity->GetAABB().min);
 
 	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+
+	glm::vec3 light_pos(256, 512.0f, 256);
+	glm::vec3 light_color(1.0f, 1.0f, 1.0f);
+
+	//mvp matrices
+	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
+
+	//lighting
+	glUniform3fv(glGetUniformLocation(shader, "viewPos"), 1, &m_camera->GetPosition()[0]);
+	glUniform3fv(glGetUniformLocation(shader, "lightPos"), 1, &light_pos[0]);
+	glUniform3fv(glGetUniformLocation(shader, "lightColor"), 1, &light_color[0]);
+
 
 	m_resrcMang->GetModel(modelID)->Draw(shader);
 }
@@ -166,9 +183,9 @@ void GameScene::RenderModel(Entity *entity)
 
 	glUseProgram(shader);
 
-	glm::mat4 model;
+	glm::mat4 model(1.0f);
+	model = glm::scale(model, glm::vec3(.01f, .01f, .01f));
 	model = glm::translate(glm::mat4(1.0f), entity->GetPosition());
-	//model = glm::scale(model, glm::vec3(64.0f, 64.0f, 64.0f));
 	//model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
 
 	glm::vec3 light_pos(256, 512.0f, 256);
@@ -368,9 +385,8 @@ void GameScene::CreateEntity()
 	int id = entity - m_entity_list;
 
 	int size = 1;
-
 	//TODO move this to a json file
-	AABB bounds = { glm::vec3(0.0f), glm::vec3(size) };
+	AABB bounds = { glm::vec3(0.0f), glm::vec3(1.0f, 2.5f, 1.0f) };
 
 	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(size*id, 64, size*id), bounds);
 

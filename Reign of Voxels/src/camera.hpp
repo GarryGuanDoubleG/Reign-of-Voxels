@@ -50,7 +50,7 @@ public:
 	bool PointInCamera(glm::vec3 &point);
 	bool SphereInCamera(glm::vec3 &point, float radius);
 	bool AABBInCamera(AABB &aabb);
-	bool AABBInCamera(CubeRegion &aabb);
+	bool AABBInCamera(glm::ivec3 minPos, int size);
 
 	void DrawRay();
 
