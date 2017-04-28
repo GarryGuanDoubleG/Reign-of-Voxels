@@ -281,7 +281,7 @@ bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
 {
 	VoxelOctree * node = m_octreeRoot->FindLeafNode(world_pos);
 
-	if (!node)
+	if (!node || ~node->m_flag & OCTREE_ACTIVE)
 		return false;
 	
 	return true;

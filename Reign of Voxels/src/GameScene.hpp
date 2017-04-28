@@ -42,15 +42,19 @@ private:
 
 					  //minimap
 	Camera *m_minimap_cam; /**<camera used to display minimap*/
+	
+	//frame buffers
+	GLuint m_minimapFBO;
+	GLuint m_minimapRBO;//render buffer
+	GLuint m_minimapTexture;
 
-	glm::vec2 m_minimap_size;//size to display minimap
-	glm::vec2 m_minimap_scale;
-	glm::vec2 m_minimap_pos;
+
 
 	Model * m_model; // test model, get rid of it once entities work
 
 	bool wire_frame = false;
 	bool draw_textured = false;
+
 
 public:
 	/**

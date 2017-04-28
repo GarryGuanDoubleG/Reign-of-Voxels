@@ -19,7 +19,7 @@
 */
 GameScene::GameScene()
 {
-	m_flags |= RENDER_GROUND_MODE | RENDER_SKYBOX_MODE;
+	m_flags |= RENDER_GROUND_MODE;
 
 	//load models, textures, fonts, etc.
 	m_resrcMang = new ResourceManager();
@@ -85,17 +85,28 @@ void GameScene::InitRayVertex()
 
 void GameScene::InitMinimap()
 {
-	//minimap cam
-	m_minimap_cam = new Camera(glm::vec3(256, 256, 512), glm::vec3(255, 0, 255));
-	m_minimap_cam->SetToOrtho(glm::ortho(-256.0f, 256.0f, -256.0f, 256.0f, 0.1f, 1000.0f));
+	glGenFramebuffers(1, &m_minimapFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_minimapFBO);
 
-	//minimap resizing^
-	glm::vec2 minimap_size = glm::vec2(256.0f, 256.0f);
+	glGenTextures(1, &m_minimapTexture);
+	glBindTexture(GL_TEXTURE_2D, m_minimapTexture);
 
-	//put minimap on the bottom left
-	//m_minimap_pos = glm::vec2(0.0f, SCREEN_HEIGHT - (minimap_size.y / 2.0f));
-	m_minimap_pos = glm::vec2(-5.0f, -256.0f);
-	m_minimap_scale = glm::vec2(minimap_size.x / (float)SCREEN_WIDTH, minimap_size.y / (float)SCREEN_HEIGHT);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	
+	/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_minimapTexture, 0);
+
+	glGenRenderbuffers(1, &m_minimapRBO);
+	glBindRenderbuffer(GL_RENDERBUFFER, m_minimapRBO);
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
+
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_minimapRBO);*/
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+
 }
 
 void GameScene::InitSkybox()
@@ -253,7 +264,6 @@ void GameScene::Render()
 	sf::Clock timer;
 
 	RenderWorld();
-	RenderMinimap();
 	RenderEntities();
 
 	if(m_flags & RAY_CAST_MODE)
@@ -263,6 +273,9 @@ void GameScene::Render()
 	{
 		RenderSkybox();
 	}
+
+	RenderMinimap();
+
 	m_hud->Render();
 
 	Game::instance().getWindow()->display();
@@ -416,10 +429,10 @@ void GameScene::RenderMinimap()
 
 	glUseProgram(shader);
 
-	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_minimap_cam->GetViewMat()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_minimap_cam->GetProj()[0][0]);
+	//glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_minimap_cam->GetViewMat()[0][0]);
+	//glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_minimap_cam->GetProj()[0][0]);
 
-	m_voxelManager->RenderMinimap(shader, m_minimap_scale, m_minimap_pos);
+
 }
 
 void GameScene::RenderRayCast()

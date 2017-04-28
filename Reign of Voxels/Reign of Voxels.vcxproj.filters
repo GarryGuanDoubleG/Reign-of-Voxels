@@ -332,5 +332,11 @@
     <None Include="shader\skybox_fs.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shader\quad_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\quad_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

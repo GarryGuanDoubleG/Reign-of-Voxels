@@ -804,12 +804,12 @@ VoxelOctree * VoxelOctree::FindLeafNode(glm::vec3 pos)
 		//calculate index 
 		index = 4 * x + 2 * y + z;
 
-		node = m_children[index];
+		node = node->m_children[index];
 
-		if (!node || ~node->m_flag & OCTREE_ACTIVE)
+		if (!node || ~node->m_flag & OCTREE_ACTIVE || ~node->m_flag & OCTREE_INUSE)
 			return NULL;
 
-		if (node->m_flag & OCTREE_LEAF)
+		if (node->m_type  == Node_Leaf)
 			found = true;
 	}
 
