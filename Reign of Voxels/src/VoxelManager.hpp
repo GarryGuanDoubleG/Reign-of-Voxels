@@ -8,7 +8,7 @@
 class VoxelManager
 {
 public:
-	VoxelManager();
+	VoxelManager(int worldSize);
 	~VoxelManager();
 
 	int GetWorldSize();

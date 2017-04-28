@@ -11,15 +11,23 @@ using Json = nlohmann::json;
 
 class ResourceManager
 {
+private:
+	GLuint m_screen_width;
+	GLuint m_screen_height;
+	GLuint m_worldSize;
+
 public:
 	ResourceManager();
 	~ResourceManager();
 
+
 	//loads resources
+	void LoadConfig();
 	void LoadResources();
-	void LoadModels(Json data);
-	void LoadTextures(Json &data);
-	void LoadFonts(Json &data);
+
+	int GetScreenWidth();
+	int GetScreenHeight();
+	int GetWorldResolution();
 
 	//getters
 	GLint GetModelID(std::string name);
@@ -28,6 +36,10 @@ public:
 	GLuint GetTextureID(std::string name);
 	GLuint GetNormalMapID(std::string name);
 private:
+	void LoadModels(Json data);
+	void LoadTextures(Json &data);
+	void LoadFonts(Json &data);
+
 	std::map<std::string, GLint> m_model_keys; //map of model names to their id
 	std::vector<Model *> m_models; //vector of models
 	
@@ -40,3 +52,5 @@ GLuint GetTextureID(std::string name);
 GLuint GetNormalMapID(std::string name);
 GLint GetModelID(std::string name);
 Model * GetModel(GLint id);
+
+int GetWorldResolution();

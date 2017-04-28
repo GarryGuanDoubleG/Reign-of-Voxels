@@ -9,9 +9,10 @@
 #include "sceneManager.hpp"
 #include "Gui\Menu.hpp"
 #include "client.hpp"
+#include "ResourceManager.hpp"
 
-#define SCREEN_WIDTH 1280 /**<width of the window */ 
-#define SCREEN_HEIGHT 720 /**<height of the window */ 
+//#define Game::screen_width 1280 /**<width of the window */ 
+//#define Game::screen_height 720 /**<height of the window */ 
 
 /**
 * Singleton Game class
@@ -21,9 +22,12 @@ class Game
 {
 public:
 	bool				m_lock_mouse;
+	ResourceManager			*m_resourceManager;
 
-	static float g_delta_time;
-	static sf::Clock g_clock;/**<tracks total time since ininitation of gamescene*/  
+	static float delta_time;
+	static sf::Clock clock;/**<tracks total time since ininitation of gamescene*/  
+	static int Game::screen_width;
+	static int Game::screen_height;
 
 	/**
 	* Constructor
@@ -39,6 +43,7 @@ public:
 	* @brief initializes the game from graphics to loading scene and managing client connection
 	*/
 	void					Initialize();
+
 	/*
 	* @brief Game loop that handles what happens every frame
 	*/
@@ -60,6 +65,7 @@ public:
 	sf::RenderWindow*		getWindow();
 
 	void HandleInput();
+
 private:
 	/*
 	* @brief Initializes sfml window and glew
@@ -77,7 +83,6 @@ private:
 	SceneManager			*m_sceneManager; /**< manages which scene runs in the foreground*/  
 	EventSystem				*m_eventSystem; /**<Throws events from anywhere in code*/  
 	Client					*m_client; /**<manages connection to server*/  
-
 	//flags
 	bool					m_in_game; /**<flag if game already initiatd */  
 	bool					m_running; /**<flag for whether or not to run gameloop*/  

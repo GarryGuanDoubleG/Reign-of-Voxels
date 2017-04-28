@@ -21,10 +21,6 @@ GameScene::GameScene()
 {
 	m_flags |= RENDER_GROUND_MODE;
 
-	//load models, textures, fonts, etc.
-	m_resrcMang = new ResourceManager();
-	m_resrcMang->LoadResources();
-
 	//hud handler
 	m_hud = new HUD();
 
@@ -33,7 +29,7 @@ GameScene::GameScene()
 	m_camera->SetToPersp();
 
 	//Generate vertice and types for voxels
-	m_voxelManager = new VoxelManager();
+	m_voxelManager = new VoxelManager(GetWorldResolution());
 	m_voxelManager->GenerateVoxels();
 
 	InitMinimap();
@@ -97,9 +93,9 @@ void GameScene::InitMinimap()
 	};
 
 	m_minimapCam = new Camera(glm::vec3(128, 256, 128), glm::vec3(127.5, 0, 127.5));
-	m_minimapCam->SetToOrtho(glm::ortho(-256.0f, 256.0f, -256.0f, 256.0f, 0.1f, 1000.0f));
+	m_minimapCam->SetToOrtho(glm::ortho(128.0f, -128.0f, 128.0f, -128.0f, 0.1f, 1000.0f));
 
-	m_minimapScale = glm::vec2(256.0f / (float) SCREEN_WIDTH, 256.0f / (float) SCREEN_HEIGHT);
+	m_minimapScale = glm::vec2(256.0f / (float) Game::screen_width, 256.0f / (float) Game::screen_height);
 	//bind quad vertices
 	glGenVertexArrays(1, &m_minimapVAO);
 	glBindVertexArray(m_minimapVAO);
@@ -125,7 +121,7 @@ void GameScene::InitMinimap()
 	glGenTextures(1, &m_minimapTexture);
 	glBindTexture(GL_TEXTURE_2D, m_minimapTexture);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Game::screen_width, Game::screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
 	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_minimapTexture, 0);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -317,7 +313,7 @@ void GameScene::RenderAABB(Entity *entity, GLuint shader)
 
 	glBindVertexArray(m_cubemapVAO);
 
-	GLuint modelID = m_resrcMang->GetModelID("cube");
+	GLuint modelID = GetModelID("cube");
 
 	glm::mat4 model;
 	model = glm::translate(glm::mat4(1.0f), entity->GetPosition() + entity->GetAABB().min);
@@ -342,14 +338,14 @@ void GameScene::RenderAABB(Entity *entity, GLuint shader)
 	glBindTexture(GL_TEXTURE_2D, GetTextureID("skybox1"));
 	glUniform1i(glGetUniformLocation(shader, "texture_diffuse0"), 0);
 
-	//m_resrcMang->GetModel(modelID)->Draw(shader);
+	//Game::instance().m_resourceManager->GetModel(modelID)->Draw(shader);
 	glDrawArrays(GL_TRIANGLES, 0, 36);
 	glBindVertexArray(0);
 }
 
 void GameScene::RenderModel(Entity *entity)
 {
-	Model *ent_model = m_resrcMang->GetModel(entity->GetModelID());
+	Model *ent_model = GetModel(entity->GetModelID());
 	
 	GLuint shader;
 
@@ -392,7 +388,7 @@ void GameScene::RenderModel(Entity *entity)
 	glUniform3fv(glGetUniformLocation(shader, "colorMod"), 1, &ent_color[0]);
 
 	if (ent_model->IsRigged())
-		ent_model->Draw(shader, Game::instance().g_clock.getElapsedTime().asSeconds());
+		ent_model->Draw(shader, Game::instance().clock.getElapsedTime().asSeconds());
 	else
 		ent_model->Draw(shader);
 
@@ -453,10 +449,11 @@ void GameScene::RenderEntities()
 void GameScene::RenderMinimap()
 {	
 	glBindFramebuffer(GL_FRAMEBUFFER, m_minimapFBO);
-	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	GLfloat bg_color[] = { 0.3f, 0.3f, 0.3f, 0.3f };
 
-	glEnable(GL_DEPTH_TEST);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearBufferfv(GL_COLOR, 0, bg_color);
+
 
 	m_voxelManager->RenderWorld(draw_textured, m_minimapCam);
 
@@ -471,7 +468,7 @@ void GameScene::RenderMinimap()
 
 	glUniform2fv(glGetUniformLocation(shader, "scale"), 1, &m_minimapScale[0]);
 
-	glDisable(GL_DEPTH_TEST);
+	;
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_minimapTexture);
 	
@@ -523,6 +520,7 @@ void GameScene::onNotify(Event event, sf::Event &input)
 void GameScene::HandleInput(sf::Event event)
 {
 	m_camera->HandleInput(event);
+	//m_minimapCam->HandleInput(event);
 
 	if (event.type == sf::Event::KeyPressed)
 	{
@@ -566,7 +564,7 @@ void GameScene::HandleInput(sf::Event event)
 
 		//TODO thread ray intersection
 		 PhysicsUtil::ScreenPosToWorldRay(m_camera->GetPosition(), mouse_pos,
-								glm::vec2((float)SCREEN_WIDTH, (float)SCREEN_HEIGHT), m_camera->GetViewMat(),
+								glm::vec2((float)Game::screen_width, (float)Game::screen_height), m_camera->GetViewMat(),
 								m_camera->GetProj(), ray);
 
 		 m_rays.push_back(ray);
@@ -630,7 +628,7 @@ void GameScene::CreateEntity()
 	//TODO move this to a json file
 	AABB bounds = { glm::vec3(-4.0f, 0.0f, -4.0f), glm::vec3(3.0f, 12.5f, 3.0f) };
 
-	entity->Init(m_resrcMang->GetModelID("worker"), glm::vec3(size*id, 64, size*id), bounds);
+	entity->Init(GetModelID("worker"), glm::vec3(size*id, 64, size*id), bounds);
 
 	entity->m_nextFree = NULL;
 }

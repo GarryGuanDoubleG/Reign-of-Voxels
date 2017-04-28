@@ -338,5 +338,8 @@
     <None Include="shader\quad_fs.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="Resources\config.json">
+      <Filter>Json</Filter>
+    </None>
   </ItemGroup>
 </Project>

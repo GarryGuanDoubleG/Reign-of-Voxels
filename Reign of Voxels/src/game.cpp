@@ -2,8 +2,11 @@
 #include "GameScene.hpp"
 #include "simple_logger.h"
 
-float Game::g_delta_time;
-sf::Clock Game::g_clock; /**<tracks total time since ininitation of gamescene*/  
+float Game::delta_time;
+sf::Clock Game::clock; /**<tracks total time since ininitation of gamescene*/  
+
+int Game::screen_width;
+int Game::screen_height;
 
 Game Game::m_instance; /**<singleton instance of game */ 
 
@@ -46,8 +49,14 @@ void Game::GraphicsInit()
 	settings.majorVersion = 4;
 	settings.minorVersion = .0;
 
+	m_resourceManager = new ResourceManager();
+	m_resourceManager->LoadConfig();
+
+	screen_width = m_resourceManager->GetScreenWidth();
+	screen_height = m_resourceManager->GetScreenHeight();
+
 	//Create context
-	m_window = new sf::RenderWindow(sf::VideoMode(SCREEN_WIDTH, SCREEN_HEIGHT), "Reign of Voxels", sf::Style::Default, settings);
+	m_window = new sf::RenderWindow(sf::VideoMode(Game::screen_width, Game::screen_height), "Reign of Voxels", sf::Style::Default, settings);
 	m_window->setMouseCursorGrabbed(false);
 	m_window->setMouseCursorVisible(true);
 
@@ -85,6 +94,8 @@ void Game::Initialize()
 
 	m_initialized = true;
 	m_lock_mouse = false;
+
+	m_resourceManager->LoadResources();
 }
 /*
 * @brief throws a close game event to start clean up process
@@ -96,6 +107,12 @@ void Game::GameClose()
 
 	m_running = false;
 	m_instance.getEventSystem().Notify(Event::Close, event);
+
+	delete m_resourceManager;
+	delete m_eventSystem;
+	delete m_client;
+	delete m_sceneManager;
+
 	exit(0);
 }
 /*
@@ -168,10 +185,10 @@ void Game::HandleInput()
 void Game::GameLoop()
 {
 	m_running = true;
-	g_clock.restart();
+	clock.restart();
 	
 	//center mouse in window
-	sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
+	sf::Mouse::setPosition(sf::Vector2i(Game::screen_width / 2, Game::screen_height / 2), *m_window);
 	
 	float last_time = 0;
 
@@ -182,15 +199,15 @@ void Game::GameLoop()
 
 		if (m_lock_mouse)
 		{
-			sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
+			sf::Mouse::setPosition(sf::Vector2i(Game::screen_width / 2, Game::screen_height / 2), *m_window);
 		}
 
 		m_sceneManager->SceneFrame();
 
-		g_delta_time = g_clock.getElapsedTime().asSeconds() - last_time;
-		last_time = g_clock.getElapsedTime().asSeconds();
+		delta_time = clock.getElapsedTime().asSeconds() - last_time;
+		last_time = clock.getElapsedTime().asSeconds();
 
-		//std::cout << "Framerate: " << 1.0f / g_delta_time << std::endl;
+		//std::cout << "Framerate: " << 1.0f / delta_time << std::endl;
 	}
 	m_window->close();
 }

@@ -44,8 +44,8 @@ void PhysicsUtil::ScreenPosToWorldRay(const glm::vec3& camera_pos, const sf::Vec
 									const glm::mat4& projection_matrix, Ray& out_ray)
 {	
 	//expensive ray casting
-	glm::vec4 screenPos = glm::vec4((mouse_pos.x * 2.0f / (float)SCREEN_WIDTH) - 1.0f,
-		1.0f - (mouse_pos.y * 2.0f / (float)SCREEN_HEIGHT),
+	glm::vec4 screenPos = glm::vec4((mouse_pos.x * 2.0f / (float)Game::screen_width) - 1.0f,
+		1.0f - (mouse_pos.y * 2.0f / (float)Game::screen_height),
 		1.0f,
 		1.0f);
 	//move cam to near plane

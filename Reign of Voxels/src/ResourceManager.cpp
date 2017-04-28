@@ -53,14 +53,33 @@ void ResourceManager::LoadResources()
 
 }
 
-GLint ResourceManager::GetModelID(std::string name)
+void ResourceManager::LoadConfig()
 {
-	return m_model_keys[name];
-}
+	Json resources;
 
-Model * ResourceManager::GetModel(GLint id)
-{
-	return m_models[id];
+	std::ifstream in(RESOURCE_PATH);
+
+	if (in.is_open())
+		in >> resources;
+	in.close();
+
+	Json data;
+
+	//load models json
+	std::string json_path = resources["config"];
+	in.open(json_path);
+
+	if (in.is_open())
+	{
+		in >> data;
+		
+		m_screen_width = data["screen_width"];
+		m_screen_height = data["screen_height"];
+		m_worldSize = data["resolution"];
+
+		in.close();
+	}
+
 }
 
 void ResourceManager::LoadModels(Json data)
@@ -120,6 +139,18 @@ void ResourceManager::LoadTextures(Json &data)
 	}
 }
 
+GLint ResourceManager::GetModelID(std::string name)
+{
+	return m_model_keys[name];
+}
+
+Model * ResourceManager::GetModel(GLint id)
+{
+	return m_models[id];
+}
+
+
+
 GLuint ResourceManager::GetTextureID(std::string name)
 {
 	return m_textures[name];
@@ -152,4 +183,23 @@ GLint GetModelID(std::string name)
 Model * GetModel(GLint id)
 {
 	return g_resourceManager->GetModel(id);
+}
+
+
+int ResourceManager::GetScreenWidth()
+{
+	return m_screen_width;
+}
+int ResourceManager::GetScreenHeight()
+{
+	return m_screen_height;
+}
+int ResourceManager::GetWorldResolution()
+{
+	return m_worldSize;
+}
+
+int GetWorldResolution()
+{
+	return g_resourceManager->GetWorldResolution();
 }

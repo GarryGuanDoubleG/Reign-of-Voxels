@@ -19,7 +19,7 @@ public:
 	~Camera();
 
 	void Update();
-
+	void UpdateFrustum();
 	/**
 	* @brief returns the view matrix
 	* @return the view matrix

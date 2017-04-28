@@ -18,7 +18,7 @@ Camera::Camera(glm::vec3 position, glm::vec3 target)
 
 	//set up perspective mat4
 	m_fov = glm::radians(45.0f);
-	m_aspect_ratio = (float)SCREEN_WIDTH / (float)SCREEN_HEIGHT;
+	m_aspect_ratio = (float)Game::screen_width / (float)Game::screen_height;
 	m_nearD = 1.0f;
 	m_farD = 1000.0f;
 
@@ -58,6 +58,19 @@ void Camera::SwitchProjection()
 void Camera::SetToOrtho(glm::mat4 ortho)
 {
 	m_ortho_proj = ortho;
+	m_yaw = -89.9f;
+	m_pitch = -89.9f;
+
+	m_up = glm::vec3(0.0f, 0.0f, 1.0f);
+
+	m_forward.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+	m_forward.y = sin(glm::radians(m_pitch));
+	m_forward.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+
+	m_forward = glm::normalize(m_forward);
+
+	m_view_mat = glm::lookAt(m_pos, m_forward + m_pos, m_up);
+
 	m_perspective = false;
 }
 
@@ -106,7 +119,7 @@ glm::vec3 Camera::GetRotation()
 
 void Camera::HandleKeyboard()
 {
-	GLfloat cam_speed = 100.0f * Game::g_delta_time;
+	GLfloat cam_speed = 100.0f * Game::delta_time;
 	if (cam_speed < 0.1f)
 	{
 		cam_speed = 0.1f;
@@ -143,17 +156,16 @@ void Camera::HandleKeyboard()
 	}
 
 }
-void Camera::Update()
-{
-	HandleKeyboard();
 
+void Camera::UpdateFrustum()
+{
 	//based on lighthouse3d tutorials
 	glm::vec3 dir, nearCenter, farCenter,
-			X_axis, Y_axis, Z_axis;
-	
+		X_axis, Y_axis, Z_axis;
+
 	//4 corners of near plane
 	glm::vec3 nearTL, nearTR, nearBL, nearBR;
-	
+
 	//4 corners of far plane
 	glm::vec3 farTL, farTR, farBL, farBR;
 
@@ -184,6 +196,12 @@ void Camera::Update()
 	SetPlane(m_planes[RIGHT], nearBR, nearTR, farBR);
 	SetPlane(m_planes[BACK], nearTL, nearTR, nearBR);
 	SetPlane(m_planes[FRONT], farTR, farTL, farBL);
+}
+
+void Camera::Update()
+{
+	HandleKeyboard();
+
 }
 
 //checks if object is within frustum
@@ -278,7 +296,7 @@ glm::vec3 Camera::GetForward()
 
 void Camera::HandleInput(sf::Event event)
 {
-	float time = Game::g_delta_time;
+	float time = Game::delta_time;
 	GLfloat cam_speed = 3.0f;
 	bool newKeyPress = false;
 	//if (event.type == sf::Event::KeyPressed)
@@ -383,14 +401,17 @@ void Camera::HandleInput(sf::Event event)
 	if (event.type == sf::Event::MouseWheelMoved)
 	{
 		m_pos += (float)event.mouseWheel.delta * m_forward * cam_speed;
+		UpdateFrustum();
+		slog("Yaw %5f\nPtich %5f\nRoll %5f\n", m_yaw, m_pitch, m_roll);
 	}
 	
 	//TODO remove after testing
 	else if (event.type == sf::Event::MouseMoved && Game::instance().m_lock_mouse)
 	{
+		slog("Yaw %5f\nPtich %5f\nRoll %5f\n", m_yaw, m_pitch, m_roll);
 		GLfloat sensitivity = 0.05f; // mouse sensitivity
 		sf::Vector2i mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
-		sf::Vector2i center(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2);
+		sf::Vector2i center(Game::screen_width / 2, Game::screen_height / 2);
 		if (mouse_pos == center)
 			return;
 		sf::Vector2i offset = mouse_pos - center;
@@ -413,6 +434,8 @@ void Camera::HandleInput(sf::Event event)
 
 		m_forward = glm::normalize(front);
 		m_right = glm::normalize(glm::cross(m_forward, m_up));
+
+		UpdateFrustum();
 	}
 
 	m_view_mat = glm::lookAt(m_pos, m_pos + m_forward, m_up);

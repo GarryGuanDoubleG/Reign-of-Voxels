@@ -15,7 +15,7 @@ HUD::HUD()
 	m_camera = new Camera(glm::vec3(0.0f, 0.0f, 1.0f), 
 						  glm::vec3(0.0f, 0.0f, 0.0f));
 	
-	m_camera->SetToOrtho(glm::ortho(0.0f, (float)SCREEN_WIDTH, (float)SCREEN_HEIGHT, 0.0f));
+	m_camera->SetToOrtho(glm::ortho(0.0f, (float)Game::screen_width, (float)Game::screen_height, 0.0f));
 
 	Init();
 }
@@ -40,13 +40,13 @@ void LoadHudWidget(Json &data, HUDWidget &widget)
 
 	if (data["position"] == "bottom_right")
 	{
-		widget.rect.position.x = (float)SCREEN_WIDTH - widget.rect.size.x;
-		widget.rect.position.y = (float)SCREEN_HEIGHT  - widget.rect.size.y;
+		widget.rect.position.x = (float)Game::screen_width - widget.rect.size.x;
+		widget.rect.position.y = (float)Game::screen_height  - widget.rect.size.y;
 	}
 	else if (data["position"] == "bottom_center")
 	{
-		widget.rect.position.x = (float)SCREEN_WIDTH * .5f -  widget.rect.size.x *.5f;
-		widget.rect.position.y = (float)SCREEN_HEIGHT - widget.rect.size.y;
+		widget.rect.position.x = (float)Game::screen_width * .5f -  widget.rect.size.x *.5f;
+		widget.rect.position.y = (float)Game::screen_height - widget.rect.size.y;
 	}
 
 }
