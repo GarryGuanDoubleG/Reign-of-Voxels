@@ -24,6 +24,10 @@ Camera::Camera(glm::vec3 position, glm::vec3 target)
 
 	m_perspect_proj = glm::perspective(m_fov, m_aspect_ratio, m_nearD, m_farD);
 
+	m_yaw = 0.0f;
+	m_pitch = 0.0f;
+	m_roll = 0.0f;
+
 	//compute near far plane dimensions for frustum culling
 	GLfloat tan_angle = tan(glm::radians(m_fov * .5f));
 	

@@ -40,13 +40,17 @@ private:
 								   //main player camera
 	Camera *m_camera; /**<player camera*/
 
-					  //minimap
-	Camera *m_minimap_cam; /**<camera used to display minimap*/
 	
-	//frame buffers
+					  //minimap
+	Camera *m_minimapCam; /**<camera used to display minimap*/
+	glm::vec2 m_minimapScale;
+	
+	//minimap objects
 	GLuint m_minimapFBO;
-	GLuint m_minimapRBO;//render buffer
+	GLuint m_minimapRBO;
 	GLuint m_minimapTexture;
+	GLuint m_minimapVAO;//quad
+	GLuint m_minimapVBO;//quad
 
 
 

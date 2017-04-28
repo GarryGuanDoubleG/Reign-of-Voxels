@@ -42,6 +42,11 @@
   "skybox": {
     "vs": "shader/skybox_vs.glsl",
     "fs": "shader/skybox_fs.glsl"
+  },
+
+  "quad": {
+    "vs": "shader/quad_vs.glsl",
+    "fs": "shader/quad_fs.glsl"
   }
 
 }

@@ -11,7 +11,7 @@ std::mutex g_free_chunk_guard;
 VoxelManager::VoxelManager()
 {
 	//TODO load voxel world from json
-	m_resolution = 512;
+	m_resolution = 256;
 	
 	int worldSizeXZ = m_resolution * m_resolution;
 

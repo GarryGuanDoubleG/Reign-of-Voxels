@@ -189,6 +189,8 @@ void Game::GameLoop()
 
 		g_delta_time = g_clock.getElapsedTime().asSeconds() - last_time;
 		last_time = g_clock.getElapsedTime().asSeconds();
+
+		//std::cout << "Framerate: " << 1.0f / g_delta_time << std::endl;
 	}
 	m_window->close();
 }

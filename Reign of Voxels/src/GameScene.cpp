@@ -85,6 +85,40 @@ void GameScene::InitRayVertex()
 
 void GameScene::InitMinimap()
 {
+	GLfloat quadVertices[] = {   // Vertex attributes for a quad that fills the entire screen in Normalized Device Coordinates.
+								 // Positions   // TexCoords
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		-1.0f, -1.0f,  0.0f, 0.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
+
+		-1.0f,  1.0f,  0.0f, 1.0f,
+		1.0f, -1.0f,  1.0f, 0.0f,
+		1.0f,  1.0f,  1.0f, 1.0f
+	};
+
+	m_minimapCam = new Camera(glm::vec3(128, 256, 128), glm::vec3(127.5, 0, 127.5));
+	m_minimapCam->SetToOrtho(glm::ortho(-256.0f, 256.0f, -256.0f, 256.0f, 0.1f, 1000.0f));
+
+	m_minimapScale = glm::vec2(256.0f / (float) SCREEN_WIDTH, 256.0f / (float) SCREEN_HEIGHT);
+	//bind quad vertices
+	glGenVertexArrays(1, &m_minimapVAO);
+	glBindVertexArray(m_minimapVAO);
+
+	glGenBuffers(1, &m_minimapVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_minimapVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+
+	//Frame Buffer
 	glGenFramebuffers(1, &m_minimapFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_minimapFBO);
 
@@ -92,21 +126,12 @@ void GameScene::InitMinimap()
 	glBindTexture(GL_TEXTURE_2D, m_minimapTexture);
 
 	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, SCREEN_WIDTH, SCREEN_HEIGHT, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_minimapTexture, 0);
 
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-	
-	/*glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_minimapTexture, 0);
-
-	glGenRenderbuffers(1, &m_minimapRBO);
-	glBindRenderbuffer(GL_RENDERBUFFER, m_minimapRBO);
-	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH24_STENCIL8, SCREEN_WIDTH, SCREEN_HEIGHT);
-
-	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_STENCIL_ATTACHMENT, GL_RENDERBUFFER, m_minimapRBO);*/
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-
 }
 
 void GameScene::InitSkybox()
@@ -256,6 +281,8 @@ void GameScene::Update()
 */
 void GameScene::Render()
 {
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
 	GLfloat bg_color[] = { 0.3f, 0.3f, 0.3f, 0.3f };
 
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
@@ -424,15 +451,33 @@ void GameScene::RenderEntities()
 }
 
 void GameScene::RenderMinimap()
-{
-	GLuint shader = GetShader("minimap");
+{	
+	glBindFramebuffer(GL_FRAMEBUFFER, m_minimapFBO);
+	glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
+	glEnable(GL_DEPTH_TEST);
+
+	m_voxelManager->RenderWorld(draw_textured, m_minimapCam);
+
+
+	//rebind original
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+
+	GLuint shader = GetShader("quad"); // draw quad
 	glUseProgram(shader);
 
-	//glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_minimap_cam->GetViewMat()[0][0]);
-	//glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_minimap_cam->GetProj()[0][0]);
+	glBindVertexArray(m_minimapVAO);
 
+	glUniform2fv(glGetUniformLocation(shader, "scale"), 1, &m_minimapScale[0]);
 
+	glDisable(GL_DEPTH_TEST);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, m_minimapTexture);
+	
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glBindVertexArray(0);
 }
 
 void GameScene::RenderRayCast()
