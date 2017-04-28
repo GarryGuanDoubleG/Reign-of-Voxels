@@ -139,6 +139,9 @@ void VoxelManager::RenderGrass(Camera * player_cam)
 {
 	GLuint shader = GetShader("grass");
 	glUseProgram(shader);
+	
+	glDisable(GL_DEPTH_FUNC);
+	glDisable(GL_DEPTH_TEST);
 
 	glm::vec3 light_pos = glm::vec3(256, 512, 256);
 	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -166,6 +169,9 @@ void VoxelManager::RenderGrass(Camera * player_cam)
 	m_octreeRoot->DrawGrass();
 	
 	glActiveTexture(GL_TEXTURE0);
+
+	glEnable(GL_DEPTH_FUNC);
+	glEnable(GL_DEPTH_TEST);
 }
 
 void VoxelManager::RenderVoxels(bool draw_textured, Camera * player_cam)

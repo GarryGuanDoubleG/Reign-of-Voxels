@@ -1,7 +1,7 @@
 {
-  "resolution": 512,
-  "screen_width": 1920,
-  "screen_height": 1080,
+  "resolution": 256,
+  "screen_width": 1280,
+  "screen_height": 720,
   "minimap_size":  256
 }
 

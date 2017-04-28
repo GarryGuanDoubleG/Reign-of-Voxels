@@ -460,22 +460,31 @@ void GameScene::RenderMinimap()
 
 	m_voxelManager->RenderWorld(draw_textured, m_minimapCam);
 
-
 	//rebind original
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
+
+	GLuint alphaTex = GetTextureID("minimap_alpha");
 	GLuint shader = GetShader("quad"); // draw quad
+
 	glUseProgram(shader);
 
 	glBindVertexArray(m_minimapVAO);
 
 	glUniform2fv(glGetUniformLocation(shader, "scale"), 1, &m_minimapScale[0]);
 
-	;
+	glUniform1i(glGetUniformLocation(shader, "screenTexture"), 0);
+	glUniform1i(glGetUniformLocation(shader, "alphaMask"), 1);
+
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_minimapTexture);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, alphaTex);
 	
 	glDrawArrays(GL_TRIANGLES, 0, 6);
+	
+	glActiveTexture(GL_TEXTURE0);
 
 	glBindVertexArray(0);
 }

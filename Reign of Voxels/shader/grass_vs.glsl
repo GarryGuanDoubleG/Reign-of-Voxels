@@ -19,19 +19,10 @@ uniform vec2 billboardSize;
 
 void main(void)
 {
-	//vec3 CameraRight_worldspace = vec3(view[0][0], view[1][0], view[2][0]);
-	//vec3 CameraUp_worldspace = vec3(view[0][1], view[1][1], view[2][1]);
-
-	//vec3 particleCenterWorldSpace = verts + worldPos + vec3(billboardSize.xy / 2, 0);
-
-
-	//vec3 vertexPosWorldSpace = particleCenterWorldSpace + 
-	//								CameraRight_worldspace * verts.x * billboardSize.x + 
-	//								CameraUp_worldspace * verts.y * billboardSize.y;
 
 	mat4 modelMat = model;
 	modelMat[3][0] = worldPos.x;
-	modelMat[3][1] = worldPos.y + 1;
+	modelMat[3][1] = worldPos.y + .5f;
 	modelMat[3][2] = worldPos.z;
 	modelMat[3][3] = 1.0f;
 

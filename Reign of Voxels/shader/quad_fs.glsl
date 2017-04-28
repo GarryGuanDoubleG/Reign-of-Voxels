@@ -3,8 +3,12 @@ in vec2 UV;
 out vec4 color;
 
 uniform sampler2D screenTexture;
+uniform sampler2D alphaMask;
 
 void main()
 { 
-    color = texture(screenTexture, UV);
+    vec4 minimap = texture(screenTexture, UV);
+	float alpha = texture(alphaMask, UV).r;
+
+	color = vec4(minimap.rgb, minimap.a * alpha);
 }

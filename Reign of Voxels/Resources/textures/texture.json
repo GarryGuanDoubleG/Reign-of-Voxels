@@ -20,5 +20,8 @@
   },
   "skybox1": {
     "path": "Resources\\textures\\skybox\\front.jpg"
+  },
+  "minimap_alpha":{
+    "path": "Resources\\textures\\minimap_alpha.png"
   }
 }
