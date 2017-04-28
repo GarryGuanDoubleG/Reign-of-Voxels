@@ -11,13 +11,15 @@
 
 #define RAY_CAST_MODE 1
 #define AABB_MODE 2
+#define RENDER_GROUND_MODE 4
+#define RENDER_SKYBOX_MODE 8
 /**
 * constructor
 * Subscribes to event system and sets up a camera and loads models
 */
 GameScene::GameScene()
 {
-	m_flags = 0;
+	m_flags |= RENDER_GROUND_MODE | RENDER_SKYBOX_MODE;
 
 	//load models, textures, fonts, etc.
 	m_resrcMang = new ResourceManager();
@@ -36,6 +38,7 @@ GameScene::GameScene()
 
 	InitMinimap();
 	InitRayVertex();
+	InitSkybox();
 
 	//allocate memeory for all entities
 	m_entity_list = new Entity[MAX_ENTITES];
@@ -66,11 +69,11 @@ void GameScene::InitRayVertex()
 		.0000001f,.0000001f,.0000001f
 	};
 
-	glGenVertexArrays(1, &m_vao);
-	glBindVertexArray(m_vao);
+	glGenVertexArrays(1, &m_raycast_vao);
+	glBindVertexArray(m_raycast_vao);
 
-	glGenBuffers(1, &m_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glGenBuffers(1, &m_raycast_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_raycast_vbo);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(verts), verts, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
@@ -95,6 +98,127 @@ void GameScene::InitMinimap()
 	m_minimap_scale = glm::vec2(minimap_size.x / (float)SCREEN_WIDTH, minimap_size.y / (float)SCREEN_HEIGHT);
 }
 
+void GameScene::InitSkybox()
+{
+	GLfloat cubeVertices[] = {
+		// Positions          // Texture Coords
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 0.0f,
+
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 1.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f, -0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f, -0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f, -0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f, -0.5f, -0.5f,  0.0f, 1.0f,
+
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f,
+		0.5f,  0.5f, -0.5f,  1.0f, 1.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		0.5f,  0.5f,  0.5f,  1.0f, 0.0f,
+		-0.5f,  0.5f,  0.5f,  0.0f, 0.0f,
+		-0.5f,  0.5f, -0.5f,  0.0f, 1.0f
+	};
+
+	GLfloat skyboxVertices[] = {
+		// Positions          
+		-1.0f,  1.0f, -1.0f,
+		-1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f, -1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+
+		-1.0f, -1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f,
+		-1.0f, -1.0f,  1.0f,
+
+		-1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f, -1.0f,
+		1.0f,  1.0f,  1.0f,
+		1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f,  1.0f,
+		-1.0f,  1.0f, -1.0f,
+
+		-1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f, -1.0f,
+		1.0f, -1.0f, -1.0f,
+		-1.0f, -1.0f,  1.0f,
+		1.0f, -1.0f,  1.0f
+	};
+
+	glGenVertexArrays(1, &m_cubemapVAO);
+	glBindVertexArray(m_cubemapVAO);
+
+	glGenBuffers(1, &m_cubemapVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_cubemapVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(cubeVertices), &cubeVertices, GL_STATIC_DRAW);
+	
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 5 * sizeof(GLfloat), (GLvoid*)(3 * sizeof(GLfloat)));
+	
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenVertexArrays(1, &m_skyboxVAO);
+	glBindVertexArray(m_skyboxVAO);
+
+	glGenBuffers(1, &m_skyboxVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_skyboxVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(skyboxVertices), &skyboxVertices[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 3 * sizeof(GLfloat), (GLvoid*)0);
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
 /**
 *@brief code to run every frame of game loop
 */
@@ -135,6 +259,10 @@ void GameScene::Render()
 	if(m_flags & RAY_CAST_MODE)
 		RenderRayCast();
 
+	if (m_flags & RENDER_SKYBOX_MODE)
+	{
+		RenderSkybox();
+	}
 	m_hud->Render();
 
 	Game::instance().getWindow()->display();
@@ -146,6 +274,8 @@ void GameScene::RenderAABB(Entity *entity, GLuint shader)
 {
 	shader = GetShader("object");
 	glUseProgram(shader);
+
+	glBindVertexArray(m_cubemapVAO);
 
 	GLuint modelID = m_resrcMang->GetModelID("cube");
 
@@ -164,12 +294,17 @@ void GameScene::RenderAABB(Entity *entity, GLuint shader)
 	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
 
 	//lighting
-	glUniform3fv(glGetUniformLocation(shader, "viewPos"), 1, &m_camera->GetPosition()[0]);
-	glUniform3fv(glGetUniformLocation(shader, "lightPos"), 1, &light_pos[0]);
-	glUniform3fv(glGetUniformLocation(shader, "lightColor"), 1, &light_color[0]);
+	//glUniform3fv(glGetUniformLocation(shader, "viewPos"), 1, &m_camera->GetPosition()[0]);
+	//glUniform3fv(glGetUniformLocation(shader, "lightPos"), 1, &light_pos[0]);
+	//glUniform3fv(glGetUniformLocation(shader, "lightColor"), 1, &light_color[0]);
 
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, GetTextureID("skybox1"));
+	glUniform1i(glGetUniformLocation(shader, "texture_diffuse0"), 0);
 
-	m_resrcMang->GetModel(modelID)->Draw(shader);
+	//m_resrcMang->GetModel(modelID)->Draw(shader);
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+	glBindVertexArray(0);
 }
 
 void GameScene::RenderModel(Entity *entity)
@@ -224,7 +359,31 @@ void GameScene::RenderModel(Entity *entity)
 	if(m_flags & AABB_MODE)
 		RenderAABB(entity, shader);
 }
+void GameScene::RenderSkybox()
+{	
+	GLuint shader = GetShader("skybox");
 
+	glDepthFunc(GL_LEQUAL);
+	glUseProgram(shader);
+
+	// ... Set view and projection matrix
+	glm::mat4 model = glm::translate(glm::mat4(1.0f), m_camera->GetPosition());
+	glm::mat4 view = glm::mat4(glm::mat3(m_camera->GetViewMat()));
+
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &view[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
+
+	glBindVertexArray(m_skyboxVAO);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, GetTextureID("skybox"));
+	glUniform1i(glGetUniformLocation(shader, "skybox"), 0);
+
+	glDrawArrays(GL_TRIANGLES, 0, 36);
+
+	glBindVertexArray(0);
+
+	glDepthFunc(GL_LESS);
+}
 void GameScene::RenderWorld()
 {
 	if (wire_frame)
@@ -232,7 +391,14 @@ void GameScene::RenderWorld()
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	m_voxelManager->RenderWorld(draw_textured, m_camera);
+	if (m_flags & RENDER_GROUND_MODE)
+	{
+		m_voxelManager->RenderWorld(draw_textured, m_camera);
+	}
+	else
+	{
+		m_voxelManager->RenderGrass(m_camera);
+	}
 }
 
 void GameScene::RenderEntities()
@@ -261,7 +427,7 @@ void GameScene::RenderRayCast()
 	GLuint shader = GetShader("ray");
 	glUseProgram(shader);
 
-	glBindVertexArray(m_vao);
+	glBindVertexArray(m_raycast_vao);
 
 	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
@@ -318,6 +484,12 @@ void GameScene::HandleInput(sf::Event event)
 			break;
 		case sf::Keyboard::U:
 			m_flags ^= AABB_MODE;
+			break;
+		case sf::Keyboard::H:
+			m_flags ^= RENDER_GROUND_MODE;
+			break;
+		case sf::Keyboard::G:
+			m_flags ^= RENDER_SKYBOX_MODE;
 			break;
 		case sf::Keyboard::Num1:
 			draw_textured = false;

@@ -10,7 +10,7 @@ uniform vec3 lightPos;
 uniform vec3 lightColor;
 uniform vec3 voxelColor;
 
-#define MAX_TEXTURES 3
+#define MAX_TEXTURES 100
 
 uniform sampler2D voxelTexture[MAX_TEXTURES];
 

@@ -13,6 +13,7 @@
 #define GRASS 0
 #define WATER 1
 #define SNOW 2
+#define DIRT 3
 
 enum OctreeNodeType
 {
@@ -104,6 +105,7 @@ public:
 	static void SortRenderList(glm::vec3 camera_pos);//closest chunks render first
 
 private:
+	int AddTerrainType(const OctreeDrawInfo *drawInfo);
 	void GenerateMeshFromOctree();
 	void GenerateVertexIndices();
 	void ContourCellProc();

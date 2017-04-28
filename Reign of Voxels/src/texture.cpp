@@ -97,3 +97,59 @@ GLuint LoadTexture(const char *filename, const char * filepath)
 
 	return LoadTexture(name.c_str());
 }
+
+GLuint LoadSkyBox(const char *filepath)
+{
+	const std::string faces[6] =
+	{
+		"right.jpg",
+		"left.jpg",
+		"top.jpg",
+		"bottom.jpg",
+		"back.jpg",
+		"front.jpg"
+	};
+
+	GLuint textureID;
+
+	//now generate texture with data
+	glGenTextures(1, &textureID);
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_CUBE_MAP, textureID);
+	//use GL_BGR because thats how bmp files store color
+	//give image to opengl
+
+	for (GLuint i = 0; i < 6; i++)
+	{
+		sf::Image *img_data = new sf::Image();
+		sf::Vector2u size;
+
+		if (!img_data->loadFromFile(filepath + faces[i]))
+		{
+			slog("Could not load image %s", filepath + faces[i]);
+			return 0;
+		}
+
+		size = img_data->getSize();
+
+		glTexImage2D(GL_TEXTURE_CUBE_MAP_POSITIVE_X + i, 0, GL_RGB, 
+						size.x, size.y, 0, GL_RGBA, 
+						GL_UNSIGNED_BYTE, img_data->getPixelsPtr());
+
+		delete img_data;
+	}
+
+
+	//trilinear filtering
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_S, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_T, GL_CLAMP_TO_EDGE);
+	glTexParameteri(GL_TEXTURE_CUBE_MAP, GL_TEXTURE_WRAP_R, GL_CLAMP_TO_EDGE);
+
+	//unbind texture
+	glBindTexture(GL_TEXTURE_CUBE_MAP, 0);
+
+
+	return textureID;	
+}

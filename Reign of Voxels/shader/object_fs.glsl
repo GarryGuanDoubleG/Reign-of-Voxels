@@ -3,8 +3,8 @@ out vec4 color;
 
 in vec2 UV;
 
-in vec3 vs_normal;
-in vec3 FragPos;
+//in vec3 vs_normal;
+//in vec3 FragPos;
 
 uniform vec3 viewPos;
 uniform vec3 lightPos; 
@@ -18,22 +18,25 @@ uniform vec4 colorMod;
 
 void main()
 {
-	//color = vec4((texture(texture_diffuse1, UV)) *lightColor);
-	vec3 lightDir = normalize(lightPos - FragPos); 
-	
-	float specularStrength = 0.69f;
-	vec3 norm = normalize(vs_normal);
-	vec3 viewDir = normalize(viewPos - FragPos);
-	vec3 reflectDir = reflect(-lightDir, norm);
-	float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
-	vec3 specular = specularStrength * spec * lightColor;
+	vec4 texColor = texture(texture_diffuse0, UV);
 
-	float diff = max(dot(norm, lightDir), 0.0);
-	vec3 diffuse = diff * lightColor;
+	////color = vec4((texture(texture_diffuse1, UV)) *lightColor);
+	//vec3 lightDir = normalize(lightPos - FragPos); 
 	
-	float ambientStrength = 0.1f;
-	vec3 ambient = ambientStrength * lightColor;
+	//float specularStrength = 0.69f;
+	//vec3 norm = normalize(vs_normal);
+	//vec3 viewDir = normalize(viewPos - FragPos);
+	//vec3 reflectDir = reflect(-lightDir, norm);
+	//float spec = pow(max(dot(viewDir, reflectDir), 0.0), 32);
+	//vec3 specular = specularStrength * spec * lightColor;
 
-    vec3 result = (specular + ambient + diffuse);
-	color = vec4(result, 1.0f) * colorMod;
+	//float diff = max(dot(norm, lightDir), 0.0);
+	//vec3 diffuse = diff * lightColor;
+	
+	//float ambientStrength = 0.1f;
+	//vec3 ambient = ambientStrength * lightColor;
+
+ //   vec3 result = (specular + ambient + diffuse);
+	//color = vec4(result, 1.0f) * texColor;
+	color =  texColor;
 }

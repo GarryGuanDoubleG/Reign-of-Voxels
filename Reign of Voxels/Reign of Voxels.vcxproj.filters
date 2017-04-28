@@ -326,5 +326,11 @@
     <None Include="shader\grass_fs.glsl">
       <Filter>Shaders</Filter>
     </None>
+    <None Include="shader\skybox_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\skybox_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

@@ -18,3 +18,5 @@ GLuint LoadTexture(aiTexture *texture);
 * @param filepath path to the texture directory
 */
 GLuint LoadTexture(const char *filename, const char * filepath);
+
+GLuint LoadSkyBox(const char *filepath);

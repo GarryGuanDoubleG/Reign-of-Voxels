@@ -11,7 +11,7 @@ std::mutex g_free_chunk_guard;
 VoxelManager::VoxelManager()
 {
 	//TODO load voxel world from json
-	m_resolution = 256;
+	m_resolution = 512;
 	
 	int worldSizeXZ = m_resolution * m_resolution;
 
@@ -32,7 +32,7 @@ VoxelManager::VoxelManager()
 	}
 
 	//Allocate space for Octree. 2^(3h + 1) - 1 nodes
-	int maxOctree = (int)log2(m_resolution) - 1;
+	int maxOctree = (int)log2(m_resolution) - 2;
 	maxOctree = (1 << (3 * maxOctree)); //2^3 times for 8 child nodes
 
 	m_maxOctNodes = maxOctree;
@@ -232,7 +232,7 @@ void VoxelManager::RenderVoxelTextured(Camera *player_cam)
 	GLuint grass = GetTextureID("grass");
 	GLuint water = GetTextureID("water");
 	GLuint snow = GetTextureID("snow");
-
+	GLuint dirt = GetTextureID("dirt");
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, grass);
@@ -243,11 +243,13 @@ void VoxelManager::RenderVoxelTextured(Camera *player_cam)
 	glActiveTexture(GL_TEXTURE0 + 2);
 	glBindTexture(GL_TEXTURE_2D, snow);
 
+	glActiveTexture(GL_TEXTURE0 + 3);
+	glBindTexture(GL_TEXTURE_2D, dirt);
+
 	glActiveTexture(GL_TEXTURE0);
 
-	GLint samplers[3] = { 0, 1, 2 };
-	int loc = glGetUniformLocation(voxel_shader, "voxelTexture");
-	glUniform1iv(glGetUniformLocation(voxel_shader, "voxelTexture"), 3, &samplers[0]);
+	GLint samplers[4] = { 0, 1, 2, 3};
+	glUniform1iv(glGetUniformLocation(voxel_shader, "voxelTexture"), 4, &samplers[0]);
 
 	m_octreeRoot->Draw();
 }

@@ -118,6 +118,8 @@
     <None Include="shader\ray.frag" />
     <None Include="shader\ray.vert" />
     <None Include="shader\shader.json" />
+    <None Include="shader\skybox_fs.glsl" />
+    <None Include="shader\skybox_vs.glsl" />
     <None Include="shader\ui.frag" />
     <None Include="shader\ui.vert" />
     <None Include="shader\voxelTex_fs.glsl" />

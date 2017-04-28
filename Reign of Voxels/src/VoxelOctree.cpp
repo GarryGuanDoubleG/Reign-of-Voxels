@@ -223,10 +223,6 @@ void VoxelOctree::GenerateVertexIndices()
 
 
 		m_drawInfo->index = g_terrainVertices.size();
-		if (m_drawInfo->averageNormal.y > .90f)
-		{
-			g_terrainGrassPos.push_back(m_drawInfo->position);
-		}
 		g_terrainVertices.push_back(VoxelVertex(m_drawInfo->position, m_drawInfo->averageNormal, m_drawInfo->type));
 	}
 
@@ -599,6 +595,27 @@ void VoxelOctree::InitChildren()
 }
 
 
+int VoxelOctree::AddTerrainType(const OctreeDrawInfo *drawInfo)
+{
+	GLint type = GRASS;
+	sf::Color terrainColor = GetPerlinColorValue(drawInfo->position.x, drawInfo->position.z);
+
+	if (terrainColor == sf::Color(224, 224, 0))
+	{
+		type = DIRT;
+		//flat area
+		if (drawInfo->averageNormal.y > .95f)
+		{
+			g_terrainGrassPos.push_back(drawInfo->position);
+		}
+	}
+	else if (terrainColor.b > 200)
+	{
+		type = WATER;
+	}
+
+	return type;
+}
 
 bool VoxelOctree::BuildLeafNode()
 {
@@ -675,23 +692,7 @@ bool VoxelOctree::BuildLeafNode()
 	drawInfo->averageNormal = glm::normalize(averageNormal / (float)edgeCount);
 	drawInfo->corners = corners;
 
-
-	GLint type = GRASS;
-	sf::Color terrainColor = GetPerlinColorValue(drawInfo->position.x, drawInfo->position.z);
-
-	if (terrainColor.r > 200)
-		type = SNOW;
-	else if (terrainColor.g > terrainColor.b)
-	{
-		type = GRASS;
-
-		//flat area
-
-	}
-	else if (terrainColor.b > terrainColor.g)
-		type = WATER;
-
-	drawInfo->type = type;
+	drawInfo->type = AddTerrainType(drawInfo);
 
 
 	m_type = Node_Leaf;

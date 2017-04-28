@@ -37,6 +37,12 @@
   "ray": {
     "vs": "shader/ray.vert",
     "fs": "shader/ray.frag"
+  },
+
+  "skybox": {
+    "vs": "shader/skybox_vs.glsl",
+    "fs": "shader/skybox_fs.glsl"
   }
+
 }
 

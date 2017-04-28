@@ -3,7 +3,9 @@
     "path": "Resources\\textures\\grass\\0206 060x2 gld01.png",
     "normal": "Resources\\textures\\grass\\grass_lush_daisies_01_N.png"
   },
-
+  "dirt": {
+    "path": "Resources\\textures\\dirt.png"
+  },
   "water": {
     "path": "Resources\\textures\\water2.png"
   },
@@ -11,6 +13,12 @@
     "path": "Resources\\textures\\snow.png"
   },
   "billboard_grass": {
-    "path":  "Resources\\textures\\billboard_grass.png"
+    "path": "Resources\\textures\\billboard_grass.png"
+  },
+  "skybox": {
+    "path": "Resources\\textures\\skybox\\"
+  },
+  "skybox1": {
+    "path": "Resources\\textures\\skybox\\front.jpg"
   }
 }

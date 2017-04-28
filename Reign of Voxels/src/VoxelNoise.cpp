@@ -53,7 +53,7 @@ std::string GenerateTerrainMap(int resolution)
 	renderer.AddGradientPoint(-0.5000, utils::Color(0, 255, 0, 255)); // shore
 	renderer.AddGradientPoint(0.0625, utils::Color(0, 255, 0, 255)); // sand
 	renderer.AddGradientPoint(0.250, utils::Color(0, 255, 0, 255)); // grass
-	renderer.AddGradientPoint(1.0000, utils::Color(255, 0, 0, 255)); // snow
+	renderer.AddGradientPoint(1.0000, utils::Color(224, 224, 0, 255)); // dirt
 
 	renderer.Render();
 

@@ -101,9 +101,17 @@ void ResourceManager::LoadTextures(Json &data)
 	for (Json::iterator it = data.begin(); it != data.end(); ++it)
 	{
 		Json obj = *it;
-		std::string path = obj["path"];
-		m_textures.insert(std::pair<std::string, GLuint>(it.key(), LoadTexture(path.c_str())));
 
+		std::string path = obj["path"];
+
+		if (it.key() == "skybox")
+		{
+			m_textures.insert(std::pair<std::string, GLuint>(it.key(), LoadSkyBox(path.c_str())));
+		}
+		else
+		{
+			m_textures.insert(std::pair<std::string, GLuint>(it.key(), LoadTexture(path.c_str())));
+		}
 		if (obj.find("normal") != obj.end())
 		{
 			std::string normal = obj["normal"];

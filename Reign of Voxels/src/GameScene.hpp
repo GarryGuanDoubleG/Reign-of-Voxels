@@ -17,6 +17,41 @@
 */
 class GameScene : public Scene
 {
+private:
+	sf::Uint16 m_flags;
+
+	ResourceManager *m_resrcMang;
+	//entites
+	Entity *m_entity_list;/**<object pool of entities. */
+	Entity *m_next_free_entity; /**<head of free list for entites*/
+	GLuint m_entity_count;
+
+	std::vector<Ray> m_rays;
+	GLuint m_raycast_vao,
+		m_raycast_vbo;
+
+	GLuint m_cubemapVAO, m_cubemapVBO;
+	GLuint m_skyboxVAO, m_skyboxVBO;
+
+	HUD * m_hud;/**<HUD handler class that managers hud inputs and rendering*/
+
+	VoxelManager * m_voxelManager; /**<Handles Voxel Generation, rendering, and interaction*/
+
+								   //main player camera
+	Camera *m_camera; /**<player camera*/
+
+					  //minimap
+	Camera *m_minimap_cam; /**<camera used to display minimap*/
+
+	glm::vec2 m_minimap_size;//size to display minimap
+	glm::vec2 m_minimap_scale;
+	glm::vec2 m_minimap_pos;
+
+	Model * m_model; // test model, get rid of it once entities work
+
+	bool wire_frame = false;
+	bool draw_textured = false;
+
 public:
 	/**
 	* constructor
@@ -44,6 +79,7 @@ private:
 
 	void InitRayVertex();
 	void InitMinimap();
+	void InitSkybox();
 
 	/**
 	*@brief Updates game world 
@@ -67,6 +103,7 @@ private:
 
 	void RenderEntities();
 	void RenderModel(Entity *entity);
+	void RenderSkybox();
 	void RenderAABB(Entity *entity, GLuint shader);
 	void RenderRayCast();
 
@@ -80,36 +117,4 @@ private:
 	*/
 	void CreateEntity();
 
-	/***********************MEMBER VARIABLES ****************************/
-
-	sf::Uint16 m_flags;
-
-	ResourceManager *m_resrcMang;
-	//entites
-	Entity *m_entity_list;/**<object pool of entities. */
-	Entity *m_next_free_entity; /**<head of free list for entites*/
-	GLuint m_entity_count;
-
-	std::vector<Ray> m_rays;
-	GLuint m_vao,
-		m_vbo;
-
-	HUD * m_hud;/**<HUD handler class that managers hud inputs and rendering*/
-	
-	VoxelManager * m_voxelManager; /**<Handles Voxel Generation, rendering, and interaction*/
-
-	//main player camera
-	Camera *m_camera; /**<player camera*/  
-	
-	//minimap
-	Camera *m_minimap_cam; /**<camera used to display minimap*/
-
-	glm::vec2 m_minimap_size;//size to display minimap
-	glm::vec2 m_minimap_scale;
-	glm::vec2 m_minimap_pos;
-
-	Model * m_model; // test model, get rid of it once entities work
-
-	bool wire_frame = false;
-	bool draw_textured = false;
 };
