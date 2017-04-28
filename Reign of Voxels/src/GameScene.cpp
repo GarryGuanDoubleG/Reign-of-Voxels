@@ -46,6 +46,9 @@ GameScene::GameScene()
 	//head of free list
 	m_next_free_entity = m_entity_list;
 
+
+	m_worldChanged = true;
+
 	Game::instance().getEventSystem().addObserver(this);
 }
 /**
@@ -451,18 +454,21 @@ void GameScene::RenderEntities()
 
 void GameScene::RenderMinimap()
 {	
-	glBindFramebuffer(GL_FRAMEBUFFER, m_minimapFBO);
-	GLfloat bg_color[] = { 0.3f, 0.3f, 0.3f, 0.3f };
+	if (m_worldChanged)
+	{
+		glBindFramebuffer(GL_FRAMEBUFFER, m_minimapFBO);
+		GLfloat bg_color[] = { 0.3f, 0.3f, 0.3f, 0.3f };
 
-	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-	glClearBufferfv(GL_COLOR, 0, bg_color);
+		glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+		glClearBufferfv(GL_COLOR, 0, bg_color);
 
+		m_voxelManager->RenderMinimap(m_minimapCam);
 
-	m_voxelManager->RenderWorld(draw_textured, m_minimapCam);
+		//rebind original
+		glBindFramebuffer(GL_FRAMEBUFFER, 0);
 
-	//rebind original
-	glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
+		m_worldChanged = false;
+	}
 
 	GLuint alphaTex = GetTextureID("minimap_alpha");
 	GLuint shader = GetShader("quad"); // draw quad
@@ -472,7 +478,6 @@ void GameScene::RenderMinimap()
 	glBindVertexArray(m_minimapVAO);
 
 	glUniform2fv(glGetUniformLocation(shader, "scale"), 1, &m_minimapScale[0]);
-
 	glUniform1i(glGetUniformLocation(shader, "screenTexture"), 0);
 	glUniform1i(glGetUniformLocation(shader, "alphaMask"), 1);
 
@@ -561,9 +566,11 @@ void GameScene::HandleInput(sf::Event event)
 			break;
 		case sf::Keyboard::Num1:
 			draw_textured = false;
+			m_worldChanged = true;
 			break;
 		case sf::Keyboard::Num2:
 			draw_textured = true;
+			m_worldChanged = true;
 			break;
 		default:
 			break;

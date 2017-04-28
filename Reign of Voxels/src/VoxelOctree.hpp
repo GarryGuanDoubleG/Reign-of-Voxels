@@ -96,6 +96,7 @@ public:
 	//create vertices for world
 	void GenerateMesh(int i, int length);
 	void GenerateWorldMesh();
+	VoxelOctree* SimplifyOctree(float threshold);
 
 	VoxelOctree * FindLeafNode(glm::vec3 pos);
 	VoxelChunk *  FindLeafChunk(glm::vec3 pos);

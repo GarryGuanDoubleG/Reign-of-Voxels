@@ -57,7 +57,7 @@ private:
 
 	bool wire_frame = false;
 	bool draw_textured = false;
-
+	bool m_worldChanged;
 
 public:
 	/**

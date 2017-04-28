@@ -48,13 +48,6 @@ public:
 	void InsertVoxelAtPos(int x, int y, int z);
 
 	void Render();
-	void RenderMinimap();
-
-	sf::Uint8 GetVoxel(glm::ivec3 local_pos);
-
-
-	std::vector<Vertex> m_vertices;
-	std::vector<Vertex> m_top_verts;
 
 	VoxelChunk * m_next;
 
@@ -66,29 +59,21 @@ public:
 	}
 private:
 	void AddTrianglesIndices();
-	void AddMinimapIndices();
 
 	int GetIndex(int x, int y, int z);
 
 	std::vector<GLuint> m_tri_indices;//order to draw vertices
-	std::vector<GLuint> m_mp_indices;//indices for minimap
-
+	std::vector<VoxelVertex> m_vertices;
+	
 	int m_indices_count; /**< number of indices for world */
-	int m_mp_indices_count; /**< number of indices for minimap */
 
 	GLuint	m_vao, 
 			m_vbo, 
 			m_ebo;
 
-	//minimap
-	GLuint m_mp_vao,
-		m_mp_vbo,
-		m_mp_ebo;
-
 	glm::vec3 m_position;
 
 	sf::Uint8 m_flag;//bool for active
-	sf::Uint8 m_voxels[CHUNK_SIZE_CUBED];
 
 	VoxelChunk *m_neighbor[6];
 };

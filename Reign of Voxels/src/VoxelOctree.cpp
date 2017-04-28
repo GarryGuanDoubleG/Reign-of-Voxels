@@ -117,17 +117,12 @@ void VoxelOctree::InitNode(glm::ivec3 minPos, int size)
 
 void VoxelOctree::DestroyNode()
 {
+	if (!this)
+	{
+		return;
+	}
+
 	m_flag = 0;
-
-	//for (int i = 0; i < 8; i++)
-	//{
-	//	if (m_children[i])
-	//	{
-	//		m_children[i]->DestroyNode();
-	//	}
-
-	//	m_children[i] = NULL;
-	//}
 
 	voxelManager->destroyOctreeNode(this);
 
@@ -199,6 +194,11 @@ void VoxelOctree::GenerateMeshFromOctree()
 
 void VoxelOctree::GenerateVertexIndices()
 {
+	if (!this)
+	{
+		return;
+	}
+
 	if (~m_flag & OCTREE_ACTIVE)
 		return;
 
@@ -463,6 +463,123 @@ void VoxelOctree::ContourCellProc()
 	}
 }
 
+VoxelOctree * VoxelOctree::SimplifyOctree(float threshold)
+{
+	if (!this)
+	{
+		return NULL;
+	}
+
+	if (m_type != Node_Internal)
+	{
+		// can't simplify!
+		return this;
+	}
+
+	svd::QefSolver qef;
+	int signs[8] = { -1, -1, -1, -1, -1, -1, -1, -1 };
+	int midsign = -1;
+	int edgeCount = 0;
+	bool isCollapsible = true;
+
+	for (int i = 0; i < 8; i++)
+	{
+		m_children[i] = m_children[i] ->SimplifyOctree(threshold);
+		
+		if (m_children[i])
+		{
+			VoxelOctree* child = m_children[i];
+
+			if (child->m_type == Node_Internal)
+			{
+				isCollapsible = false;
+			}
+			else
+			{
+				qef.add(child->m_drawInfo->qef);
+
+				midsign = (child->m_drawInfo->corners >> (7 - i)) & 1;
+				signs[i] = (child->m_drawInfo->corners >> i) & 1;
+
+				edgeCount++;
+			}
+		}
+	}
+
+	if (!isCollapsible)
+	{
+		// at least one child is an internal node, can't collapse
+		return this;
+	}
+
+	svd::Vec3 qefPosition;
+	qef.solve(qefPosition, QEF_ERROR, QEF_SWEEPS, QEF_ERROR);
+	float error = qef.getError();
+
+	// convert to glm vec3 for ease of use
+	glm::vec3 position(qefPosition.x, qefPosition.y, qefPosition.z);
+
+	// at this point the masspoint will actually be a sum, so divide to make it the average
+	if (error > threshold)
+	{
+		// this collapse breaches the threshold
+		return this;
+	}
+
+	if (position.x < m_min.x || position.x >(m_min.x + m_size) ||
+		position.y < m_min.y || position.y >(m_min.y + m_size) ||
+		position.z < m_min.z || position.z >(m_min.z + m_size))
+	{
+		const auto& mp = qef.getMassPoint();
+		position = glm::vec3(mp.x, mp.y, mp.z);
+	}
+
+	// change the node from an internal node to a 'psuedo leaf' node
+	OctreeDrawInfo* drawInfo = new OctreeDrawInfo;
+
+	for (int i = 0; i < 8; i++)
+	{
+		if (signs[i] == -1)
+		{
+			// Undetermined, use centre sign instead
+			drawInfo->corners |= (midsign << i);
+		}
+		else
+		{
+			drawInfo->corners |= (signs[i] << i);
+		}
+	}
+
+	drawInfo->averageNormal = glm::vec3(0.f);
+
+	for (int i = 0; i < 8; i++)
+	{
+		if (m_children[i])
+		{
+			
+			if (m_children[i]->m_type == Node_Psuedo ||
+				m_children[i]->m_type == Node_Leaf)
+			{
+				drawInfo->averageNormal += m_children[i]->m_drawInfo->averageNormal;
+			}
+
+		}
+	}
+
+	drawInfo->averageNormal = glm::normalize(drawInfo->averageNormal);
+	drawInfo->position = position;
+	drawInfo->qef = qef.getData();
+
+	for (int i = 0; i < 8; i++)
+	{
+		m_children[i]->DestroyNode();
+		m_children[i] = nullptr;
+	}
+
+	m_type = Node_Psuedo;
+	m_drawInfo = drawInfo;
+}
+
 
 void VoxelOctree::UploadMesh()
 {
@@ -547,9 +664,6 @@ void VoxelOctree::UploadGrass()
 }
 
 
-
-
-
 void VoxelOctree::SortRenderList(glm::vec3 camera_pos)
 {
 	//update chunk's dist to cam
@@ -569,6 +683,7 @@ void VoxelOctree::InitOctree(int worldSize, VoxelManager *manager)
 	sf::Clock build_time; //profiling
 
 	this->BuildTree();
+	this->SimplifyOctree(-0.5f);
 	this->GenerateMeshFromOctree();
 	this->UploadMesh();
 	this->UploadGrass();
@@ -743,8 +858,6 @@ bool VoxelOctree::BuildTree()
 	}
 	return m_childMask;
 }
-
-
 
 void VoxelOctree::AssignNeighbors()
 {

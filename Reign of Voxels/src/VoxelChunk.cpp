@@ -66,15 +66,6 @@ void VoxelChunk::InsertVoxelAtPos(int x, int y, int z)
 	}
 }
 
-void VoxelChunk::AddMinimapIndices()
-{
-	m_mp_indices.push_back(m_top_verts.size() - 4);
-	m_mp_indices.push_back(m_top_verts.size() - 3);
-	m_mp_indices.push_back(m_top_verts.size() - 2);
-	m_mp_indices.push_back(m_top_verts.size() - 4);
-	m_mp_indices.push_back(m_top_verts.size() - 2);
-	m_mp_indices.push_back(m_top_verts.size() - 1);
-}
 
 void VoxelChunk::AddTrianglesIndices()
 {

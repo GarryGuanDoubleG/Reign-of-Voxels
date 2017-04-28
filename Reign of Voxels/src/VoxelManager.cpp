@@ -135,6 +135,45 @@ void VoxelManager::RenderWorld(bool draw_textured, Camera * player_cam)
 	RenderGrass(player_cam);
 }
 
+void VoxelManager::RenderMinimap(Camera * player_cam)
+{
+	GLuint voxel_shader = GetShader("minimap");
+
+	glUseProgram(voxel_shader);
+
+	glm::mat4 model(1.0f);
+
+	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "model"), 1, GL_FALSE, &model[0][0]);
+
+	// And finally bind the texture
+	//textures
+	GLuint grass = GetTextureID("grass");
+	GLuint water = GetTextureID("water");
+	GLuint snow = GetTextureID("snow");
+	GLuint dirt = GetTextureID("dirt");
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, grass);
+
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, water);
+
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, snow);
+
+	glActiveTexture(GL_TEXTURE0 + 3);
+	glBindTexture(GL_TEXTURE_2D, dirt);
+
+	glActiveTexture(GL_TEXTURE0);
+
+	GLint samplers[4] = { 0, 1, 2, 3 };
+	glUniform1iv(glGetUniformLocation(voxel_shader, "voxelTexture"), 4, &samplers[0]);
+
+	m_octreeRoot->Draw();
+}
+
 void VoxelManager::RenderGrass(Camera * player_cam)
 {
 	GLuint shader = GetShader("grass");
@@ -258,29 +297,6 @@ void VoxelManager::RenderVoxelTextured(Camera *player_cam)
 	glUniform1iv(glGetUniformLocation(voxel_shader, "voxelTexture"), 4, &samplers[0]);
 
 	m_octreeRoot->Draw();
-}
-
-void VoxelManager::RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &position)
-{
-	GLuint model_loc = glGetUniformLocation(shader, "model");
-
-	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
-	{
-		glm::mat4 model = glm::mat4(1.0f);
-		
-		//scale down to minimap size
-		model = glm::scale(model, glm::vec3(scale.x, 1.0f, scale.y));
-
-		//translate voxels to world position
-		model = glm::translate(model, VoxelOctree::render_list[i]->getPosition());
-
-		//translate again to minimap position
-		model = glm::translate(model, glm::vec3(position.x, 0.0f, position.y));		
-
-		glUniformMatrix4fv(model_loc, 1, GL_FALSE, glm::value_ptr(model));		
-
-		VoxelOctree::render_list[i]->RenderMinimap();
-	}
 }
 
 bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)

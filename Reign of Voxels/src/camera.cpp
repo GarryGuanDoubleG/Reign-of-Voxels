@@ -402,13 +402,11 @@ void Camera::HandleInput(sf::Event event)
 	{
 		m_pos += (float)event.mouseWheel.delta * m_forward * cam_speed;
 		UpdateFrustum();
-		slog("Yaw %5f\nPtich %5f\nRoll %5f\n", m_yaw, m_pitch, m_roll);
 	}
 	
 	//TODO remove after testing
 	else if (event.type == sf::Event::MouseMoved && Game::instance().m_lock_mouse)
 	{
-		slog("Yaw %5f\nPtich %5f\nRoll %5f\n", m_yaw, m_pitch, m_roll);
 		GLfloat sensitivity = 0.05f; // mouse sensitivity
 		sf::Vector2i mouse_pos = sf::Mouse::getPosition(*Game::instance().getWindow());
 		sf::Vector2i center(Game::screen_width / 2, Game::screen_height / 2);
