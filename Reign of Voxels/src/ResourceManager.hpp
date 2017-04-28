@@ -25,9 +25,7 @@ public:
 	void LoadConfig();
 	void LoadResources();
 
-	int GetScreenWidth();
-	int GetScreenHeight();
-	int GetWorldResolution();
+	int GetConfigSetting(std::string key);
 
 	//getters
 	GLint GetModelID(std::string name);
@@ -45,6 +43,7 @@ private:
 	
 	std::map<std::string, GLuint> m_textures;
 	std::map<std::string, GLuint> m_normalMaps;
+	std::map<std::string, GLuint> m_configSettings;
 	size_t m_totalMemory;
 };
 
@@ -53,4 +52,4 @@ GLuint GetNormalMapID(std::string name);
 GLint GetModelID(std::string name);
 Model * GetModel(GLint id);
 
-int GetWorldResolution();
+int GetConfigSetting(std::string key);

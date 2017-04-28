@@ -73,9 +73,10 @@ void ResourceManager::LoadConfig()
 	{
 		in >> data;
 		
-		m_screen_width = data["screen_width"];
-		m_screen_height = data["screen_height"];
-		m_worldSize = data["resolution"];
+		for (Json::iterator it = data.begin(); it != data.end(); ++it)
+		{
+			m_configSettings.insert(std::pair<std::string, int>(it.key(), it.value()));
+		}
 
 		in.close();
 	}
@@ -139,6 +140,13 @@ void ResourceManager::LoadTextures(Json &data)
 	}
 }
 
+void ResourceManager::LoadFonts(Json &data)
+{
+
+}
+
+
+
 GLint ResourceManager::GetModelID(std::string name)
 {
 	return m_model_keys[name];
@@ -161,12 +169,6 @@ GLuint ResourceManager::GetNormalMapID(std::string name)
 	return m_normalMaps[name];
 }
 
-
-void ResourceManager::LoadFonts(Json &data)
-{
-
-}
-
 GLuint GetTextureID(std::string name)
 {
 	return g_resourceManager->GetTextureID(name);
@@ -186,20 +188,13 @@ Model * GetModel(GLint id)
 }
 
 
-int ResourceManager::GetScreenWidth()
+int ResourceManager::GetConfigSetting(std::string key)
 {
-	return m_screen_width;
-}
-int ResourceManager::GetScreenHeight()
-{
-	return m_screen_height;
-}
-int ResourceManager::GetWorldResolution()
-{
-	return m_worldSize;
+	std::cout << "key: " << key << " value: " << m_configSettings[key] << std::endl;
+	return m_configSettings[key];
 }
 
-int GetWorldResolution()
+int GetConfigSetting(std::string key)
 {
-	return g_resourceManager->GetWorldResolution();
+	return g_resourceManager->GetConfigSetting(key);
 }

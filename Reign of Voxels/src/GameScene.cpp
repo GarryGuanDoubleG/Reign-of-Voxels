@@ -29,7 +29,7 @@ GameScene::GameScene()
 	m_camera->SetToPersp();
 
 	//Generate vertice and types for voxels
-	m_voxelManager = new VoxelManager(GetWorldResolution());
+	m_voxelManager = new VoxelManager(GetConfigSetting("resolution"));
 	m_voxelManager->GenerateVoxels();
 
 	InitMinimap();
@@ -92,10 +92,13 @@ void GameScene::InitMinimap()
 		1.0f,  1.0f,  1.0f, 1.0f
 	};
 
-	m_minimapCam = new Camera(glm::vec3(128, 256, 128), glm::vec3(127.5, 0, 127.5));
-	m_minimapCam->SetToOrtho(glm::ortho(128.0f, -128.0f, 128.0f, -128.0f, 0.1f, 1000.0f));
+	float minimap_size = GetConfigSetting("minimap_size");
+	float worldSize = GetConfigSetting("resolution");
 
-	m_minimapScale = glm::vec2(256.0f / (float) Game::screen_width, 256.0f / (float) Game::screen_height);
+	m_minimapCam = new Camera(glm::vec3(worldSize / 2, 256, worldSize / 2), glm::vec3(127.5, 0, 127.5));
+	m_minimapCam->SetToOrtho(glm::ortho(worldSize / 2.0f, -worldSize / 2.0f, worldSize / 2.0f, -worldSize / 2.0f, 0.1f, 1000.0f));
+
+	m_minimapScale = glm::vec2(minimap_size / (float) Game::screen_width, minimap_size / (float) Game::screen_height);
 	//bind quad vertices
 	glGenVertexArrays(1, &m_minimapVAO);
 	glBindVertexArray(m_minimapVAO);

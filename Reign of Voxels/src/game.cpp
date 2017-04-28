@@ -31,8 +31,6 @@ Game::~Game()
 	delete m_sceneManager;
 	delete m_client;
 	delete m_eventSystem;
-
-	
 }
 /*
 * @brief Initializes sfml window and glew
@@ -52,8 +50,8 @@ void Game::GraphicsInit()
 	m_resourceManager = new ResourceManager();
 	m_resourceManager->LoadConfig();
 
-	screen_width = m_resourceManager->GetScreenWidth();
-	screen_height = m_resourceManager->GetScreenHeight();
+	screen_width = m_resourceManager->GetConfigSetting("screen_width");
+	screen_height = m_resourceManager->GetConfigSetting("screen_height");
 
 	//Create context
 	m_window = new sf::RenderWindow(sf::VideoMode(Game::screen_width, Game::screen_height), "Reign of Voxels", sf::Style::Default, settings);
@@ -109,9 +107,6 @@ void Game::GameClose()
 	m_instance.getEventSystem().Notify(Event::Close, event);
 
 	delete m_resourceManager;
-	delete m_eventSystem;
-	delete m_client;
-	delete m_sceneManager;
 
 	exit(0);
 }
