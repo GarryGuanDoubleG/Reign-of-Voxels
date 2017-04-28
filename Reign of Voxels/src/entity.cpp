@@ -63,7 +63,7 @@ void Entity::Update()
 		}
 	}
 
-	m_thinkTimer += Game::g_delta_clock.getElapsedTime().asSeconds();
+	m_thinkTimer += Game::g_delta_time;
 
 	if (m_thinkTimer >= m_nextThink)
 	{

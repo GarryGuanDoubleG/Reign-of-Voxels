@@ -19,6 +19,7 @@ VoxelManager * VoxelOctree::voxelManager;
 
 std::vector<VoxelVertex> g_terrainVertices;
 std::vector<int> g_terrainIndices;
+std::vector<glm::vec3> g_terrainGrassPos;
 
 const int MATERIAL_AIR = 0;
 const int MATERIAL_SOLID = 1;
@@ -26,7 +27,9 @@ const int MATERIAL_SOLID = 1;
 const float QEF_ERROR = 1e-6f;
 const int QEF_SWEEPS = 4;
 
-GLuint m_vao, m_vbo, m_ebo;
+//terrain
+static GLuint g_terrainVAO, g_terrainVBO, g_terrainEBO;
+static GLuint g_grassVAO, g_grassQuadVBO, g_grassPosVBO;
 
 // ----------------------------------------------------------------------------
 
@@ -99,8 +102,11 @@ VoxelOctree::VoxelOctree()
 void VoxelOctree::InitNode(glm::ivec3 minPos, int size)
 {
 	if (m_flag & OCTREE_INUSE)
+	{
 		std::cout << "Already using node ?" << std::endl;
-	m_flag |= OCTREE_INUSE;
+	}
+
+	m_flag = OCTREE_INUSE;
 
 	m_childMask = 0;
 	m_min = minPos;
@@ -112,52 +118,27 @@ void VoxelOctree::InitNode(glm::ivec3 minPos, int size)
 void VoxelOctree::DestroyNode()
 {
 	m_flag = 0;
+
+	//for (int i = 0; i < 8; i++)
+	//{
+	//	if (m_children[i])
+	//	{
+	//		m_children[i]->DestroyNode();
+	//	}
+
+	//	m_children[i] = NULL;
+	//}
+
+	voxelManager->destroyOctreeNode(this);
+
 	if (m_chunk)
-		m_chunk->Destroy();
-
-}
-
-void VoxelOctree::SortRenderList(glm::vec3 camera_pos)
-{
-	//update chunk's dist to cam
-	int threads = 8;
-
-	for (int i = 0; i < render_list.size(); i++)
-		render_list[i]->distToCam = glm::distance(camera_pos, render_list[i]->getPosition());
-
-	//sort by distance
-	std::sort(render_list.begin(), render_list.end());
-}
-
-void VoxelOctree::InitOctree(int worldSize, VoxelManager *manager)
-{
-	voxelManager = manager;
-
-	sf::Clock build_time; //profiling
-
-	this->BuildTree();
-	this->GenerateMeshFromOctree();
-	this->UploadMesh();
-
-	std::cout << "Build time is " << build_time.getElapsedTime().asSeconds() << std::endl;
-}
-
-void VoxelOctree::InitChildren()
-{
-	int childSize = m_size / 2;
-
-	if (m_size == 1)
-		return;
-
-	for(int i = 0; i < 8; i ++)
 	{
-		VoxelOctree * child;
-		glm::ivec3 childMinPos = m_min + CHILD_MIN_OFFSETS[i] * childSize;
-
-		child = voxelManager->createOctreeChild(this, i, childMinPos, childSize);
+		m_chunk->Destroy();
+		voxelManager->destroyChunk(m_chunk);
 	}
 }
 
+/***dual contouring ***/
 glm::vec3 ApproximateZeroCrossingPosition(const glm::vec3& p0, const glm::vec3& p1)
 {
 	// approximate the zero crossing by finding the min value along the edge
@@ -182,232 +163,11 @@ glm::vec3 ApproximateZeroCrossingPosition(const glm::vec3& p0, const glm::vec3& 
 	return p0 + ((p1 - p0) * t);
 }
 
-
-bool VoxelOctree::BuildLeafNode()
-{
-	int corners = 0;
-
-	for (int i = 0; i < 8; i++)
-	{
-		glm::ivec3 cornerPos = m_min + CHILD_MIN_OFFSETS[i];
-		const float density = Density_Func(glm::vec3(cornerPos));
-		const int material = density < 0.f ? MATERIAL_SOLID : MATERIAL_AIR;
-		corners |= (material << i);
-	}
-
-	if (corners == 0 || corners == 255)
-	{
-		// voxel is full inside or outside the volume
-		//m_type = Node_Leaf;
-		m_flag &= ~(OCTREE_ACTIVE);
-
-		return false;
-	}
-
-	//build leaf node if node contains isosurface
-	const int MAX_CROSSINGS = 6;
-	int edgeCount = 0;
-	glm::vec3 averageNormal(0.f);
-	svd::QefSolver qef;
-
-	for (int i = 0; i < 12 && edgeCount < MAX_CROSSINGS; i++)
-	{
-		const int c1 = edgevmap[i][0];
-		const int c2 = edgevmap[i][1];
-
-		const int m1 = (corners >> c1) & 1;
-		const int m2 = (corners >> c2) & 1;
-
-		if ((m1 == MATERIAL_AIR && m2 == MATERIAL_AIR) ||
-			(m1 == MATERIAL_SOLID && m2 == MATERIAL_SOLID))
-		{
-			continue; //no change in sign density
-		}
-
-		const glm::vec3 p1 = glm::vec3(m_min + CHILD_MIN_OFFSETS[c1]);
-		const glm::vec3 p2 = glm::vec3(m_min + CHILD_MIN_OFFSETS[c2]);
-
-		const glm::vec3 p = ApproximateZeroCrossingPosition(p1, p2);
-		const glm::vec3 n = CalculateSurfaceNormal(p);
-		
-		qef.add(p.x, p.y, p.z, n.x, n.y, n.z);
-
-		averageNormal += n;
-
-		edgeCount++;
-	}
-
-	svd::Vec3 qefPosition;
-	qef.solve(qefPosition, QEF_ERROR, QEF_SWEEPS, QEF_ERROR);
-
-	OctreeDrawInfo* drawInfo = new OctreeDrawInfo;
-	drawInfo->position = glm::vec3(qefPosition.x, qefPosition.y, qefPosition.z);
-	drawInfo->qef = qef.getData();
-
-	const glm::vec3 min = glm::vec3(m_min);
-	const glm::vec3 max = glm::vec3(m_min + glm::ivec3(m_size));
-
-	if (drawInfo->position.x < min.x || drawInfo->position.x > max.x ||
-		drawInfo->position.y < min.y || drawInfo->position.y > max.y ||
-		drawInfo->position.z < min.z || drawInfo->position.z > max.z)
-	{
-		const auto& mp = qef.getMassPoint();
-		drawInfo->position = glm::vec3(mp.x, mp.y, mp.z);
-	}
-
-	drawInfo->averageNormal = glm::normalize(averageNormal / (float)edgeCount);
-	drawInfo->corners = corners;
-
-	GLint type = GRASS;
-	sf::Color terrainColor = GetPerlinColorValue(drawInfo->position.x, drawInfo->position.z);
-
-	if (terrainColor.r > 200)
-		type = SNOW;
-	else if (terrainColor.g > terrainColor.b)
-		type = GRASS;
-	else if (terrainColor.b > terrainColor.g)
-		type = WATER;
-
-	drawInfo->type = type;
-
-
-	m_type = Node_Leaf;
-	m_drawInfo = drawInfo;
-
-	m_flag |= OCTREE_ACTIVE;
-	m_flag |= OCTREE_LEAF;
-
-	return true;
-}
-
-bool VoxelOctree::BuildTree()
-{
-	bool active = false;
-
-	int i = 0;
-	
-	//base case
-	//region matches chunk size
-	if (m_size == 1)
-	{
-		return BuildLeafNode();
-	}
-	else
-	{
-		m_type = Node_Internal;
-	}
-	//activate 8 children
-	InitChildren();
-
-	//recursively descend tree to find the active nodes
-	for (int i = 0; i < 8; i++)
-	{
-		VoxelOctree *child = voxelManager->getOctreeChild(this, i);
-
-		//skip nodes above the max world height
-		if (child->m_min.y <= (VoxelOctree::maxHeight << 1)
-			 && child->BuildTree())
-		{
-			m_childMask |= 1 << i;
-			m_flag |= OCTREE_ACTIVE;//if at least one child is active, then active
-		}
-		else
-		{
-			m_childMask &= ~(1 << i);
-			child->m_flag &= ~(OCTREE_ACTIVE);
-		}
-	}
-
-	return m_childMask;
-}
-
-void VoxelOctree::AssignNeighbors()
-{
-	for (int i = 0; i < render_list.size(); i++)
-	{
-		glm::vec3 position = render_list[i]->getPosition();
-		
-		//find chunk above and below
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, VoxelChunk::CHUNK_SIZE, 0)), (int)TOP);
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, -VoxelChunk::CHUNK_SIZE, 0)), (int)BOTTOM);	
-
-		//assign left and right chunks
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(-VoxelChunk::CHUNK_SIZE, 0, 0)), (int)LEFT);	
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(VoxelChunk::CHUNK_SIZE, 0, 0)), (int)RIGHT);
-
-		//back and front
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, 0, -VoxelChunk::CHUNK_SIZE)), (int)BACK);
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, 0, VoxelChunk::CHUNK_SIZE)), (int)FRONT);
-	}
-}
-
-VoxelChunk * VoxelOctree::FindLeafChunk(glm::vec3 pos)
-{
-	VoxelOctree * node = FindLeafNode(pos);
-	return node ? node->m_chunk : NULL;
-}
-
-VoxelOctree * VoxelOctree::FindLeafNode(glm::vec3 pos)
-{
-	//check if position is within world bounds
-	if (pos.x < 0 || pos.y < 0 || pos.z < 0 || 
-		pos.x >= voxelManager->GetWorldSize() || 
-		pos.y >= voxelManager->GetWorldSize() || 
-		pos.z >= voxelManager->GetWorldSize())
-	{
-		return NULL;
-	}
-
-	//iteratively find chunk that contains start position
-	VoxelOctree *node = voxelManager->getRootNode();
-
-	//traverse tree, find chunk
-	bool found = false;
-
-	while (!found)
-	{
-		int index = 0;
-
-		//check which child the next node is in 
-		int child_size = node->m_size >> 1;
-
-		//octal search
-		int x = pos.x >= node->m_min.x && pos.x < node->m_min.x + child_size ? 0 : 1;
-		int y = pos.y >= node->m_min.y && pos.y < node->m_min.y + child_size ? 0 : 1;
-		int z = pos.z >= node->m_min.z && pos.z < node->m_min.z + child_size ? 0 : 1;
-
-		//calculate index 
-		index = 4 * x + 2 * y + z;
-
-		node = voxelManager->getOctreeChild(node, index);
-
-		if (!node || ~node->m_flag & OCTREE_ACTIVE)
-			return NULL;
-
-		if (node->m_flag & OCTREE_LEAF)
-			found = true;
-	}
-
-	return node;
-}
-
-void VoxelOctree::GenerateMesh(int portion, int portion_len)
-{
-	sf::Clock timer;
-
-	for (int j = portion * portion_len; j < portion * portion_len + portion_len; j++)
-	{
-		if (j < render_list.size())
-			render_list[j]->GenerateMesh();
-	}
-}
-
 void VoxelOctree::GenerateWorldMesh()
 {
 	GenerateVertexIndices();
 	ContourCellProc();
 }
-
 
 glm::vec3 VoxelOctree::CalculateSurfaceNormal(const glm::vec3 &pos)
 {
@@ -431,7 +191,7 @@ glm::vec3 VoxelOctree::CalculateSurfaceNormal(const glm::vec3 &pos)
 void VoxelOctree::GenerateMeshFromOctree()
 {
 	g_terrainIndices.clear();
-	g_terrainIndices.clear();
+	g_terrainVertices.clear();
 
 	GenerateVertexIndices();
 	ContourCellProc();
@@ -446,12 +206,14 @@ void VoxelOctree::GenerateVertexIndices()
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			VoxelOctree *node = voxelManager->getOctreeChild(this, i);
-			node->GenerateVertexIndices();
+			if (m_childMask & 1 << i)
+			{
+				m_children[i]->GenerateVertexIndices();
+			}
 		}
 	}
 
-	if (m_type != Node_Internal)	
+	if (m_type != Node_Internal)
 	{
 		if (!m_drawInfo)
 		{
@@ -461,6 +223,10 @@ void VoxelOctree::GenerateVertexIndices()
 
 
 		m_drawInfo->index = g_terrainVertices.size();
+		if (m_drawInfo->averageNormal.y > .90f)
+		{
+			g_terrainGrassPos.push_back(m_drawInfo->position);
+		}
 		g_terrainVertices.push_back(VoxelVertex(m_drawInfo->position, m_drawInfo->averageNormal, m_drawInfo->type));
 	}
 
@@ -523,10 +289,14 @@ void VoxelOctree::ContourProcessEdge(VoxelOctree* node[4], int dir)
 	}
 }
 
-// ----------------------------------------------------------------------------
+//----------------------------------------------------------------------------
 
 void VoxelOctree::ContourEdgeProc(VoxelOctree* node[4], int dir)
 {
+	if (!node[0] || !node[1] || !node[2] || !node[3])
+	{
+		return;
+	}
 	if ((~node[0]->m_flag & OCTREE_ACTIVE) || (~node[1]->m_flag & OCTREE_ACTIVE)
 		|| (~node[2]->m_flag & OCTREE_ACTIVE) || (~node[3]->m_flag & OCTREE_ACTIVE))
 	{
@@ -562,7 +332,7 @@ void VoxelOctree::ContourEdgeProc(VoxelOctree* node[4], int dir)
 				}
 				else
 				{
-					edgeNodes[j] = voxelManager->getOctreeChild(node[j], c[j]);
+					edgeNodes[j] = node[j]->m_children[c[j]];
 				}
 			}
 
@@ -575,6 +345,10 @@ void VoxelOctree::ContourEdgeProc(VoxelOctree* node[4], int dir)
 
 void VoxelOctree::ContourFaceProc(VoxelOctree* node[2], int dir)
 {
+	if (!node[0] || !node[1])
+	{
+		return;
+	}
 	if ((~node[0]->m_flag & OCTREE_ACTIVE) || (~node[1]->m_flag & OCTREE_ACTIVE))
 	{
 		return;
@@ -600,7 +374,7 @@ void VoxelOctree::ContourFaceProc(VoxelOctree* node[2], int dir)
 				}
 				else
 				{
-					faceNodes[j] = voxelManager->getOctreeChild(node[j], c[j]);
+					faceNodes[j] = node[j]->m_children[c[j]];
 				}
 			}
 
@@ -633,8 +407,7 @@ void VoxelOctree::ContourFaceProc(VoxelOctree* node[2], int dir)
 				}
 				else
 				{
-					edgeNodes[j] = voxelManager->getOctreeChild(node[order[j]], c[j]);
-					//edgeNodes[j] = node[order[j]]->children[c[j]];
+					edgeNodes[j] = node[order[j]]->m_children[c[j]];
 				}
 			}
 
@@ -655,8 +428,10 @@ void VoxelOctree::ContourCellProc()
 	{
 		for (int i = 0; i < 8; i++)
 		{
-			VoxelOctree * child = voxelManager->getOctreeChild(this, i);
-			child->ContourCellProc();
+			if (m_children[i] && m_children[i]->m_flag & OCTREE_ACTIVE)
+			{
+				m_children[i]->ContourCellProc();
+			}
 		}
 
 		for (int i = 0; i < 12; i++)
@@ -665,8 +440,8 @@ void VoxelOctree::ContourCellProc()
 			const int c[2] = { cellProcFaceMask[i][0], cellProcFaceMask[i][1] };
 
 
-			faceNodes[0] = voxelManager->getOctreeChild(this, c[0]);
-			faceNodes[1] = voxelManager->getOctreeChild(this, c[1]);
+			faceNodes[0] = m_children[c[0]];
+			faceNodes[1] = m_children[c[1]];
 
 			ContourFaceProc(faceNodes, cellProcFaceMask[i][2]);
 		}
@@ -684,7 +459,7 @@ void VoxelOctree::ContourCellProc()
 
 			for (int j = 0; j < 4; j++)
 			{
-				edgeNodes[j] = voxelManager->getOctreeChild(this, c[j]);
+				edgeNodes[j] = m_children[c[j]];
 			}
 
 			ContourEdgeProc(edgeNodes, cellProcEdgeMask[i][4]);
@@ -698,15 +473,15 @@ void VoxelOctree::UploadMesh()
 	if (g_terrainIndices.empty() || g_terrainVertices.empty())
 		return;
 
-	glGenVertexArrays(1, &m_vao);
-	glBindVertexArray(m_vao);
+	glGenVertexArrays(1, &g_terrainVAO);
+	glBindVertexArray(g_terrainVAO);
 
-	glGenBuffers(1, &m_vbo);
-	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
+	glGenBuffers(1, &g_terrainVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, g_terrainVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(VoxelVertex) * g_terrainVertices.size(), &g_terrainVertices[0], GL_STATIC_DRAW);
 
-	glGenBuffers(1, &m_ebo);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
+	glGenBuffers(1, &g_terrainEBO);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_terrainEBO);
 	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * g_terrainIndices.size(), &g_terrainIndices[0], GL_STATIC_DRAW);
 
 	//location 0 should be verts
@@ -718,7 +493,7 @@ void VoxelOctree::UploadMesh()
 
 	glEnableVertexAttribArray(2);
 	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, textureID));
-	
+
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -727,9 +502,329 @@ void VoxelOctree::UploadMesh()
 	printf("Mesh: %d vertices %d triangles\n", g_terrainVertices.size(), g_terrainIndices.size() / 3);
 }
 
+void VoxelOctree::UploadGrass()
+{
+
+	const GLfloat g_grassVerts[] = {
+		// Positions				// uv
+		-0.50f,  0.50f,  0.0f,	1.0f, 0.0f,
+		0.50f, -0.50f,  0.0f,	0.0f, 1.0f,
+		-0.50f, -0.50f,  0.0f,	1.0f, 1.0f,
+
+		0.50f, -0.50f,  0.0f,	0.0f, 1.0f,
+		-0.50f,  0.50f, 0.0f,	1.0f, 0.0f,
+		0.50f,  0.50f, 0.0f,	0.0f, 0.0f
+	};
+
+	if (g_terrainGrassPos.empty())
+	{
+		return;
+	}
+
+	glGenBuffers(1, &g_grassPosVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, g_grassPosVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(glm::vec3) * g_terrainGrassPos.size(), &g_terrainGrassPos[0], GL_STATIC_DRAW);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	glGenVertexArrays(1, &g_grassVAO);
+	glBindVertexArray(g_grassVAO);
+
+	glGenBuffers(1, &g_grassQuadVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, g_grassQuadVBO);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(g_grassVerts), &g_grassVerts[0], GL_STATIC_DRAW);
+
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)0);
+
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(GLfloat) * 5, (GLvoid*)(3 * sizeof(GLfloat)));
+
+	glBindBuffer(GL_ARRAY_BUFFER, g_grassPosVBO);
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, sizeof(glm::vec3), (GLvoid*)0);
+	glVertexAttribDivisor(2, 1);
+
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
+
+
+
+
+
+void VoxelOctree::SortRenderList(glm::vec3 camera_pos)
+{
+	//update chunk's dist to cam
+	int threads = 8;
+
+	for (int i = 0; i < render_list.size(); i++)
+		render_list[i]->distToCam = glm::distance(camera_pos, render_list[i]->getPosition());
+
+	//sort by distance
+	std::sort(render_list.begin(), render_list.end());
+}
+
+void VoxelOctree::InitOctree(int worldSize, VoxelManager *manager)
+{
+	voxelManager = manager;
+
+	sf::Clock build_time; //profiling
+
+	this->BuildTree();
+	this->GenerateMeshFromOctree();
+	this->UploadMesh();
+	this->UploadGrass();
+
+	std::cout << "Build time is " << build_time.getElapsedTime().asSeconds() << std::endl;
+}
+
+
+void VoxelOctree::InitChildren()
+{
+	int childSize = m_size >> 1;
+
+	if (m_size == 1)
+	{
+		return;
+	}
+	for (int i = 0; i < 8; i++)
+	{
+		glm::ivec3 childMinPos = m_min + CHILD_MIN_OFFSETS[i] * childSize;
+
+		m_children[i] = voxelManager->InitNode(childMinPos, childSize);
+	}
+
+}
+
+
+
+bool VoxelOctree::BuildLeafNode()
+{
+	int corners = 0;
+
+	for (int i = 0; i < 8; i++)
+	{
+		glm::ivec3 cornerPos = m_min + CHILD_MIN_OFFSETS[i];
+		const float density = Density_Func(glm::vec3(cornerPos));
+		const int material = density < 0.f ? MATERIAL_SOLID : MATERIAL_AIR;
+		corners |= (material << i);
+	}
+
+	if (corners == 0 || corners == 255)
+	{
+		// voxel is full inside or outside the volume
+		//m_type = Node_Leaf;
+		m_flag &= ~(OCTREE_ACTIVE);
+
+		return false;
+	}
+
+	//build leaf node if node contains isosurface
+	const int MAX_CROSSINGS = 6;
+	int edgeCount = 0;
+	glm::vec3 averageNormal(0.f);
+	svd::QefSolver qef;
+
+	for (int i = 0; i < 12 && edgeCount < MAX_CROSSINGS; i++)
+	{
+		const int c1 = edgevmap[i][0];
+		const int c2 = edgevmap[i][1];
+
+		const int m1 = (corners >> c1) & 1;
+		const int m2 = (corners >> c2) & 1;
+
+		if ((m1 == MATERIAL_AIR && m2 == MATERIAL_AIR) ||
+			(m1 == MATERIAL_SOLID && m2 == MATERIAL_SOLID))
+		{
+			continue; //no change in sign density
+		}
+
+		const glm::vec3 p1 = glm::vec3(m_min + CHILD_MIN_OFFSETS[c1]);
+		const glm::vec3 p2 = glm::vec3(m_min + CHILD_MIN_OFFSETS[c2]);
+
+		const glm::vec3 p = ApproximateZeroCrossingPosition(p1, p2);
+		const glm::vec3 n = CalculateSurfaceNormal(p);
+
+		qef.add(p.x, p.y, p.z, n.x, n.y, n.z);
+
+		averageNormal += n;
+
+		edgeCount++;
+	}
+
+	svd::Vec3 qefPosition;
+	qef.solve(qefPosition, QEF_ERROR, QEF_SWEEPS, QEF_ERROR);
+
+	OctreeDrawInfo* drawInfo = new OctreeDrawInfo;
+	drawInfo->position = glm::vec3(qefPosition.x, qefPosition.y, qefPosition.z);
+	drawInfo->qef = qef.getData();
+
+	const glm::vec3 min = glm::vec3(m_min);
+	const glm::vec3 max = glm::vec3(m_min + glm::ivec3(m_size));
+
+	if (drawInfo->position.x < min.x || drawInfo->position.x > max.x ||
+		drawInfo->position.y < min.y || drawInfo->position.y > max.y ||
+		drawInfo->position.z < min.z || drawInfo->position.z > max.z)
+	{
+		const auto& mp = qef.getMassPoint();
+		drawInfo->position = glm::vec3(mp.x, mp.y, mp.z);
+	}
+
+	drawInfo->averageNormal = glm::normalize(averageNormal / (float)edgeCount);
+	drawInfo->corners = corners;
+
+
+	GLint type = GRASS;
+	sf::Color terrainColor = GetPerlinColorValue(drawInfo->position.x, drawInfo->position.z);
+
+	if (terrainColor.r > 200)
+		type = SNOW;
+	else if (terrainColor.g > terrainColor.b)
+	{
+		type = GRASS;
+
+		//flat area
+
+	}
+	else if (terrainColor.b > terrainColor.g)
+		type = WATER;
+
+	drawInfo->type = type;
+
+
+	m_type = Node_Leaf;
+	m_drawInfo = drawInfo;
+
+	m_flag |= OCTREE_ACTIVE;
+	m_flag |= OCTREE_LEAF;
+
+	return true;
+}
+
+bool VoxelOctree::BuildTree()
+{
+	bool active = false;
+
+	int i = 0;
+
+	//base case
+	//region matches chunk size
+	if (m_size == 1)
+	{
+		return BuildLeafNode();
+	}
+
+	//activate 8 children
+	InitChildren();
+
+	//recursively descend tree to find the active nodes
+	for (int i = 0; i < 8; i++)
+	{
+		m_type = Node_Internal;
+		//skip nodes above the max world height
+		if (m_children[i]->m_min.y <= (VoxelOctree::maxHeight)
+			&& m_children[i]->BuildTree())
+		{
+			m_childMask |= 1 << i;
+		}
+		else
+		{
+			m_childMask &= ~(1 << i);
+			m_children[i]->DestroyNode();
+			m_children[i] = NULL;
+		}
+	}
+	if (m_childMask)
+	{
+		m_flag |= OCTREE_ACTIVE;//if at least one child is active, then active
+	}
+	return m_childMask;
+}
+
+
+
+void VoxelOctree::AssignNeighbors()
+{
+	for (int i = 0; i < render_list.size(); i++)
+	{
+		glm::vec3 position = render_list[i]->getPosition();
+
+		//find chunk above and below
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, VoxelChunk::CHUNK_SIZE, 0)), (int)TOP);
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, -VoxelChunk::CHUNK_SIZE, 0)), (int)BOTTOM);
+
+		//assign left and right chunks
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(-VoxelChunk::CHUNK_SIZE, 0, 0)), (int)LEFT);
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(VoxelChunk::CHUNK_SIZE, 0, 0)), (int)RIGHT);
+
+		//back and front
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, 0, -VoxelChunk::CHUNK_SIZE)), (int)BACK);
+		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, 0, VoxelChunk::CHUNK_SIZE)), (int)FRONT);
+	}
+}
+
+VoxelChunk * VoxelOctree::FindLeafChunk(glm::vec3 pos)
+{
+	VoxelOctree * node = FindLeafNode(pos);
+	return node ? node->m_chunk : NULL;
+}
+
+VoxelOctree * VoxelOctree::FindLeafNode(glm::vec3 pos)
+{
+	//check if position is within world bounds
+	if (pos.x < 0 || pos.y < 0 || pos.z < 0 ||
+		pos.x >= voxelManager->GetWorldSize() ||
+		pos.y >= voxelManager->GetWorldSize() ||
+		pos.z >= voxelManager->GetWorldSize())
+	{
+		return NULL;
+	}
+
+	//iteratively find chunk that contains start position
+	VoxelOctree *node = voxelManager->getRootNode();
+
+	//traverse tree, find chunk
+	bool found = false;
+
+	while (!found)
+	{
+		int index = 0;
+
+		//check which child the next node is in 
+		int child_size = node->m_size >> 1;
+
+		//octal search
+		int x = pos.x >= node->m_min.x && pos.x < node->m_min.x + child_size ? 0 : 1;
+		int y = pos.y >= node->m_min.y && pos.y < node->m_min.y + child_size ? 0 : 1;
+		int z = pos.z >= node->m_min.z && pos.z < node->m_min.z + child_size ? 0 : 1;
+
+		//calculate index 
+		index = 4 * x + 2 * y + z;
+
+		node = m_children[index];
+
+		if (!node || ~node->m_flag & OCTREE_ACTIVE)
+			return NULL;
+
+		if (node->m_flag & OCTREE_LEAF)
+			found = true;
+	}
+
+	return node;
+}
+
+void VoxelOctree::DrawGrass()
+{
+	glBindVertexArray(g_grassVAO);
+	glDrawArraysInstanced(GL_TRIANGLES, 0, 6, g_terrainGrassPos.size());
+	glBindVertexArray(0);
+}
+
 void VoxelOctree::Draw()
 {
-	glBindVertexArray(m_vao);
+	glBindVertexArray(g_terrainVAO);
 	glDrawElements(GL_TRIANGLES, g_terrainIndices.size(), GL_UNSIGNED_INT, (void *)0);
 	glBindVertexArray(0);
 }

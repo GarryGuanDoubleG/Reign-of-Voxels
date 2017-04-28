@@ -27,19 +27,25 @@ VoxelManager::VoxelManager()
 
 	//set next available nodes
 	for (int i = 0; i < maxChunks - 1; i++)
+	{
 		m_chunkPool[i].m_next = &m_chunkPool[i + 1];
+	}
 
 	//Allocate space for Octree. 2^(3h + 1) - 1 nodes
-
-	//TODO reduce nodes so those above max height aren't allocated
-	int maxOctree =  (int)log2(m_resolution);
-		maxOctree = (1 << (3 * maxOctree) ) ; //2^3 times for 8 child nodes
+	int maxOctree = (int)log2(m_resolution) - 1;
+	maxOctree = (1 << (3 * maxOctree)); //2^3 times for 8 child nodes
 
 	m_maxOctNodes = maxOctree;
-	sizeof(VoxelOctree);
 
-	m_octreePool = new VoxelOctree[maxOctree];
-	m_octreeRoot = &m_octreePool[0];
+	m_octreeRoot = new VoxelOctree[maxOctree];
+	memset(m_octreeRoot, 0, sizeof(VoxelOctree) * maxOctree);
+
+	for (int i = 0; i < maxOctree - 1; i++)
+	{
+		m_octreeRoot[i].next_free = &m_octreeRoot[i + 1];
+	}
+
+	m_nextFreeNode = m_octreeRoot->next_free;
 }
 
 VoxelManager::~VoxelManager()
@@ -52,26 +58,19 @@ int VoxelManager::GetWorldSize()
 	return m_resolution;
 }
 
+
 void VoxelManager::GenerateVoxels()
 {
-	sf::Image *heightmap = new sf::Image();
+	glm::ivec3 rootMinPos(0.0f);
 
-	if (!heightmap->loadFromFile(GenerateTerrainMap(m_resolution)))
-		slog("Failed to Load or Generate HeightMap");
-	else
-	{
-		glm::ivec3 rootMinPos(0.0f);
-
-		m_octreeRoot->InitNode(rootMinPos, m_resolution);//activate root octree node
+	GenerateTerrainMap(m_resolution);
+	m_octreeRoot->InitNode(rootMinPos, m_resolution);//activate root octree node
 		
-		//start building tree and voxel data
-		m_octreeRoot->InitOctree(m_resolution, this);
+	//start building tree and voxel data
+	m_octreeRoot->InitOctree(m_resolution, this);
 
-		//start generating vertices
-		m_octreeRoot->GenerateWorldMesh();
-	}
-
-	delete heightmap;
+	//start generating vertices&
+	m_octreeRoot->GenerateWorldMesh();
 }
 
 VoxelChunk * VoxelManager::CreateChunk(glm::vec3 worldPosition)
@@ -91,7 +90,10 @@ VoxelChunk * VoxelManager::CreateChunk(glm::vec3 worldPosition)
 
 void VoxelManager::destroyChunk(VoxelChunk * chunk)
 {
-	chunk->Destroy();
+	if (chunk->m_flag != 0)
+	{
+		chunk->Destroy();
+	}
 
 
 	chunk->m_next = m_freeChunkHead;
@@ -103,35 +105,67 @@ VoxelOctree *VoxelManager::getRootNode()
 	return m_octreeRoot;
 }
 
-VoxelOctree *VoxelManager::getOctreeChild(VoxelOctree * currentNode, int child_index)
-{
-	//get index of current node
-	int curr = currentNode - m_octreePool;
-	int child = 8 * curr + child_index + 1; //child: 8i + (1 to 8)
 
-	if (child >= m_maxOctNodes)
+VoxelOctree *VoxelManager::InitNode(glm::ivec3 minPos, int size)
+{
+	if (!m_nextFreeNode)
 	{
-		std::cout << "Too many octree nodes" << std::endl;
-		return NULL;
+		slog("Out of nodes");
 	}
 
-	//in-array octree, return child at given index
-	return &m_octreePool[child];
-}
+	VoxelOctree * node = m_nextFreeNode;	
+	m_nextFreeNode = m_nextFreeNode->next_free;
 
-VoxelOctree *VoxelManager::createOctreeChild(VoxelOctree *currentNode, int child_index, glm::ivec3 minPos, int size)
-{
-	VoxelOctree *child = getOctreeChild(currentNode, child_index);
-
-	child->InitNode(minPos, size);
-
-	return child;
+	node->next_free = NULL;
+	node->InitNode(minPos, size);
+	return node;
 }
 
 
 void VoxelManager::destroyOctreeNode(VoxelOctree * node)
 {
-	node->DestroyNode(); //clears minimal data for reuse
+	//prepend free node
+	node->next_free = m_nextFreeNode;
+	m_nextFreeNode = node;
+}
+
+void VoxelManager::RenderWorld(bool draw_textured, Camera * player_cam)
+{
+	RenderVoxels(draw_textured, player_cam);
+	RenderGrass(player_cam);
+}
+
+void VoxelManager::RenderGrass(Camera * player_cam)
+{
+	GLuint shader = GetShader("grass");
+	glUseProgram(shader);
+
+	glm::vec3 light_pos = glm::vec3(256, 512, 256);
+	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	//glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(10.0f));
+	glm::mat4 model(1.0f);
+
+	glm::vec2 billboardSize(1.0f, 2.0f);
+
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+
+	glUniform3fv(glGetUniformLocation(shader, "cameraRight"), 1, &player_cam->GetRight()[0]);
+	glUniform3fv(glGetUniformLocation(shader, "cameraUp"), 1, &player_cam->GetUp()[0]);
+	glUniform2fv(glGetUniformLocation(shader, "billboardSize"), 1, &billboardSize[0]);
+
+	GLuint grass = GetTextureID("billboard_grass");
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, grass);
+
+	glUniform1i(glGetUniformLocation(shader, "grassTexture"), 0);
+
+	m_octreeRoot->DrawGrass();
+	
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void VoxelManager::RenderVoxels(bool draw_textured, Camera * player_cam)
@@ -143,22 +177,19 @@ void VoxelManager::RenderVoxels(bool draw_textured, Camera * player_cam)
 	}
 
 	GLuint voxel_shader = GetShader("voxel");
-	GLuint model_loc;
 
 	glUseProgram(voxel_shader);
 
 	glm::vec3 light_pos = glm::vec3(256, 512, 256);
 	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
-	glm::mat4 view = player_cam->GetViewMat();
-	glm::mat4 proj = player_cam->GetProj();
 	glm::mat4 model(1.0f);
 
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "model"), 1, GL_FALSE, &model[0][0]);
 
-	glm::vec3 voxel_color(0.6f, 1.0f, 0.3f);
+	glm::vec3 voxel_color(0.8f, 0.0f, 0.3f);
 
 	//lighting
 	glUniform3fv(glGetUniformLocation(voxel_shader, "viewPos"), 1, &player_cam->GetPosition()[0]);
@@ -170,7 +201,6 @@ void VoxelManager::RenderVoxels(bool draw_textured, Camera * player_cam)
 
 
 	m_octreeRoot->Draw();
-
 }
 
 void VoxelManager::RenderVoxelTextured(Camera *player_cam)
@@ -182,16 +212,12 @@ void VoxelManager::RenderVoxelTextured(Camera *player_cam)
 	glm::vec3 light_pos = glm::vec3(256, 512, 256);
 	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
-	glm::mat4 view = player_cam->GetViewMat();
-	glm::mat4 proj = player_cam->GetProj();
 	glm::mat4 model(1.0f);
 	//glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 2.0f, 4.0f));
 
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "model"), 1, GL_FALSE, &model[0][0]);
-
-	glm::vec3 voxel_color(0.6f, 1.0f, 0.3f);
 
 	//lighting
 	glUniform3fv(glGetUniformLocation(voxel_shader, "viewPos"), 1, &player_cam->GetPosition()[0]);

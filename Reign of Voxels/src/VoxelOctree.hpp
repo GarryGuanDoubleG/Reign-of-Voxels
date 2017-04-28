@@ -74,7 +74,13 @@ private:
 
 	OctreeDrawInfo * m_drawInfo;
 
-	//GLuint m_vao, m_vbo, m_ebo;
+	//active nodes have children
+	//inactive are added to free node linked list
+	union
+	{
+		VoxelOctree *m_children[8];
+		VoxelOctree *next_free; 
+	};
 public:
 	VoxelOctree();
 	
@@ -93,7 +99,7 @@ public:
 	VoxelOctree * FindLeafNode(glm::vec3 pos);
 	VoxelChunk *  FindLeafChunk(glm::vec3 pos);
 
-	static const int maxHeight = 32;
+	static const int maxHeight = 64;
 	static std::vector<VoxelChunk *> render_list;//list of leaf nodes
 	static void SortRenderList(glm::vec3 camera_pos);//closest chunks render first
 
@@ -106,7 +112,10 @@ private:
 	void ContourFaceProc(VoxelOctree* node[2], int dir);
 	
 	void UploadMesh();
+	void UploadGrass();
+
 	void Draw();
+	void DrawGrass();
 
 	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos);
 

@@ -33,6 +33,11 @@ Camera::Camera(glm::vec3 position, glm::vec3 target)
 	m_farH = m_farD * tan_angle;
 	m_farW = m_farH * m_aspect_ratio;
 
+	m_keyW = false;
+	m_keyS = false;
+	m_keyA = false;
+	m_keyD = false;
+
 	Update();
 }
 
@@ -94,8 +99,50 @@ glm::vec3 Camera::GetRotation()
 	return glm::vec3(glm::radians(m_pitch), glm::radians(m_yaw), glm::radians(m_roll));
 }
 
+
+void Camera::HandleKeyboard()
+{
+	GLfloat cam_speed = 100.0f * Game::g_delta_time;
+	if (cam_speed < 0.1f)
+	{
+		cam_speed = 0.1f;
+	}
+	//GLfloat cam_speed = 1.0f;
+
+	if(Game::instance().m_lock_mouse)
+	{
+		if (m_keyW)
+			m_pos += cam_speed * m_forward;
+
+		if (m_keyS)
+			m_pos -= cam_speed * m_forward;
+
+		if (m_keyA)
+			m_pos -= m_right * cam_speed;
+
+		if (m_keyD)
+			m_pos += m_right * cam_speed;
+	}
+	else
+	{
+		if (m_keyW)
+			m_pos.z -= cam_speed;
+			
+		if (m_keyS)
+			m_pos.z += cam_speed;
+			
+		if (m_keyA)
+			m_pos.x -= cam_speed;
+			
+		if (m_keyD)
+			m_pos.x += cam_speed;
+	}
+
+}
 void Camera::Update()
 {
+	HandleKeyboard();
+
 	//based on lighthouse3d tutorials
 	glm::vec3 dir, nearCenter, farCenter,
 			X_axis, Y_axis, Z_axis;
@@ -212,17 +259,75 @@ bool Camera::AABBInCamera(glm::ivec3 minPos, int size)
 	return true;
 }
 
-void Camera::DrawRay()
+glm::vec3 Camera::GetRight()
 {
-	GetShader("ray");
-
-
+	return m_right;
+}
+glm::vec3 Camera::GetUp()
+{
+	return m_up;
+}
+glm::vec3 Camera::GetForward()
+{
+	return m_forward;
 }
 
 void Camera::HandleInput(sf::Event event)
 {
-	sf::Time time = Game::g_delta_clock.getElapsedTime();
+	float time = Game::g_delta_time;
 	GLfloat cam_speed = 3.0f;
+	bool newKeyPress = false;
+	//if (event.type == sf::Event::KeyPressed)
+	//{
+	//	//for testing
+	//	//TODO remove use of m_lock_mouse after testing
+
+	//	switch (event.key.code)
+	//	{
+	//	case sf::Keyboard::W:
+	//		newKeyPress = m_keyW == false ? true : false;
+	//		m_keyW = true;			
+	//		break;
+	//	case sf::Keyboard::S:
+	//		newKeyPress = m_keyS == false ? true : false;
+	//		m_keyS = true;
+	//		break;
+	//	case sf::Keyboard::A:
+	//		newKeyPress = m_keyA == false ? true : false;
+	//		m_keyA = true;
+	//		break;
+	//	case sf::Keyboard::D:
+	//		newKeyPress = m_keyD == false ? true : false;
+	//		m_keyD = true;
+	//		break;
+	//	default:
+	//		break;
+	//	}
+	//	//if (newKeyPress)
+	//	//{
+	//	//	HandleKeyboard();
+	//	//}
+	//}
+	//else if (event.type == sf::Event::KeyReleased)
+	//{
+	//	switch (event.key.code)
+	//	{
+	//	case sf::Keyboard::W:
+	//		m_keyW = false;
+	//		break;
+	//	case sf::Keyboard::S:
+	//		m_keyS = false;
+	//		break;
+	//	case sf::Keyboard::A:
+	//		m_keyA = false;
+	//		break;
+	//	case sf::Keyboard::D:
+	//		m_keyD = false;
+	//		break;
+	//	default:
+	//		break;
+	//	}
+	//}
 
 	if (event.type == sf::Event::KeyPressed)
 	{
@@ -267,10 +372,11 @@ void Camera::HandleInput(sf::Event event)
 			default:
 				break;
 			}
-		}		
+		}
 
 	}
-	else if (event.type == sf::Event::MouseWheelMoved)
+
+	if (event.type == sf::Event::MouseWheelMoved)
 	{
 		m_pos += (float)event.mouseWheel.delta * m_forward * cam_speed;
 	}
@@ -305,6 +411,5 @@ void Camera::HandleInput(sf::Event event)
 		m_right = glm::normalize(glm::cross(m_forward, m_up));
 	}
 
-	Update();
 	m_view_mat = glm::lookAt(m_pos, m_pos + m_forward, m_up);
 }

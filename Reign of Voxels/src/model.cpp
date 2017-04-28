@@ -118,7 +118,6 @@ void Model::LoadModel(std::string model_path, const std::vector<std::string> &an
 }
 
 
-
 /**
 * @brief renders all the m_meshes of this model
 * @param shader compiled shader id to use to render
@@ -131,7 +130,7 @@ void Model::Draw(GLuint shader)
 
 void Model::Draw(GLuint shader, float timeInSeconds)
 {
-	m_animController.SetAnimation(timeInSeconds, "walking");
+	m_animController.SetAnimation(timeInSeconds, "hook_punch");
 	m_animController.BoneTransform(timeInSeconds);
 
 	glUniformMatrix4fv(glGetUniformLocation(shader, "gBones"), 

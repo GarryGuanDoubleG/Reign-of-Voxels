@@ -17,6 +17,9 @@ public:
 	* Empty Destructor
 	*/
 	~Camera();
+
+	void Update();
+
 	/**
 	* @brief returns the view matrix
 	* @return the view matrix
@@ -28,6 +31,10 @@ public:
 	*/
 	glm::mat4 GetProj();
 
+	glm::vec3 GetRight();
+	glm::vec3 GetUp();
+	glm::vec3 GetForward();
+
 	/**
 	* @brief adjusts camera on user input
 	* @param event the user input
@@ -35,7 +42,6 @@ public:
 	void HandleInput(sf::Event event);
 
 	glm::vec3 GetRotation();
-
 	glm::vec3 GetPosition();
 	void SetPosition(glm::vec3 position);
 
@@ -52,11 +58,13 @@ public:
 	bool AABBInCamera(AABB &aabb);
 	bool AABBInCamera(glm::ivec3 minPos, int size);
 
-	void DrawRay();
-
 private:
+	void HandleKeyboard();
 
-	void Update();
+	bool m_keyW;
+	bool m_keyA;
+	bool m_keyS;
+	bool m_keyD;
 
 	glm::vec3 m_pos; /**< position of camera */  
 	glm::vec3 m_target; /**<the position the camera looks at */  

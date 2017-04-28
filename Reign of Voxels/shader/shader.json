@@ -1,4 +1,8 @@
 {
+  "grass": {
+    "fs": "shader/grass_fs.glsl",
+    "vs": "shader/grass_vs.glsl"
+  },
   "model": {
     "fs": "shader/model_fs.glsl",
     "vs": "shader/model_vs.glsl"
@@ -11,11 +15,10 @@
     "vs": "shader/voxel_vs.glsl",
     "fs": "shader/voxel_fs.glsl"
   },
-  "voxelTex":
-	{
-		"vs": "shader/voxelTex_vs.glsl",
-		"fs": "shader/voxelTex_fs.glsl"
-	},
+  "voxelTex": {
+    "vs": "shader/voxelTex_vs.glsl",
+    "fs": "shader/voxelTex_fs.glsl"
+  },
   "lighting": {
     "vs": "shader/lighting_vs.glsl",
     "fs": "shader/lighting_fs.glsl"

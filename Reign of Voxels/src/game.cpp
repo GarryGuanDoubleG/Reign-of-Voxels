@@ -2,7 +2,7 @@
 #include "GameScene.hpp"
 #include "simple_logger.h"
 
-sf::Clock Game::g_delta_clock; /**<timer that tracks time since last iteration of game loop*/
+float Game::g_delta_time;
 sf::Clock Game::g_clock; /**<tracks total time since ininitation of gamescene*/  
 
 Game Game::m_instance; /**<singleton instance of game */ 
@@ -172,11 +172,11 @@ void Game::GameLoop()
 	
 	//center mouse in window
 	sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
-	sf::Clock frame_rate;
+	
+	float last_time = 0;
 
 	while (m_running)
 	{
-		frame_rate.restart();
 
 		HandleInput();
 
@@ -185,9 +185,10 @@ void Game::GameLoop()
 			sf::Mouse::setPosition(sf::Vector2i(SCREEN_WIDTH / 2, SCREEN_HEIGHT / 2), *m_window);
 		}
 
-		g_delta_clock.restart();
 		m_sceneManager->SceneFrame();
 
+		g_delta_time = g_clock.getElapsedTime().asSeconds() - last_time;
+		last_time = g_clock.getElapsedTime().asSeconds();
 	}
 	m_window->close();
 }

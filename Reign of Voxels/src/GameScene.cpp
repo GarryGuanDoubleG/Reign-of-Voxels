@@ -111,6 +111,8 @@ void GameScene::Update()
 		if (m_entity_list[i].IsActive())
 			m_entity_list[i].Update();
 	}
+
+	m_camera->Update();
 }
 
 
@@ -230,7 +232,7 @@ void GameScene::RenderWorld()
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
 
-	m_voxelManager->RenderVoxels(draw_textured, m_camera);
+	m_voxelManager->RenderWorld(draw_textured, m_camera);
 }
 
 void GameScene::RenderEntities()

@@ -30,7 +30,7 @@ GLuint check_shader_err(char *name, GLuint shader)
 		glGetShaderiv(shader, GL_INFO_LOG_LENGTH, &InfoLogLength);
 		glGetShaderInfoLog(shader, InfoLogLength, &InfoLogLength, infoLog);
 
-		slog("Shader Error %s: %s\n", name, infoLog);
+		std::cout << "Shader Error: " << name << " " << infoLog << std::endl;
 
 		return GL_FALSE;
 	}

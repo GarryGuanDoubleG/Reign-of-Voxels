@@ -33,7 +33,7 @@ void main(void)
 	vec3 xaxis = texture2D( voxelTexture[index], FragPos.yz * scale).rgb;
 	vec3 yaxis = texture2D( voxelTexture[index], FragPos.xz * scale).rgb;
 	vec3 zaxis = texture2D( voxelTexture[index], FragPos.xy * scale).rgb;
-	vec3 tex = xaxis * blending.x + xaxis * blending.y + zaxis * blending.z;
+	vec3 tex = xaxis * blending.x + yaxis * blending.y + zaxis * blending.z;
 
 
 	vec3 lightDir = normalize(lightPos - FragPos); 

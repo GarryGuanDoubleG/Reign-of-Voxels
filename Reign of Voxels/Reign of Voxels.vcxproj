@@ -105,8 +105,8 @@
     <None Include="Resources\models\models.json" />
     <None Include="Resources\resources.json" />
     <None Include="Resources\textures\texture.json" />
-    <None Include="shader\hud_fs.glsl" />
-    <None Include="shader\hud_vs.glsl" />
+    <None Include="shader\grass_fs.glsl" />
+    <None Include="shader\grass_vs.glsl" />
     <None Include="shader\lighting_fs.glsl" />
     <None Include="shader\lighting_vs.glsl" />
     <None Include="shader\minimap_fs.glsl" />

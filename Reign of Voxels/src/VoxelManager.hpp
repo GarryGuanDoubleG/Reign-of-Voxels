@@ -15,6 +15,8 @@ public:
 
 	void GenerateVoxels();
 
+	void RenderWorld(bool draw_textured, Camera * player_cam);
+	void RenderGrass(Camera * player_cam);
 	void RenderVoxels(bool draw_textured, Camera * player_cam);
 	void RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &position);
 	void RenderVoxelTextured(Camera *player_cam);
@@ -25,10 +27,7 @@ public:
 	//gets the child of a node at a specific index
 	VoxelOctree *getRootNode();
 
-
-	VoxelOctree *getOctreeChild(VoxelOctree * currentNode, int child_index);
-	VoxelOctree *createOctreeChild(VoxelOctree *currentNode, int child_index, glm::ivec3 minPos, int size);
-
+	VoxelOctree *InitNode(glm::ivec3 minPos, int size);
 
 	//free octree node
 	void		 destroyOctreeNode(VoxelOctree * node);
@@ -45,7 +44,7 @@ private:
 	VoxelChunk * m_freeChunkHead;//head ptr to free chunk list
 
 	VoxelOctree *m_octreeRoot; // ptr to octree root node
-	VoxelOctree * m_octreePool;//array of octrees
+	VoxelOctree *m_nextFreeNode;//linked list of inactive nodes
 
 	Model *m_cube;
 };

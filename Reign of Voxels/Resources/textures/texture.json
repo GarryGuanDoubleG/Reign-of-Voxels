@@ -8,6 +8,9 @@
     "path": "Resources\\textures\\water2.png"
   },
   "snow": {
-     "path": "Resources\\textures\\snow.png"
+    "path": "Resources\\textures\\snow.png"
+  },
+  "billboard_grass": {
+    "path":  "Resources\\textures\\billboard_grass.png"
   }
 }

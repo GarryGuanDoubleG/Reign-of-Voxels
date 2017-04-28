@@ -311,12 +311,6 @@
     <None Include="Resources\gui\menu.json">
       <Filter>Json</Filter>
     </None>
-    <None Include="shader\hud_fs.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shader\hud_vs.glsl">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="Resources\textures\texture.json">
       <Filter>Json</Filter>
     </None>
@@ -324,6 +318,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="shader\voxelTex_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\grass_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\grass_fs.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

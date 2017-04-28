@@ -22,7 +22,7 @@ class Game
 public:
 	bool				m_lock_mouse;
 
-	static sf::Clock g_delta_clock; /**<timer that tracks time since last iteration of game loop*/  
+	static float g_delta_time;
 	static sf::Clock g_clock;/**<tracks total time since ininitation of gamescene*/  
 
 	/**
