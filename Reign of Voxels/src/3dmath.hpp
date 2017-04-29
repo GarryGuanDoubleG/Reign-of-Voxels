@@ -65,7 +65,8 @@ enum Side
 	LEFT,
 	RIGHT,
 	BACK,
-	FRONT
+	FRONT,
+	FRONT_RIGHT
 };
 
 /**

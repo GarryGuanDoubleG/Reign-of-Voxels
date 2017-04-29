@@ -11,9 +11,9 @@ std::mutex g_free_chunk_guard;
 VoxelManager::VoxelManager(int worldSize)
 {
 	//TODO load voxel world from json
-	m_resolution = worldSize;
+	m_worldSize = worldSize;
 	
-	int worldSizeXZ = m_resolution * m_resolution;
+	int worldSizeXZ = m_worldSize * m_worldSize;
 
 	//intialize chunkpool
 	int maxChunks = worldSizeXZ * (VoxelOctree::maxHeight * 2) / VoxelChunk::CHUNK_SIZE_CUBED;
@@ -32,7 +32,7 @@ VoxelManager::VoxelManager(int worldSize)
 	}
 
 	//Allocate space for Octree. 2^(3h + 1) - 1 nodes
-	int maxOctree = (int)log2(m_resolution) - 2;
+	int maxOctree = (int)log2(m_worldSize) - 1;
 	maxOctree = (1 << (3 * maxOctree)); //2^3 times for 8 child nodes
 
 	m_maxOctNodes = maxOctree;
@@ -55,7 +55,7 @@ VoxelManager::~VoxelManager()
 
 int VoxelManager::GetWorldSize()
 {
-	return m_resolution;
+	return m_worldSize;
 }
 
 
@@ -63,26 +63,48 @@ void VoxelManager::GenerateVoxels()
 {
 	glm::ivec3 rootMinPos(0.0f);
 
-	GenerateTerrainMap(m_resolution);
-	m_octreeRoot->InitNode(rootMinPos, m_resolution);//activate root octree node
+	GenerateTerrainMap(m_worldSize);
+	m_octreeRoot->InitNode(rootMinPos, m_worldSize);//activate root octree node
 		
 	//start building tree and voxel data
-	m_octreeRoot->InitOctree(m_resolution, this);
+	m_octreeRoot->InitOctree(m_worldSize, this);
 
-	//start generating vertices&
-	m_octreeRoot->GenerateWorldMesh();
 }
 
-VoxelChunk * VoxelManager::CreateChunk(glm::vec3 worldPosition)
+void VoxelManager::GenerateChunks()
 {
+	//TODO generate octree bottom up then assign to chunks
+	//chunks are SVO with cubic bound box
+
+	for (int x = 0; x < m_worldSize; x += VoxelChunk::CHUNK_SIZE)
+	{
+		for (int y = 0; y <= VoxelOctree::maxHeight; y += VoxelChunk::CHUNK_SIZE)
+		{
+			for (int z = 0; z < m_worldSize; z += VoxelChunk::CHUNK_SIZE)
+			{
+				glm::vec3 chunkPos(x, y, z);
+				CreateChunk(chunkPos, m_octreeRoot->FindLeafNode(chunkPos));
+			}
+		}
+	}
+
+}
+
+VoxelChunk * VoxelManager::CreateChunk(glm::vec3 worldPosition, VoxelOctree *node)
+{
+	if (!node)
+	{
+		return NULL;
+	}
 	if (m_freeChunkHead == m_freeChunkHead->m_next)
+	{
 		std::cout << "free list is empty" << std::endl;
+	}
 
 	VoxelChunk * chunk = m_freeChunkHead;
 	m_freeChunkHead = chunk->m_next;
 
-	chunk->Init(worldPosition);
-	chunk->m_next = NULL;
+	chunk->Init(worldPosition, node);
 
 	return chunk;
 }
@@ -179,13 +201,14 @@ void VoxelManager::RenderGrass(Camera * player_cam)
 	GLuint shader = GetShader("grass");
 	glUseProgram(shader);
 	
-	glDisable(GL_DEPTH_FUNC);
-	glDisable(GL_DEPTH_TEST);
+	glDepthFunc(GL_ALWAYS);
+	/*glDisable(GL_DEPTH_FUNC);
+	glDisable(GL_DEPTH_TEST);*/
 
 	glm::vec3 light_pos = glm::vec3(256, 512, 256);
 	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
-	//glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(10.0f));
+	
 	glm::mat4 model(1.0f);
 
 	glm::vec2 billboardSize(1.0f, 2.0f);
@@ -197,6 +220,7 @@ void VoxelManager::RenderGrass(Camera * player_cam)
 	glUniform3fv(glGetUniformLocation(shader, "cameraRight"), 1, &player_cam->GetRight()[0]);
 	glUniform3fv(glGetUniformLocation(shader, "cameraUp"), 1, &player_cam->GetUp()[0]);
 	glUniform2fv(glGetUniformLocation(shader, "billboardSize"), 1, &billboardSize[0]);
+	glUniform1f(glGetUniformLocation(shader, "time"), Game::clock.getElapsedTime().asSeconds());
 
 	GLuint grass = GetTextureID("billboard_grass");
 
@@ -209,8 +233,7 @@ void VoxelManager::RenderGrass(Camera * player_cam)
 	
 	glActiveTexture(GL_TEXTURE0);
 
-	glEnable(GL_DEPTH_FUNC);
-	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_LESS);
 }
 
 void VoxelManager::RenderVoxels(bool draw_textured, Camera * player_cam)
@@ -244,8 +267,8 @@ void VoxelManager::RenderVoxels(bool draw_textured, Camera * player_cam)
 	//voxels
 	glUniform3fv(glGetUniformLocation(voxel_shader, "voxelColor"), 1, &voxel_color[0]);
 
-
-	m_octreeRoot->Draw();
+	VoxelOctree::Draw(voxel_shader);
+	//m_octreeRoot->Draw();
 }
 
 void VoxelManager::RenderVoxelTextured(Camera *player_cam)
@@ -306,5 +329,10 @@ bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
 	if (!node || ~node->m_flag & OCTREE_ACTIVE)
 		return false;
 	
+	VoxelChunk * chunk = m_octreeRoot->FindChunk(world_pos);
+	chunk->m_render_mode = !chunk->m_render_mode;
+
+
+
 	return true;
 }

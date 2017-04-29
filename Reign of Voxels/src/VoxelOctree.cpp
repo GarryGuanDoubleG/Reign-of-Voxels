@@ -17,8 +17,6 @@ static std::mutex g_render_list_mutex;
 
 VoxelManager * VoxelOctree::voxelManager;
 
-std::vector<VoxelVertex> g_terrainVertices;
-std::vector<int> g_terrainIndices;
 std::vector<glm::vec3> g_terrainGrassPos;
 
 const int MATERIAL_AIR = 0;
@@ -28,7 +26,6 @@ const float QEF_ERROR = 1e-6f;
 const int QEF_SWEEPS = 4;
 
 //terrain
-static GLuint g_terrainVAO, g_terrainVBO, g_terrainEBO;
 static GLuint g_grassVAO, g_grassQuadVBO, g_grassPosVBO;
 
 // ----------------------------------------------------------------------------
@@ -124,12 +121,14 @@ void VoxelOctree::DestroyNode()
 
 	m_flag = 0;
 
+
 	voxelManager->destroyOctreeNode(this);
 
 	if (m_chunk)
 	{
 		m_chunk->Destroy();
 		voxelManager->destroyChunk(m_chunk);
+		m_chunk = NULL;
 	}
 }
 
@@ -158,12 +157,6 @@ glm::vec3 ApproximateZeroCrossingPosition(const glm::vec3& p0, const glm::vec3& 
 	return p0 + ((p1 - p0) * t);
 }
 
-void VoxelOctree::GenerateWorldMesh()
-{
-	GenerateVertexIndices();
-	ContourCellProc();
-}
-
 glm::vec3 VoxelOctree::CalculateSurfaceNormal(const glm::vec3 &pos)
 {
 	const float H = 0.05f;
@@ -185,14 +178,23 @@ glm::vec3 VoxelOctree::CalculateSurfaceNormal(const glm::vec3 &pos)
 
 void VoxelOctree::GenerateMeshFromOctree()
 {
-	g_terrainIndices.clear();
-	g_terrainVertices.clear();
-
-	GenerateVertexIndices();
-	ContourCellProc();
+	for (int i = 0; i < render_list.size(); i++)
+	{
+		render_list[i]->m_node->GenerateVertexIndices(render_list[i]->m_vertices);
+		render_list[i]->m_node->ContourCellProc(render_list[i]->m_tri_indices);
+	}
 }
 
-void VoxelOctree::GenerateVertexIndices()
+void VoxelOctree::GenerateSeams()
+{
+	for (int i = 0; i < render_list.size(); i++)
+	{
+		render_list[i]->GenerateSeam();
+	}
+
+}
+
+void VoxelOctree::GenerateVertexIndices(std::vector<VoxelVertex> &voxelVerts)
 {
 	if (!this)
 	{
@@ -208,7 +210,7 @@ void VoxelOctree::GenerateVertexIndices()
 		{
 			if (m_childMask & 1 << i)
 			{
-				m_children[i]->GenerateVertexIndices();
+				m_children[i]->GenerateVertexIndices(voxelVerts);
 			}
 		}
 	}
@@ -221,15 +223,14 @@ void VoxelOctree::GenerateVertexIndices()
 			exit(EXIT_FAILURE);
 		}
 
-
-		m_drawInfo->index = g_terrainVertices.size();
-		g_terrainVertices.push_back(VoxelVertex(m_drawInfo->position, m_drawInfo->averageNormal, m_drawInfo->type));
+		m_drawInfo->index = voxelVerts.size();
+		voxelVerts.push_back(VoxelVertex(m_drawInfo->position, m_drawInfo->averageNormal, m_drawInfo->type));
 	}
 
 }
 
 
-void VoxelOctree::ContourProcessEdge(VoxelOctree* node[4], int dir)
+void VoxelOctree::ContourProcessEdge(std::vector<GLuint> &m_tri_indices, VoxelOctree* node[4], int dir)
 {
 	int minSize = 1000000;		// arbitrary big number
 	int minIndex = 0;
@@ -253,41 +254,46 @@ void VoxelOctree::ContourProcessEdge(VoxelOctree* node[4], int dir)
 			flip = m1 != MATERIAL_AIR;
 		}
 
+
 		indices[i] = node[i]->m_drawInfo->index;
 
 		signChange[i] =
 			(m1 == MATERIAL_AIR && m2 != MATERIAL_AIR) ||
 			(m1 != MATERIAL_AIR && m2 == MATERIAL_AIR);
+
+		if (node[i]->m_drawInfo->averageNormal.y > .95f && node[i]->m_drawInfo->type == DIRT)
+		{
+			g_terrainGrassPos.push_back(node[i]->m_drawInfo->position + glm::vec3((rand() % 10) / 10.0f, 0, (rand() % 10) / 10.0f));
+		}
 	}
 
 	if (signChange[minIndex])
 	{
 		if (!flip)
 		{
-			g_terrainIndices.push_back(indices[0]);
-			g_terrainIndices.push_back(indices[1]);
-			g_terrainIndices.push_back(indices[3]);
+			m_tri_indices.push_back(indices[0]);
+			m_tri_indices.push_back(indices[1]);
+			m_tri_indices.push_back(indices[3]);
 
-			g_terrainIndices.push_back(indices[0]);
-			g_terrainIndices.push_back(indices[3]);
-			g_terrainIndices.push_back(indices[2]);
+			m_tri_indices.push_back(indices[0]);
+			m_tri_indices.push_back(indices[3]);
+			m_tri_indices.push_back(indices[2]);
 		}
 		else
 		{
-			g_terrainIndices.push_back(indices[0]);
-			g_terrainIndices.push_back(indices[3]);
-			g_terrainIndices.push_back(indices[1]);
+			m_tri_indices.push_back(indices[0]);
+			m_tri_indices.push_back(indices[3]);
+			m_tri_indices.push_back(indices[1]);
 
-			g_terrainIndices.push_back(indices[0]);
-			g_terrainIndices.push_back(indices[2]);
-			g_terrainIndices.push_back(indices[3]);
+			m_tri_indices.push_back(indices[0]);
+			m_tri_indices.push_back(indices[2]);
+			m_tri_indices.push_back(indices[3]);
 		}
 	}
 }
 
-//----------------------------------------------------------------------------
 
-void VoxelOctree::ContourEdgeProc(VoxelOctree* node[4], int dir)
+void VoxelOctree::ContourEdgeProc(std::vector<GLuint> &m_tri_indices, VoxelOctree* node[4], int dir)
 {
 	if (!node[0] || !node[1] || !node[2] || !node[3])
 	{
@@ -305,7 +311,7 @@ void VoxelOctree::ContourEdgeProc(VoxelOctree* node[4], int dir)
 		node[2]->m_type != Node_Internal &&
 		node[3]->m_type != Node_Internal)
 	{
-		ContourProcessEdge(node, dir);
+		ContourProcessEdge(m_tri_indices, node, dir);
 	}
 	else
 	{
@@ -332,14 +338,13 @@ void VoxelOctree::ContourEdgeProc(VoxelOctree* node[4], int dir)
 				}
 			}
 
-			ContourEdgeProc(edgeNodes, edgeProcEdgeMask[dir][i][4]);
+			ContourEdgeProc(m_tri_indices, edgeNodes, edgeProcEdgeMask[dir][i][4]);
 		}
 	}
 }
 
-// ----------------------------------------------------------------------------
 
-void VoxelOctree::ContourFaceProc(VoxelOctree* node[2], int dir)
+void VoxelOctree::ContourFaceProc(std::vector<GLuint> &m_tri_indices, VoxelOctree* node[2], int dir)
 {
 	if (!node[0] || !node[1])
 	{
@@ -374,7 +379,7 @@ void VoxelOctree::ContourFaceProc(VoxelOctree* node[2], int dir)
 				}
 			}
 
-			ContourFaceProc(faceNodes, faceProcFaceMask[dir][i][2]);
+			ContourFaceProc(m_tri_indices, faceNodes, faceProcFaceMask[dir][i][2]);
 		}
 
 		const int orders[2][4] =
@@ -407,16 +412,15 @@ void VoxelOctree::ContourFaceProc(VoxelOctree* node[2], int dir)
 				}
 			}
 
-			ContourEdgeProc(edgeNodes, faceProcEdgeMask[dir][i][5]);
+			ContourEdgeProc(m_tri_indices, edgeNodes, faceProcEdgeMask[dir][i][5]);
 		}
 	}
 }
 
-// ----------------------------------------------------------------------------
 
-void VoxelOctree::ContourCellProc()
+void VoxelOctree::ContourCellProc(std::vector<GLuint> &m_tri_indices)
 {
-	if (~m_flag & OCTREE_ACTIVE)
+	if (!this || ~m_flag & OCTREE_ACTIVE)
 	{
 		return;
 	}
@@ -426,7 +430,7 @@ void VoxelOctree::ContourCellProc()
 		{
 			if (m_children[i] && m_children[i]->m_flag & OCTREE_ACTIVE)
 			{
-				m_children[i]->ContourCellProc();
+				m_children[i]->ContourCellProc(m_tri_indices);
 			}
 		}
 
@@ -439,7 +443,7 @@ void VoxelOctree::ContourCellProc()
 			faceNodes[0] = m_children[c[0]];
 			faceNodes[1] = m_children[c[1]];
 
-			ContourFaceProc(faceNodes, cellProcFaceMask[i][2]);
+			ContourFaceProc(m_tri_indices, faceNodes, cellProcFaceMask[i][2]);
 		}
 
 		for (int i = 0; i < 6; i++)
@@ -458,7 +462,7 @@ void VoxelOctree::ContourCellProc()
 				edgeNodes[j] = m_children[c[j]];
 			}
 
-			ContourEdgeProc(edgeNodes, cellProcEdgeMask[i][4]);
+			ContourEdgeProc(m_tri_indices, edgeNodes, cellProcEdgeMask[i][4]);
 		}
 	}
 }
@@ -583,36 +587,17 @@ VoxelOctree * VoxelOctree::SimplifyOctree(float threshold)
 
 void VoxelOctree::UploadMesh()
 {
-	if (g_terrainIndices.empty() || g_terrainVertices.empty())
-		return;
+	GLuint vertices = 0;
+	GLuint indices = 0;
+	for (int i = 0; i < render_list.size(); i++)
+	{
+		vertices += render_list[i]->m_vertices.size();
+		indices += render_list[i]->m_tri_indices.size();
 
-	glGenVertexArrays(1, &g_terrainVAO);
-	glBindVertexArray(g_terrainVAO);
+		render_list[i]->BindMesh();
+	}
 
-	glGenBuffers(1, &g_terrainVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, g_terrainVBO);
-	glBufferData(GL_ARRAY_BUFFER, sizeof(VoxelVertex) * g_terrainVertices.size(), &g_terrainVertices[0], GL_STATIC_DRAW);
-
-	glGenBuffers(1, &g_terrainEBO);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, g_terrainEBO);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * g_terrainIndices.size(), &g_terrainIndices[0], GL_STATIC_DRAW);
-
-	//location 0 should be verts
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)0);
-	//now normals
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, normal));
-
-	glEnableVertexAttribArray(2);
-	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, textureID));
-
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
-
-	printf("Mesh: %d vertices %d triangles\n", g_terrainVertices.size(), g_terrainIndices.size() / 3);
+	slog("Vertices: %u, Triangles %u", vertices, indices / 3);
 }
 
 void VoxelOctree::UploadGrass()
@@ -670,7 +655,7 @@ void VoxelOctree::SortRenderList(glm::vec3 camera_pos)
 	int threads = 8;
 
 	for (int i = 0; i < render_list.size(); i++)
-		render_list[i]->distToCam = glm::distance(camera_pos, render_list[i]->getPosition());
+		render_list[i]->distToCam = glm::distance(camera_pos, glm::vec3(render_list[i]->m_node->m_min));
 
 	//sort by distance
 	std::sort(render_list.begin(), render_list.end());
@@ -683,14 +668,15 @@ void VoxelOctree::InitOctree(int worldSize, VoxelManager *manager)
 	sf::Clock build_time; //profiling
 
 	this->BuildTree();
-	this->SimplifyOctree(-0.5f);
+	//this->SimplifyOctree(-0.5f);
+	this->AssignNeighbors();
 	this->GenerateMeshFromOctree();
+	this->GenerateSeams();
 	this->UploadMesh();
 	this->UploadGrass();
 
 	std::cout << "Build time is " << build_time.getElapsedTime().asSeconds() << std::endl;
 }
-
 
 void VoxelOctree::InitChildren()
 {
@@ -708,7 +694,6 @@ void VoxelOctree::InitChildren()
 	}
 
 }
-
 
 int VoxelOctree::AddTerrainType(const OctreeDrawInfo *drawInfo)
 {
@@ -839,6 +824,7 @@ bool VoxelOctree::BuildTree()
 	for (int i = 0; i < 8; i++)
 	{
 		m_type = Node_Internal;
+
 		//skip nodes above the max world height
 		if (m_children[i]->m_min.y <= (VoxelOctree::maxHeight)
 			&& m_children[i]->BuildTree())
@@ -851,11 +837,19 @@ bool VoxelOctree::BuildTree()
 			m_children[i]->DestroyNode();
 			m_children[i] = NULL;
 		}
+
 	}
 	if (m_childMask)
 	{
 		m_flag |= OCTREE_ACTIVE;//if at least one child is active, then active
+		
+		if (m_size == VoxelChunk::CHUNK_SIZE)
+		{
+			m_chunk = voxelManager->CreateChunk(m_min, this);
+			render_list.push_back(m_chunk);
+		}
 	}
+
 	return m_childMask;
 }
 
@@ -863,26 +857,81 @@ void VoxelOctree::AssignNeighbors()
 {
 	for (int i = 0; i < render_list.size(); i++)
 	{
-		glm::vec3 position = render_list[i]->getPosition();
+		glm::vec3 position = render_list[i]->m_node->m_min;
 
 		//find chunk above and below
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, VoxelChunk::CHUNK_SIZE, 0)), (int)TOP);
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, -VoxelChunk::CHUNK_SIZE, 0)), (int)BOTTOM);
+		render_list[i]->AssignNeighbor(FindChunk(position + glm::vec3(0, VoxelChunk::CHUNK_SIZE, 0)), (int)TOP);
+		render_list[i]->AssignNeighbor(FindChunk(position + glm::vec3(0, -VoxelChunk::CHUNK_SIZE, 0)), (int)BOTTOM);
 
 		//assign left and right chunks
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(-VoxelChunk::CHUNK_SIZE, 0, 0)), (int)LEFT);
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(VoxelChunk::CHUNK_SIZE, 0, 0)), (int)RIGHT);
+		render_list[i]->AssignNeighbor(FindChunk(position + glm::vec3(-VoxelChunk::CHUNK_SIZE, 0, 0)), (int)LEFT);
+		render_list[i]->AssignNeighbor(FindChunk(position + glm::vec3(VoxelChunk::CHUNK_SIZE, 0, 0)), (int)RIGHT);
 
 		//back and front
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, 0, -VoxelChunk::CHUNK_SIZE)), (int)BACK);
-		render_list[i]->AssignNeighbor(FindLeafChunk(position + glm::vec3(0, 0, VoxelChunk::CHUNK_SIZE)), (int)FRONT);
+		render_list[i]->AssignNeighbor(FindChunk(position + glm::vec3(0, 0, -VoxelChunk::CHUNK_SIZE)), (int)BACK);
+		render_list[i]->AssignNeighbor(FindChunk(position + glm::vec3(0, 0, VoxelChunk::CHUNK_SIZE)), (int)FRONT);
+
+		//XZ diagonal
+		render_list[i]->AssignNeighbor(FindChunk(position + glm::vec3(VoxelChunk::CHUNK_SIZE, 0, VoxelChunk::CHUNK_SIZE)), (int)FRONT_RIGHT);
 	}
 }
 
-VoxelChunk * VoxelOctree::FindLeafChunk(glm::vec3 pos)
+VoxelOctree * VoxelOctree::FindChunkNode(glm::vec3 pos)
 {
-	VoxelOctree * node = FindLeafNode(pos);
-	return node ? node->m_chunk : NULL;
+	//check if position is within world bounds
+	if (pos.x < 0 || pos.y < 0 || pos.z < 0 ||
+		pos.x >= voxelManager->GetWorldSize() ||
+		pos.y >= voxelManager->GetWorldSize() ||
+		pos.z >= voxelManager->GetWorldSize())
+	{
+		return NULL;
+	}
+
+	//iteratively find chunk that contains start position
+	VoxelOctree *node = voxelManager->getRootNode();
+
+	//traverse tree, find chunk
+	bool found = false;
+
+	while (!found)
+	{
+		int index = 0;
+
+		//check which child the next node is in 
+		int child_size = node->m_size >> 1;
+
+		//octal search
+		int x = pos.x >= node->m_min.x && pos.x < node->m_min.x + child_size ? 0 : 1;
+		int y = pos.y >= node->m_min.y && pos.y < node->m_min.y + child_size ? 0 : 1;
+		int z = pos.z >= node->m_min.z && pos.z < node->m_min.z + child_size ? 0 : 1;
+
+		//calculate index 
+		index = 4 * x + 2 * y + z;
+
+		node = node->m_children[index];
+
+		if (!node || ~node->m_flag & OCTREE_ACTIVE || ~node->m_flag & OCTREE_INUSE)
+			return NULL;
+
+		if (node->m_size == VoxelChunk::CHUNK_SIZE)
+			found = true;
+		else if (node->m_size < VoxelChunk::CHUNK_SIZE)
+			return NULL;
+	}
+
+	return node;
+}
+
+VoxelChunk * VoxelOctree::FindChunk(glm::vec3 pos)
+{
+	VoxelOctree * node = FindChunkNode(pos);
+
+	if (node)
+	{
+		return node->m_chunk;
+	}
+
+	return NULL;
 }
 
 VoxelOctree * VoxelOctree::FindLeafNode(glm::vec3 pos)
@@ -897,7 +946,7 @@ VoxelOctree * VoxelOctree::FindLeafNode(glm::vec3 pos)
 	}
 
 	//iteratively find chunk that contains start position
-	VoxelOctree *node = voxelManager->getRootNode();
+	VoxelOctree *node = this;
 
 	//traverse tree, find chunk
 	bool found = false;
@@ -938,7 +987,25 @@ void VoxelOctree::DrawGrass()
 
 void VoxelOctree::Draw()
 {
-	glBindVertexArray(g_terrainVAO);
-	glDrawElements(GL_TRIANGLES, g_terrainIndices.size(), GL_UNSIGNED_INT, (void *)0);
-	glBindVertexArray(0);
+	for (int i = 0; i < render_list.size(); i++)
+	{
+		if(render_list[i] && render_list[i]->m_flag & CHUNK_FLAG_INUSE)
+		{ 
+			render_list[i]->Render();
+		}		
+	}
+}
+
+void VoxelOctree::Draw(GLint shader)
+{
+
+	for (int i = 0; i < render_list.size(); i++)
+	{
+		if (render_list[i] && render_list[i]->m_flag & CHUNK_FLAG_INUSE)
+		{
+			GLint location = glGetUniformLocation(shader, "chunkID");
+			glUniform1i(glGetUniformLocation(shader, "chunkID"), (GLint) i);
+			render_list[i]->Render();
+		}
+	}
 }

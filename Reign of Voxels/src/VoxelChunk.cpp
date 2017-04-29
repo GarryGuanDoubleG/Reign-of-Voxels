@@ -1,34 +1,31 @@
 #include "VoxelChunk.hpp"
+#include "VoxelOctree.hpp"
 #include "model.hpp"
 
 
 VoxelChunk::VoxelChunk() : m_flag(0)
 {
-
+	m_render_mode = true;
 }
 
-void VoxelChunk::Init(glm::vec3 position)
+void VoxelChunk::Init(glm::vec3 position, VoxelOctree * node)
 {
 	if (m_flag & CHUNK_FLAG_INUSE)
 		std::cout << "Error already using chunk" << std::endl;
 
-	m_flag = CHUNK_FLAG_INUSE;
+	m_flag |= CHUNK_FLAG_INUSE;
+	m_flag |= CHUNK_FLAG_ACTIVE;
 
-	m_position = position;
+	m_node = node;
 
-	memset(m_voxels, VOXEL_TYPE_AIR, sizeof(m_voxels));
+
 	memset(m_neighbor, NULL, sizeof(m_neighbor));
-
-	std::vector<GLuint>empty_indices;
-	m_tri_indices = empty_indices;
-
-	std::vector<Vertex> empty_vertices;
-	m_vertices = empty_vertices;
 }
 
 void VoxelChunk::Destroy()
 {
 	m_flag = 0;
+	m_node = NULL;
 
 	glDeleteBuffers(1, &m_vbo);
 	glDeleteBuffers(1, &m_ebo);
@@ -36,10 +33,7 @@ void VoxelChunk::Destroy()
 }
 
 
-glm::vec3 VoxelChunk::getSize()
-{
-	return glm::vec3(CHUNK_SIZE);
-}
+
 
 bool VoxelChunk::IsActive()
 {
@@ -54,29 +48,6 @@ void VoxelChunk::SetActive(bool active)
 		m_flag &= ~(CHUNK_FLAG_ACTIVE);
 }
 
-//assumes coordinates are in world position
-void VoxelChunk::InsertVoxelAtPos(int x, int y, int z)
-{
-	for (int i = 0; i < CHUNK_SIZE; i++)
-	{
-		if (i <= y - (int)m_position.y)
-		{
-			m_voxels[GetIndex(x - (int)m_position.x, i, z - (int)m_position.z)] = VOXEL_TYPE_GRASS;
-		}
-	}
-}
-
-
-void VoxelChunk::AddTrianglesIndices()
-{
-	m_tri_indices.push_back(m_vertices.size() - 4);
-	m_tri_indices.push_back(m_vertices.size() - 3);
-	m_tri_indices.push_back(m_vertices.size() - 2);
-	m_tri_indices.push_back(m_vertices.size() - 4);
-	m_tri_indices.push_back(m_vertices.size() - 2);
-	m_tri_indices.push_back(m_vertices.size() - 1);
-}
-
 void VoxelChunk::BindMesh()
 {
 	if ((m_vertices.size() == 0) || m_tri_indices.size() == 0)
@@ -84,57 +55,41 @@ void VoxelChunk::BindMesh()
 		return;
 	}
 
-	glGenVertexArrays(1, &this->m_vao);
-	glGenBuffers(1, &this->m_vbo);
-	glGenBuffers(1, &this->m_ebo);
-
+	glGenVertexArrays(1, &m_vao);
 	glBindVertexArray(m_vao);
 
+	glGenBuffers(1, &m_vbo);
 	glBindBuffer(GL_ARRAY_BUFFER, m_vbo);
-	glBufferData(GL_ARRAY_BUFFER, m_vertices.size() * sizeof(Vertex), &m_vertices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VoxelVertex) * m_vertices.size(), &m_vertices[0], GL_STATIC_DRAW);
 
+	glGenBuffers(1, &m_ebo);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_tri_indices.size() * sizeof(GLuint), &m_tri_indices[0], GL_STATIC_DRAW);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * m_tri_indices.size(), &m_tri_indices[0], GL_STATIC_DRAW);
 
 	//location 0 should be verts
 	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)0);
 	//now normals
 	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-	//now textures
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, normal));
+
 	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, textureID));
+
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
+}
 
-	////minimap
-	glGenVertexArrays(1, &m_mp_vao);
-	glGenBuffers(1, &m_mp_vbo);
-	glGenBuffers(1, &m_mp_ebo);
+void VoxelChunk::AddTrianglesIndices(GLuint indice)
+{
+	m_tri_indices.push_back(indice);
+}
 
-	glBindVertexArray(m_mp_vao);
-
-	glBindBuffer(GL_ARRAY_BUFFER, m_mp_vbo);
-	glBufferData(GL_ARRAY_BUFFER, m_top_verts.size() * sizeof(Vertex), &m_top_verts[0], GL_STATIC_DRAW);
-
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_mp_ebo);
-	glBufferData(GL_ELEMENT_ARRAY_BUFFER, m_mp_indices.size() * sizeof(GLuint), &m_mp_indices[0], GL_STATIC_DRAW);
-
-	glEnableVertexAttribArray(0);
-	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)0);
-	//now normals
-	glEnableVertexAttribArray(1);
-	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, normal));
-	//now textures
-	glEnableVertexAttribArray(2);
-	glVertexAttribPointer(2, 2, GL_FLOAT, GL_FALSE, sizeof(Vertex), (GLvoid*)offsetof(Vertex, uv));
-
-	glBindVertexArray(0);
-	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-	glBindBuffer(GL_ARRAY_BUFFER, 0);
+void VoxelChunk::AddVertices(VoxelVertex voxelVerts)
+{
+	m_vertices.push_back(voxelVerts);
 }
 
 int inline VoxelChunk::GetIndex(int x, int y, int z)
@@ -142,50 +97,241 @@ int inline VoxelChunk::GetIndex(int x, int y, int z)
 	return x * CHUNK_SIZE_SQ + y * CHUNK_SIZE + z;
 }
 
-glm::vec3 VoxelChunk::getPosition()
-{
-	return m_position;
-}
-
-void VoxelChunk::GenerateMesh()
-{
-}
-
-void VoxelChunk::ClearMeshData()
-{
-	m_mp_indices_count = m_mp_indices.size();
-	m_indices_count = m_tri_indices.size();
-
-	std::vector<Vertex>().swap(m_vertices);
-	std::vector<Vertex>().swap(m_top_verts);
-
-	std::vector<GLuint>().swap(m_tri_indices);
-	std::vector<GLuint>().swap(m_mp_indices);
-}
 
 void VoxelChunk::AssignNeighbor(VoxelChunk * neighbor, int side)
 {
 	m_neighbor[side] = neighbor;
 }
 
-sf::Uint8 VoxelChunk::GetVoxel(glm::ivec3 local_pos)
-{
-	return m_voxels[GetIndex(local_pos.x, local_pos.y, local_pos.z)];
-}
-
 void VoxelChunk::Render()
 {
-	if (~m_flag & CHUNK_FLAG_ACTIVE)
+	if (~m_flag & CHUNK_FLAG_ACTIVE || !m_render_mode)
 		return;
 
 	glBindVertexArray(m_vao);
-	glDrawElements(GL_TRIANGLES, m_indices_count, GL_UNSIGNED_INT, 0);
+	glDrawElements(GL_TRIANGLES, m_tri_indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
 
-void VoxelChunk::RenderMinimap()
+void VoxelChunk::GenerateSeam()
 {
-	glBindVertexArray(m_mp_vao);
-	glDrawElements(GL_TRIANGLES, m_mp_indices_count, GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
+	FindSeamNodes();
+
+	if (m_seam_nodes.size() == 0) return;
+
+	int currentSize = 1;
+	glm::ivec3 chunkPos = m_node->m_min;
+
+	//create an octree to contour
+	//delete tree when done
+	while (m_seam_nodes.size() > 1)
+	{
+		int parentSize = currentSize * 2;
+		std::vector<VoxelOctree *> parents;
+
+		for (int i = 0; i < m_seam_nodes.size(); i++)
+		{
+			bool foundParent = false;
+			
+			VoxelOctree * currNode = m_seam_nodes[i];
+
+			glm::ivec3 childPos = currNode->m_min;
+			glm::ivec3 parent_pos = childPos - ((childPos - chunkPos) % parentSize);
+			
+
+			int x = childPos.x >= parent_pos.x && childPos.x < parent_pos.x + currentSize ? 0 : 1;
+			int y = childPos.y >= parent_pos.y && childPos.y < parent_pos.y + currentSize ? 0 : 1;
+			int z = childPos.z >= parent_pos.z && childPos.z < parent_pos.z + currentSize ? 0 : 1;
+
+			int index = 4 * x + 2 * y + z;
+
+			for (int j = 0; j < parents.size(); j++)
+			{
+				if (parents[j]->m_min == parent_pos)
+				{
+					foundParent = true;					
+					parents[j]->m_children[index] = currNode;
+					parents[j]->m_childMask |= 1 << index;
+					break;
+				}
+			}
+			if (!foundParent)
+			{
+				VoxelOctree *parent = new VoxelOctree();
+
+				parent->InitNode(parent_pos, parentSize);
+
+				parent->m_flag |= OCTREE_ACTIVE;
+				parent->m_type = Node_Internal;
+				parent->m_childMask |= 1 << index;
+				parent->m_children[index] = m_seam_nodes[i];
+
+				parents.push_back(parent);
+			}
+		}
+
+		m_seam_nodes = parents;
+		currentSize *= 2;
+	}
+
+	m_seam_nodes[0]->GenerateVertexIndices(m_vertices);
+	m_seam_nodes[0]->ContourCellProc(m_tri_indices);
+
+	//DeleteSeamTree(NULL);
+}
+
+void VoxelChunk::FindSeamNodes()
+{
+	m_seam_nodes.clear();
+	
+	//find nodes on max border of this chunk, min of x and z neighbor, and one node on xz diagonal
+	int max = CHUNK_SIZE - 1;
+	int min = 0;
+	glm::ivec3 pos = m_node->m_min;
+
+	for (int x = 0; x < CHUNK_SIZE; x++)
+	{
+		for (int y = 0; y < CHUNK_SIZE; y++)
+		{
+			int z = max;
+			VoxelOctree * node = m_node->FindLeafNode(pos + glm::ivec3(x, y, z));
+
+			if (node && node->m_flag & OCTREE_ACTIVE)
+			{
+				m_seam_nodes.push_back(node);
+			}
+		}
+	}
+
+	for (int z = 0; z < CHUNK_SIZE; z++)
+	{
+		for (int y = 0; y < CHUNK_SIZE; y++)
+		{
+			int x = max;
+			VoxelOctree * node = m_node->FindLeafNode(pos + glm::ivec3(x, y, z));
+
+			if (z == 0 && node)
+			{
+				int a = 2;
+			}
+
+			if (node && node->m_flag & OCTREE_ACTIVE)
+			{
+				m_seam_nodes.push_back(node);
+			}
+		}
+	}
+
+	for (int z = 0; z < CHUNK_SIZE; z++)
+	{
+		for (int x = 0; x < CHUNK_SIZE; x++)
+		{
+			int y = max;
+			VoxelOctree * node = m_node->FindLeafNode(pos + glm::ivec3(x, y, z));
+
+			if (node && node->m_flag & OCTREE_ACTIVE)
+			{
+				m_seam_nodes.push_back(node);
+			}
+		}
+	}
+
+	if (m_neighbor[FRONT])
+	{
+		//find nodes on min border of neighbors
+		for (int x = 0; x < CHUNK_SIZE; x++)
+		{
+			for (int y = 0; y < CHUNK_SIZE; y++)
+			{
+				int z = min;
+				VoxelOctree * node = m_neighbor[FRONT]->m_node->FindLeafNode(m_neighbor[FRONT]->m_node->m_min + glm::ivec3(x, y, z));
+
+				if (node)
+				{
+					m_seam_nodes.push_back(node);
+				}
+			}
+		}
+	}
+
+	if (m_neighbor[TOP])
+	{
+		//find nodes on min border of neighbors
+		for (int x = 0; x < CHUNK_SIZE; x++)
+		{
+			for (int z = 0; z < CHUNK_SIZE; z++)
+			{
+				int y = min;
+				VoxelOctree * node = m_neighbor[TOP]->m_node->FindLeafNode(m_neighbor[TOP]->m_node->m_min + glm::ivec3(x, y, z));
+
+				if (node)
+				{
+					m_seam_nodes.push_back(node);
+				}
+			}
+		}
+	}
+
+	//min nodes of right neighbor
+	if (m_neighbor[RIGHT])
+	{
+		for (int z = 0; z < CHUNK_SIZE; z++)
+		{
+			for (int y = 0; y < CHUNK_SIZE; y++)
+			{
+				int x = min;
+
+				VoxelOctree * node = m_neighbor[RIGHT]->m_node->FindLeafNode(m_neighbor[RIGHT]->m_node->m_min + glm::ivec3(x, y, z));
+				if (z == 0 && node)
+				{
+					int a = 2;
+				}
+				if (node )
+				{
+					m_seam_nodes.push_back(node);
+				}
+
+			}
+		}
+	}
+
+	//finally find xz diagonal neighbor
+	for (int y = 0; y < CHUNK_SIZE; y++)
+	{
+		if (!m_neighbor[FRONT_RIGHT])
+			break;
+
+		VoxelOctree * node = m_neighbor[FRONT_RIGHT]->m_node->FindLeafNode(m_neighbor[FRONT_RIGHT]->m_node->m_min + glm::ivec3(0, y, 0));
+
+		if (node)
+		{
+			m_seam_nodes.push_back(node);
+		}
+	}
+
+}
+
+void VoxelChunk::DeleteSeamTree(VoxelOctree *node)
+{
+	if (!node)
+	{
+		node = m_seam_nodes[0];
+	}
+
+	//leaf nodes belong to chunk
+	//dont delete
+	if (node->m_type == Node_Leaf)
+		return;
+
+	for (int i = 0; i < 8; i++)
+	{
+		if (node->m_childMask & 1 << i)
+		{
+			DeleteSeamTree(node->m_children[i]);
+		}
+	}
+	
+	//can't call node destroy because it's not part of VM node pool
+	//TODO create seperate node pool for seam nodes
+	delete node;
 }

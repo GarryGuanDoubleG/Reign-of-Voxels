@@ -14,16 +14,16 @@ public:
 	int GetWorldSize();
 
 	void GenerateVoxels();
+	void GenerateChunks();
 
 	void RenderWorld(bool draw_textured, Camera * player_cam);
 	void RenderGrass(Camera * player_cam);
 	void RenderVoxels(bool draw_textured, Camera * player_cam);
-	void RenderMinimap(GLuint shader, glm::vec2 &scale, glm::vec2 &position);
 	void RenderVoxelTextured(Camera *player_cam);
 	void RenderMinimap(Camera * player_cam);
 
 
-	VoxelChunk *CreateChunk(glm::vec3 worldPosition);
+	VoxelChunk *CreateChunk(glm::vec3 worldPosition, VoxelOctree *node);
 	void		destroyChunk(VoxelChunk * chunk);
 
 	//gets the child of a node at a specific index
@@ -38,7 +38,7 @@ public:
 
 private:
 
-	int m_resolution; //size of one side of cubic world region
+	int m_worldSize; //size of one side of cubic world region
 	int m_maxChunks;
 	int m_maxOctNodes;
 

@@ -23,19 +23,6 @@ enum OctreeNodeType
 	Node_Leaf,
 };
 
-
-typedef struct VoxelVertex_S
-{
-	VoxelVertex_S() {};
-	VoxelVertex_S(glm::vec3 pos, glm::vec3 norm) : position(pos), normal(norm) {};
-	VoxelVertex_S(glm::vec3 pos, glm::vec3 norm, int type) : position(pos), normal(norm), textureID(type) {};
-
-	glm::vec3 position;
-	glm::vec3 normal;
-	GLint textureID;
-}VoxelVertex;
-
-
 struct OctreeDrawInfo
 {
 	OctreeDrawInfo()
@@ -55,6 +42,7 @@ struct OctreeDrawInfo
 class VoxelOctree
 {
 	friend class VoxelManager;
+	friend class VoxelChunk;
 private:
 	static unsigned int m_chunkCount;
 	static VoxelManager * voxelManager;
@@ -80,26 +68,25 @@ private:
 	union
 	{
 		VoxelOctree *m_children[8];
-		VoxelOctree *next_free; 
+		VoxelOctree *next_free;
 	};
 public:
 	VoxelOctree();
-	
+
 	void InitNode(glm::ivec3 minPos, int size);
 	void DestroyNode();
-	
+
 	void InitChildren();
 	void InitOctree(int size, VoxelManager *manager); // length of each side of the world
-	
+
 	void AssignNeighbors();//assign neighbors to chunks
 
 	//create vertices for world
-	void GenerateMesh(int i, int length);
-	void GenerateWorldMesh();
 	VoxelOctree* SimplifyOctree(float threshold);
 
 	VoxelOctree * FindLeafNode(glm::vec3 pos);
-	VoxelChunk *  FindLeafChunk(glm::vec3 pos);
+	VoxelOctree * FindChunkNode(glm::vec3 pos);
+	VoxelChunk * FindChunk(glm::vec3 pos);
 
 	static const int maxHeight = 64;
 	static std::vector<VoxelChunk *> render_list;//list of leaf nodes
@@ -107,18 +94,22 @@ public:
 
 private:
 	int AddTerrainType(const OctreeDrawInfo *drawInfo);
+
+	void GenerateSeams();
 	void GenerateMeshFromOctree();
-	void GenerateVertexIndices();
-	void ContourCellProc();
-	void ContourProcessEdge(VoxelOctree* node[4], int dir);
-	void ContourEdgeProc(VoxelOctree* node[4], int dir);
-	void ContourFaceProc(VoxelOctree* node[2], int dir);
-	
+	void GenerateVertexIndices(std::vector<VoxelVertex> &voxelVerts);
+
+	void ContourCellProc(std::vector<GLuint> &m_tri_indices);
+	void ContourProcessEdge(std::vector<GLuint> &m_tri_indices, VoxelOctree* node[4], int dir);
+	void ContourEdgeProc(std::vector<GLuint> &m_tri_indices, VoxelOctree* node[4], int dir);
+	void ContourFaceProc(std::vector<GLuint> &m_tri_indices, VoxelOctree* node[2], int dir);
+
 	void UploadMesh();
 	void UploadGrass();
 
 	void Draw();
 	void DrawGrass();
+	static void Draw(GLint shader);
 
 	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos);
 

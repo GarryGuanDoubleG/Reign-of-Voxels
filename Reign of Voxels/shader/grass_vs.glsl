@@ -16,11 +16,12 @@ uniform vec3 cameraRight;
 uniform vec3 cameraUp;
 uniform vec2 billboardSize;
 
+uniform float time;
 
 void main(void)
 {
-
 	mat4 modelMat = model;
+
 	modelMat[3][0] = worldPos.x;
 	modelMat[3][1] = worldPos.y + .5f;
 	modelMat[3][2] = worldPos.z;
@@ -30,7 +31,6 @@ void main(void)
 	modelView[0][0] = 1.0; 
 	modelView[0][1] = 0.0; 
 	modelView[0][2] = 0.0; 
-
 
 	// Thrid colunm.
 	modelView[2][0] = 0.0; 
