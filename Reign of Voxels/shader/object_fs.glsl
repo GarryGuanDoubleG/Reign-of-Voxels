@@ -18,7 +18,7 @@ uniform vec4 colorMod;
 
 void main()
 {
-	vec4 texColor = texture(texture_diffuse0, UV);
+	//vec4 texColor = texture(texture_diffuse0, UV);
 
 	////color = vec4((texture(texture_diffuse1, UV)) *lightColor);
 	//vec3 lightDir = normalize(lightPos - FragPos); 
@@ -38,5 +38,5 @@ void main()
 
  //   vec3 result = (specular + ambient + diffuse);
 	//color = vec4(result, 1.0f) * texColor;
-	color =  texColor;
+	color =  vec4(1.0f,.4f, .4f, 1.0f);
 }

@@ -68,14 +68,14 @@ bool BoundContains(const glm::vec3 & pos, const glm::dvec3& min, const glm::dvec
 //http://www.cse.yorku.ca/~amana/research/grid.pdf
 
 
-void PhysicsUtil::WorldRayCast(VoxelManager * voxelManager, const Ray &ray, 
+bool PhysicsUtil::WorldRayCast(VoxelManager * voxelManager, const Ray &ray, 
 								const float& length, glm::vec3 &outHit)
 {
 	//0 leads to an infinite loop
 	//returning negative if outside world
 	if (ray.dir == glm::vec3(-1))
 	{
-		return;
+		return false;
 	}
 
 	const glm::ivec3 step(glm::sign(ray.dir));
@@ -99,7 +99,7 @@ void PhysicsUtil::WorldRayCast(VoxelManager * voxelManager, const Ray &ray,
 		{
 			std::cout << "Face : " << face.x << " " << face.y << " " << face.z << std::endl;
 			outHit = cube_pos + face;
-			return;
+			return true;
 		}
 		else if(!BoundContains(cube_pos, min, max))
 		{
@@ -128,5 +128,68 @@ void PhysicsUtil::WorldRayCast(VoxelManager * voxelManager, const Ray &ray,
 	
 	outHit = glm::vec3(-1);
 	// there is no cube in range
-	return;
+	return false;
+}
+
+bool PhysicsUtil::WorldRayCast(VoxelManager * voxelManager, const Ray &ray,
+	const float& length, glm::vec3 &outHit, glm::ivec3 &outFace)
+{
+	//0 leads to an infinite loop
+	//returning negative if outside world
+	if (ray.dir == glm::vec3(-1))
+	{
+		return false;
+	}
+
+	const glm::ivec3 step(glm::sign(ray.dir));
+
+	glm::ivec3 cube_pos = ray.start;//floor the ray origin by casting to int
+
+	glm::vec3 tMax = intbounds(ray.start, ray.dir);
+	glm::vec3 tDelta = delta(ray.dir);
+
+	glm::ivec3 face;//used to track which face was hit
+
+	const glm::vec3 min = ray.start - length;
+	const glm::vec3 max = ray.start + length;
+
+	while (// ray has not gone past bounds of world
+		(step.x > 0 ? cube_pos.x < max.x : cube_pos.x > min.x) &&
+		(step.y > 0 ? cube_pos.y < max.y : cube_pos.y > min.y) &&
+		(step.z > 0 ? cube_pos.z < max.z : cube_pos.z > min.z))
+	{
+		if (voxelManager->BlockWorldPosActive(cube_pos))
+		{
+			outFace = face;
+			outHit = cube_pos;
+			return true;
+		}
+		else if (!BoundContains(cube_pos, min, max))
+		{
+			break;
+		}
+		// tMax.x stores the t-value at which we cross a cube boundary along the
+		// X axis, and similarly for Y and Z. Therefore, choosing the least tMax
+		// chooses the closest cube boundary.
+
+		sf::Uint8 i = (tMax.x < tMax.y) ? 0 : 1;
+
+		if (tMax.z < tMax[i])
+		{
+			i = 2;
+		}
+
+		cube_pos[i] += step[i];
+		// Adjust tMax to the next axis oriented boundary crossing.
+
+		tMax[i] += tDelta[i];
+
+		// Record the normal vector of the cube face we entered.
+		face.x = face.y = face.z = 0;
+		face[i] = -step[i];
+	}
+
+	outHit = glm::vec3(-1);
+	// there is no cube in range
+	return false;
 }

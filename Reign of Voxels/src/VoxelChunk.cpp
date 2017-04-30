@@ -34,7 +34,6 @@ void VoxelChunk::Destroy()
 
 
 
-
 bool VoxelChunk::IsActive()
 {
 	return m_flag & CHUNK_FLAG_ACTIVE != 0;
@@ -50,6 +49,10 @@ void VoxelChunk::SetActive(bool active)
 
 void VoxelChunk::BindMesh()
 {
+	glDeleteVertexArrays(1, &m_vao);
+	glDeleteBuffers(1, &m_vbo);
+	glDeleteBuffers(1, &m_ebo);
+
 	if ((m_vertices.size() == 0) || m_tri_indices.size() == 0)
 	{
 		return;
@@ -112,6 +115,8 @@ void VoxelChunk::Render()
 	glDrawElements(GL_TRIANGLES, m_tri_indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
+
+
 
 void VoxelChunk::GenerateSeam()
 {
@@ -189,11 +194,12 @@ void VoxelChunk::FindSeamNodes()
 	int min = 0;
 	glm::ivec3 pos = m_node->m_min;
 
-	for (int x = 0; x < CHUNK_SIZE; x++)
+	for (int x = 0; x < CHUNK_SIZE - 1; x++)
 	{
 		for (int y = 0; y < CHUNK_SIZE; y++)
 		{
 			int z = max;
+			
 			VoxelOctree * node = m_node->FindLeafNode(pos + glm::ivec3(x, y, z));
 
 			if (node && node->m_flag & OCTREE_ACTIVE)
@@ -210,11 +216,6 @@ void VoxelChunk::FindSeamNodes()
 			int x = max;
 			VoxelOctree * node = m_node->FindLeafNode(pos + glm::ivec3(x, y, z));
 
-			if (z == 0 && node)
-			{
-				int a = 2;
-			}
-
 			if (node && node->m_flag & OCTREE_ACTIVE)
 			{
 				m_seam_nodes.push_back(node);
@@ -222,9 +223,9 @@ void VoxelChunk::FindSeamNodes()
 		}
 	}
 
-	for (int z = 0; z < CHUNK_SIZE; z++)
+	for (int z = 0; z < CHUNK_SIZE - 1; z++)
 	{
-		for (int x = 0; x < CHUNK_SIZE; x++)
+		for (int x = 0; x < CHUNK_SIZE - 1; x++)
 		{
 			int y = max;
 			VoxelOctree * node = m_node->FindLeafNode(pos + glm::ivec3(x, y, z));
@@ -334,4 +335,92 @@ void VoxelChunk::DeleteSeamTree(VoxelOctree *node)
 	//can't call node destroy because it's not part of VM node pool
 	//TODO create seperate node pool for seam nodes
 	delete node;
+}
+
+
+void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos, VoxelOctree *node)
+{
+	if (node->m_type == Node_Leaf)
+	{
+		node->DestroyNode();
+		return;
+	}
+
+	int child_size = node->m_size >> 1;
+
+	int x = world_pos.x >= node->m_min.x && world_pos.x < node->m_min.x + child_size ? 0 : 1;
+	int y = world_pos.y >= node->m_min.y && world_pos.y < node->m_min.y + child_size ? 0 : 1;
+	int z = world_pos.z >= node->m_min.z && world_pos.z < node->m_min.z + child_size ? 0 : 1;
+
+	int index = 4 * x + 2 * y + z;
+
+	DestroyVoxel(world_pos, node->m_children[index]);
+	node->m_childMask &= ~(1 << index);
+
+	if (node->m_childMask == 0)
+	{
+		node->DestroyNode();
+	}
+}
+/***Edit world ***/
+void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos)
+{
+	//DestroyVoxel(world_pos, m_node);
+
+	if (world_pos.y <= 1)
+		return;
+
+	m_csgOpPos.clear();
+	m_csgOpPos.push_back(world_pos);
+
+	//VoxelOctree *targetNode = m_node->FindLeafNode(world_pos);
+	//if (!targetNode)
+	//{
+	//	slog("No node hit");
+	//	return;
+	//}
+	//targetNode->BuildLeafNode();
+	m_node->BuildTree(m_csgOpPos);
+
+	m_vertices.clear();
+	m_tri_indices.clear();
+
+	m_node->GenerateVertexIndices(m_vertices);
+	m_node->ContourCellProc(m_tri_indices);
+
+	//GenerateSeam();
+
+	BindMesh();
+}
+
+void VoxelChunk::RebuildTree(glm::ivec3 world_pos)
+{
+	//VoxelOctree *node = this;
+
+	//traverse tree, find chunk
+	bool found = false;
+
+	//while (!found)
+	//{
+	//	int index = 0;
+
+	//	//check which child the next node is in 
+	//	int child_size = node->m_size >> 1;
+
+	//	//octal search
+	//	int x = pos.x >= node->m_min.x && pos.x < node->m_min.x + child_size ? 0 : 1;
+	//	int y = pos.y >= node->m_min.y && pos.y < node->m_min.y + child_size ? 0 : 1;
+	//	int z = pos.z >= node->m_min.z && pos.z < node->m_min.z + child_size ? 0 : 1;
+
+	//	//calculate index 
+	//	index = 4 * x + 2 * y + z;
+
+	//	node = node->m_children[index];
+
+	//	if (!node || ~node->m_flag & OCTREE_ACTIVE || ~node->m_flag & OCTREE_INUSE)
+	//		return NULL;
+
+	//	if (node->m_type == Node_Leaf)
+	//		found = true;
+	//}
 }

@@ -14,10 +14,15 @@ namespace PhysicsUtil
 		Ray& out_ray
 	);
 
-	void WorldRayCast(VoxelManager * voxelManager,
+	bool WorldRayCast(VoxelManager * voxelManager,
 		const Ray &ray,
 		const float& length,
 		glm::vec3 &outHit
 	);
+
+	bool WorldRayCast(VoxelManager * voxelManager, const Ray &ray,
+		const float& length,
+		glm::vec3 &outHit,
+		glm::ivec3 &outFace);
 
 }

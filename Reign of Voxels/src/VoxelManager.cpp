@@ -143,7 +143,6 @@ VoxelOctree *VoxelManager::InitNode(glm::ivec3 minPos, int size)
 	return node;
 }
 
-
 void VoxelManager::destroyOctreeNode(VoxelOctree * node)
 {
 	//prepend free node
@@ -329,10 +328,15 @@ bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
 	if (!node || ~node->m_flag & OCTREE_ACTIVE)
 		return false;
 	
-	VoxelChunk * chunk = m_octreeRoot->FindChunk(world_pos);
-	chunk->m_render_mode = !chunk->m_render_mode;
-
-
+	/*VoxelChunk * chunk = m_octreeRoot->FindChunk(world_pos);
+	chunk->m_render_mode = !chunk->m_render_mode;*/
 
 	return true;
+}
+
+void VoxelManager::DestroyVoxel(glm::ivec3 world_pos)
+{
+	VoxelChunk * chunk = m_octreeRoot->FindChunk(world_pos);
+
+	chunk->DestroyVoxel(world_pos);
 }

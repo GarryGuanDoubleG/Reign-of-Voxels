@@ -13,6 +13,9 @@
 #define AABB_MODE 2
 #define RENDER_GROUND_MODE 4
 #define RENDER_SKYBOX_MODE 8
+#define RENDER_CHUNK_MODE 16
+
+#define SELECTION_MODE 64
 /**
 * constructor
 * Subscribes to event system and sets up a camera and loads models
@@ -292,6 +295,7 @@ void GameScene::Render()
 
 	sf::Clock timer;
 
+	RenderChunkAABB();
 	RenderWorld();
 	RenderEntities();
 
@@ -303,6 +307,7 @@ void GameScene::Render()
 		RenderSkybox();
 	}
 
+	RenderMouseBox();
 	RenderMinimap();
 
 	m_hud->Render();
@@ -441,6 +446,7 @@ void GameScene::RenderWorld()
 	{
 		m_voxelManager->RenderGrass(m_camera);
 	}
+
 }
 
 void GameScene::RenderEntities()
@@ -520,6 +526,60 @@ void GameScene::RenderRayCast()
 	glBindVertexArray(0);
 }
 
+void GameScene::RenderMouseBox()
+{
+	if (~m_flags & SELECTION_MODE)
+		return;
+
+	GLuint shader = GetShader("mouseBox");
+	Model *cube = GetModel(GetModelID("cube"));
+
+	glUseProgram(shader);
+	
+	glm::mat4 model(1.0f);
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(m_selection_box));
+
+	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
+
+	cube->Draw(shader);
+}
+
+void GameScene::RenderChunkAABB()
+{
+	if (~m_flags & RENDER_CHUNK_MODE)
+		return;
+
+	int resolution = GetConfigSetting("resolution");
+	Model *cube = GetModel(GetModelID("cube"));
+	glm::mat4 model(1.0f);
+
+
+	GLuint shader = GetShader("object");
+	glUseProgram(shader);
+
+	glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
+
+	for (int x = 0; x < resolution; x += VoxelChunk::CHUNK_SIZE)
+	{
+		for (int y = 0; y < resolution; y += VoxelChunk::CHUNK_SIZE)
+		{
+			for (int z = 0; z < resolution; z += VoxelChunk::CHUNK_SIZE)
+			{
+				model = glm::translate(glm::mat4(1.0f), glm::vec3(x, y, z));
+				model = glm::scale(model, glm::vec3(VoxelChunk::CHUNK_SIZE));
+				glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+
+				cube->Draw(shader);
+			}
+		}
+	}
+}
+
 /**
 *@brief Listens to user input events and handles it
 *@param event type of user input event
@@ -530,6 +590,23 @@ void GameScene::onNotify(Event event, sf::Event &input)
 	/*if (event == ServerInput)*/
 	HandleInput(input);
 }
+
+void GameScene::EntityRayCollision(Ray ray)
+{
+	for (int i = 0; i < MAX_ENTITES; i++)
+	{
+		if (!m_entity_list[i].IsActive())
+			continue;
+
+		glm::vec3 intersection;
+		float t;
+
+		bool hit = AABBRayIntersection(m_entity_list[i].GetPosition(), m_entity_list[i].GetAABB(), ray);
+
+		m_entity_list[i].SetSelected(hit);
+	}
+}
+
 /**
 *@brief Handles user input
 *@param event the user input
@@ -537,7 +614,6 @@ void GameScene::onNotify(Event event, sf::Event &input)
 void GameScene::HandleInput(sf::Event event)
 {
 	m_camera->HandleInput(event);
-	//m_minimapCam->HandleInput(event);
 
 	if (event.type == sf::Event::KeyPressed)
 	{
@@ -545,6 +621,9 @@ void GameScene::HandleInput(sf::Event event)
 		{
 		case sf::Keyboard::Insert:
 			wire_frame = !wire_frame;
+			break;
+		case sf::Keyboard::E:
+			m_flags ^= SELECTION_MODE;
 			break;
 		case sf::Keyboard::R:
 			CreateEntity();
@@ -554,6 +633,9 @@ void GameScene::HandleInput(sf::Event event)
 			break;
 		case sf::Keyboard::Y:
 			m_flags ^= RAY_CAST_MODE;
+			break;
+		case sf::Keyboard::F1:
+			m_flags ^= RENDER_CHUNK_MODE;
 			break;
 		case sf::Keyboard::U:
 			m_flags ^= AABB_MODE;
@@ -576,6 +658,11 @@ void GameScene::HandleInput(sf::Event event)
 			break;
 		}
 	}
+
+	else if (m_flags & SELECTION_MODE)
+	{
+		SelectionInput(event);
+	}
 	else if (event.type == sf::Event::MouseButtonPressed)
 	{
 		Ray ray;
@@ -590,49 +677,70 @@ void GameScene::HandleInput(sf::Event event)
 
 		if (event.mouseButton.button == sf::Mouse::Left)
 		{
-
-			for (int i = 0; i < MAX_ENTITES; i++)
-			{
-				if (!m_entity_list[i].IsActive())
-					continue;
-
-				glm::vec3 intersection;
-				float t;
-
-				bool hit = AABBRayIntersection(m_entity_list[i].GetPosition(), m_entity_list[i].GetAABB(), ray);
-
-				m_entity_list[i].SetSelected(hit);	
-			}
+			EntityRayCollision(ray);
 		}
 		else // right click
 		{
 			glm::vec3 hit;
 
-			PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit);
-			
-			if (hit.y < 0)
+			if (PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit))
 			{
-				slog("No hit");
-				return; //no hit if underneath world
+				std::cout << "Hit.x " << hit.x << "\nHit.y " << hit.y << "\nHit.z" << hit.z << std::endl;
 			}
-			else
-			{
-				std::cout << "Hit.x " << hit.x << std::endl;
-				std::cout << "Hit.y " << hit.y << std::endl;
-				std::cout << "Hit.z " << hit.z << std::endl;
-
-			}
-
 			for (int i = 0; i < MAX_ENTITES; i++)
 			{
-				if (!m_entity_list[i].IsActive() || 
-					!m_entity_list[i].IsSelected())
+				if (!m_entity_list[i].IsActive() || !m_entity_list[i].IsSelected())
 					continue;
 
-				m_entity_list[i].MoveTo(hit);				
+				m_entity_list[i].MoveTo(hit);
 			}
 		}
 	}
+}
+
+void GameScene::SelectionInput(sf::Event event)
+{
+	if (~m_flags & SELECTION_MODE)
+		return;
+
+	Ray ray;
+	glm::ivec3 face(0.0f);
+	glm::vec3 hit;
+
+	if (event.type == sf::Event::MouseMoved)
+	{
+		sf::Vector2i mouse_pos(sf::Mouse::getPosition(*Game::instance().getWindow()));
+
+		//TODO thread ray intersection
+		PhysicsUtil::ScreenPosToWorldRay(m_camera->GetPosition(), mouse_pos,
+			glm::vec2((float)Game::screen_width, (float)Game::screen_height), m_camera->GetViewMat(),
+			m_camera->GetProj(), ray);
+
+		if (PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit, face))
+		{
+			m_selection_box = glm::ivec3(hit);
+		}
+	}
+	else if(event.type == sf::Event::MouseButtonPressed)
+	{
+		sf::Vector2i mouse_pos(event.mouseButton.x, event.mouseButton.y);
+
+		//TODO thread ray intersection
+		PhysicsUtil::ScreenPosToWorldRay(m_camera->GetPosition(), mouse_pos,
+			glm::vec2((float)Game::screen_width, (float)Game::screen_height), m_camera->GetViewMat(),
+			m_camera->GetProj(), ray);
+
+		m_rays.push_back(ray);
+
+		if (event.mouseButton.button == sf::Mouse::Right)
+		{
+			if (PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit, face))
+			{
+				m_voxelManager->DestroyVoxel(hit);
+			}	
+		}
+	}
+
 }
 
 void GameScene::CreateEntity()

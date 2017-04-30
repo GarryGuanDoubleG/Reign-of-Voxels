@@ -114,6 +114,8 @@
     <None Include="shader\minimap_vs.glsl" />
     <None Include="shader\model_fs.glsl" />
     <None Include="shader\model_vs.glsl" />
+    <None Include="shader\mouseBox_fs.glsl" />
+    <None Include="shader\mouseBox_vs.glsl" />
     <None Include="shader\object_fs.glsl" />
     <None Include="shader\object_vs.glsl" />
     <None Include="shader\quad_fs.glsl" />

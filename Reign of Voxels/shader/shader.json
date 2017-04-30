@@ -1,4 +1,8 @@
 {
+  "mouseBox": {
+    "fs": "shader/mouseBox_fs.glsl",
+    "vs": "shader/mouseBox_vs.glsl"
+  },
   "grass": {
     "fs": "shader/grass_fs.glsl",
     "vs": "shader/grass_vs.glsl"

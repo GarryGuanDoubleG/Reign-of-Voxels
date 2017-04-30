@@ -180,3 +180,12 @@ float SignedDistFunc(const glm::vec3 &from, const glm::vec3 &to)
 {
 
 }
+
+bool AABBContainsPoint(const glm::vec3 &min, const glm::vec3 &max, const glm::vec3 &point)
+{
+	if (point.x >= min.x && point.y >= min.y && point.z >= min.z &&
+		 point.x < max.x && point.y < max.y && point.z< max.z)
+		return true;
+
+	return false;
+}

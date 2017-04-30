@@ -34,8 +34,7 @@ void main(void)
 	//					chunkID * 359 % 256 / 256.0,
 	//					chunkID * 501 % 256 / 256.0 );
 
-	vec3 chunkColor = vec3(chunkID * 257 % 256, chunkID * 509 % 256 , chunkID * 853 % 256) / 256;
-	chunkColor = normalize(chunkColor);
+	vec3 chunkColor = vec3(chunkID * 257 % 256, chunkID * 359 % 256 , chunkID * 501 % 256) / 256;
 
 	color = vec4(chunkColor, 1.0f);
 

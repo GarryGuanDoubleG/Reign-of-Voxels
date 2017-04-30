@@ -23,6 +23,8 @@ enum OctreeNodeType
 	Node_Leaf,
 };
 
+
+
 struct OctreeDrawInfo
 {
 	OctreeDrawInfo()
@@ -112,7 +114,11 @@ private:
 	static void Draw(GLint shader);
 
 	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos);
+	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos, const std::vector<glm::vec3> &csgOperationPos);
 
 	bool BuildTree();
+	bool BuildTree(const std::vector<glm::vec3> &csgOperationPos);
+
 	bool BuildLeafNode();
+	bool BuildLeafNode(const std::vector<glm::vec3> &csgOperationPos);
 };

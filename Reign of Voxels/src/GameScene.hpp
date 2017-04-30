@@ -51,14 +51,15 @@ private:
 	GLuint m_minimapVAO;//quad
 	GLuint m_minimapVBO;//quad
 
-
-
 	Model * m_model; // test model, get rid of it once entities work
 
 	bool wire_frame = false;
 	bool draw_textured = false;
 	bool m_worldChanged;
 
+	//TODO move to a player class
+	glm::ivec3 m_selection_box;
+	glm::ivec3 m_selection_face;
 public:
 	/**
 	* constructor
@@ -93,12 +94,13 @@ private:
 	*/
 	void Update();
 
+	void EntityRayCollision(Ray ray);
 	/**
 	*@brief Handles user input
 	*@param event the user input
 	*/
 	virtual void HandleInput(sf::Event event);
-
+	virtual void SelectionInput(sf::Event event);
 	/**
 	*@brief Handles drawing the game scene
 	*/
@@ -110,9 +112,11 @@ private:
 
 	void RenderEntities();
 	void RenderModel(Entity *entity);
+	void RenderMouseBox();
 	void RenderSkybox();
 	void RenderAABB(Entity *entity, GLuint shader);
 	void RenderRayCast();
+	void RenderChunkAABB();
 
 	/**
 	* @brief Renders a scaled down version of world

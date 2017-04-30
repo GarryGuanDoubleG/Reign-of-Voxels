@@ -39,8 +39,12 @@ class VoxelChunk
 
 private:
 	std::vector<GLuint> m_tri_indices;//order to draw vertices
-	std::vector<VoxelOctree *> m_seam_nodes;
 	std::vector<VoxelVertex> m_vertices;
+
+	//used to stitch neighboring chunks
+	std::vector<VoxelOctree *> m_seam_nodes;
+
+	std::vector<glm::vec3> m_csgOpPos;
 
 	GLuint	m_vao,
 		m_vbo,
@@ -56,7 +60,7 @@ public:
 	VoxelChunk();
 
 	//dimensions of chunk
-	static const int CHUNK_SIZE = 32;
+	static const int CHUNK_SIZE = 16;
 	static const int CHUNK_SIZE_SQ = CHUNK_SIZE * CHUNK_SIZE;
 	static const int CHUNK_SIZE_CUBED = CHUNK_SIZE_SQ * CHUNK_SIZE;
 
@@ -68,13 +72,15 @@ public:
 
 	void AssignNeighbor(VoxelChunk * neighbor, int side);
 
-
 	void Render();
 
 	void FindSeamNodes();
 	void GenerateSeam();
 	void DeleteSeamTree(VoxelOctree *node);
 
+	void RebuildTree(glm::ivec3 world_pos);
+	void DestroyVoxel(glm::ivec3 world_pos);
+	void DestroyVoxel(glm::ivec3 world_pos, VoxelOctree *node);
 	//free chunks have pointer to next free chunk
 	//active chunks have pointer to octree node
 	union

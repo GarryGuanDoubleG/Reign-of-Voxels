@@ -68,7 +68,6 @@ enum Side
 	FRONT,
 	FRONT_RIGHT
 };
-
 /**
 * A macro used to detect 2D collision. Useful to see if mouse click is inside a widget's bounds
 */
@@ -97,3 +96,5 @@ bool AABBRayIntersection(const glm::vec3 &objPos, const AABB &aabb, const Ray &r
 void assimpToGLMMat4(const aiMatrix4x4 *from, glm::mat4 &to);
 
 float SignedDistFunc(const glm::vec3 &from, const glm::vec3 &to);
+
+bool AABBContainsPoint(const glm::vec3 &min, const glm::vec3 &max, const glm::vec3 &point);

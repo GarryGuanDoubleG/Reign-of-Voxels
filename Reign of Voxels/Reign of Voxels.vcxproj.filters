@@ -341,5 +341,11 @@
     <None Include="Resources\config.json">
       <Filter>Json</Filter>
     </None>
+    <None Include="shader\mouseBox_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\mouseBox_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
   </ItemGroup>
 </Project>

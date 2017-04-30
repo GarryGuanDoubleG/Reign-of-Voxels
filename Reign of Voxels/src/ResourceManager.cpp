@@ -190,7 +190,6 @@ Model * GetModel(GLint id)
 
 int ResourceManager::GetConfigSetting(std::string key)
 {
-	std::cout << "key: " << key << " value: " << m_configSettings[key] << std::endl;
 	return m_configSettings[key];
 }
 
