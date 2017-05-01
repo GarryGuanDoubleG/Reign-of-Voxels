@@ -50,7 +50,6 @@
     <ClCompile Include="src\simple_logger.cpp" />
     <ClCompile Include="src\svd.cpp" />
     <ClCompile Include="src\texture.cpp" />
-    <ClCompile Include="src\VoxelBlock.cpp" />
     <ClCompile Include="src\VoxelChunk.cpp" />
     <ClCompile Include="src\VoxelManager.cpp" />
     <ClCompile Include="src\VoxelNoise.cpp" />
@@ -93,7 +92,6 @@
     <ClInclude Include="src\States.hpp" />
     <ClInclude Include="src\svd.hpp" />
     <ClInclude Include="src\texture.hpp" />
-    <ClInclude Include="src\VoxelBlock.hpp" />
     <ClInclude Include="src\VoxelChunk.hpp" />
     <ClInclude Include="src\VoxelManager.hpp" />
     <ClInclude Include="src\VoxelNoise.hpp" />

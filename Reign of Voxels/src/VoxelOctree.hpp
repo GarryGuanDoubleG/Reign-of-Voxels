@@ -35,6 +35,7 @@ struct OctreeDrawInfo
 
 	int				index;
 	int				corners;
+	float			densities[8];
 	GLint			type;
 	glm::vec3		position;
 	glm::vec3		averageNormal;

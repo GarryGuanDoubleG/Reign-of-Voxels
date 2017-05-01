@@ -258,6 +258,7 @@ int VoxelOctree::AddTerrainType(const OctreeDrawInfo *drawInfo)
 bool VoxelOctree::BuildLeafNode()
 {
 	int corners = 0;
+	float densities[8];
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -265,6 +266,8 @@ bool VoxelOctree::BuildLeafNode()
 		const float density = Density_Func(glm::vec3(cornerPos));
 		const int material = density < 0.f ? MATERIAL_SOLID : MATERIAL_AIR;
 		corners |= (material << i);
+
+		densities[i] = density;
 	}
 
 	if (corners == 0 || corners == 255)
@@ -340,6 +343,7 @@ bool VoxelOctree::BuildLeafNode()
 	}
 
 	m_drawInfo = drawInfo;
+	memcpy(m_drawInfo->densities, densities, sizeof(densities));
 
 	m_flag |= OCTREE_ACTIVE;
 	m_flag |= OCTREE_LEAF;
@@ -351,14 +355,30 @@ bool VoxelOctree::BuildLeafNode(const glm::vec3 csgOperation)
 {
 	int corners = 0;
 
-	for (int i = 0; i < 8; i++)
+	float densities[8] = { 0, 0, 0, 0, 0, 0, 0, 0 };
+	if (m_drawInfo)
 	{
-		glm::ivec3 cornerPos = m_min + CHILD_MIN_OFFSETS[i];
-		const float density = Density_Func(glm::vec3(cornerPos), csgOperation);
-		const int material = density < 0.f ? MATERIAL_SOLID : MATERIAL_AIR;
-		corners |= (material << i);
-	}
+		memcpy(densities, m_drawInfo->densities, sizeof(densities));
 
+		for (int i = 0; i < 8; i++)
+		{
+			glm::ivec3 cornerPos = m_min + CHILD_MIN_OFFSETS[i];
+			float density = Density_Func(glm::vec3(cornerPos), csgOperation);
+			density = glm::max(-densities[i], density);
+			const int material = density < 0.f ? MATERIAL_SOLID : MATERIAL_AIR;
+			corners |= (material << i);
+		}
+	}
+	else 
+	{
+		for (int i = 0; i < 8; i++)
+		{
+			glm::ivec3 cornerPos = m_min + CHILD_MIN_OFFSETS[i];
+			const float density = Density_Func(glm::vec3(cornerPos), csgOperation);
+			const int material = density < 0.f ? MATERIAL_SOLID : MATERIAL_AIR;
+			corners |= (material << i);
+		}
+	}
 	if (corners == 0 || corners == 255)
 	{
 		// voxel is full inside or outside the volume

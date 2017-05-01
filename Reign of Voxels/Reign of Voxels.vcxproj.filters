@@ -129,9 +129,6 @@
     <ClCompile Include="src\svd.cpp">
       <Filter>Source\Voxel</Filter>
     </ClCompile>
-    <ClCompile Include="src\VoxelBlock.cpp">
-      <Filter>Source\Voxel</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actor.hpp">
@@ -253,9 +250,6 @@
     </ClInclude>
     <ClInclude Include="src\States.hpp">
       <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="src\VoxelBlock.hpp">
-      <Filter>Source\Voxel</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
