@@ -28,10 +28,16 @@ float Density_Func(const glm::vec3& worldPosition)
 	perlinMapVal = perlinMapVal == 0.0 ? 1.0f / 256.0f : perlinMapVal;
 
 	const float terrain = worldPosition.y - (perlinMapVal * VoxelOctree::maxHeight);
+	//float terrain = worldPosition.x - 33.0f;
+	//float terrainy = worldPosition.y - 48.0f;
+	//float terrainz = worldPosition.z - 33.0f;
+
+
+	//const float cube = Cuboid(worldPosition, glm::ivec3(48), glm::ivec3(32, 32, 32));
 	
-	const float cube = Cuboid(worldPosition, glm::ivec3(48), glm::ivec3(32, 32, 32));
-	
-	return glm::max(-cube, terrain);
+	return terrain;
+	//return glm::max(-cube, terrain);
+	//return glm::min(terrain, glm::min(terrainy, terrainz));
 }
 
 float Density_Func(const glm::vec3& worldPosition, const std::vector<glm::vec3> &csgOperationPos)
@@ -53,9 +59,18 @@ float Density_Func(const glm::vec3& worldPosition, const std::vector<glm::vec3> 
 	float csgCube = -10000.0f;
 	for (int i = 0; i < csgOperationPos.size(); i++)
 	{
-		csgCube = Cuboid(worldPosition, csgOperationPos[i], glm::vec3(1.0f));
+		float csgCube = Cuboid(worldPosition, csgOperationPos[i] + .5f, glm::vec3(.5f));
 		postTerrain = glm::max(-csgCube, postTerrain);
 	}
 
 	return postTerrain;
+}
+
+
+float Density_Func(const glm::vec3& worldPosition, const glm::vec3 &csgOperationPos)
+{
+	const float cube = Cuboid(worldPosition, csgOperationPos + .5f, glm::vec3(.5f));
+
+	//return glm::max(-cube, terrain);
+	return cube;
 }

@@ -199,57 +199,54 @@ void VoxelChunk::FindSeamNodes()
 	//find nodes on max border of this chunk, min of x and z neighbor, and one node on xz diagonal
 	int max = CHUNK_SIZE - 1;
 	int min = 0;
-	glm::ivec3 pos = m_node->m_min;
+	
+	glm::ivec3 chunkMin = m_node->m_min;
+	glm::ivec3 chunkMax = chunkMin + CHUNK_SIZE;
 
-	for (int x = 0; x < CHUNK_SIZE - 1; x++)
+	for (int x = 0; x <= max; x++)
 	{
-		for (int y = 0; y < CHUNK_SIZE; y++)
+		for (int y = 0; y <= max; y++)
 		{
 			int z = max;
-			
-			VoxelOctree * node = m_node->FindLeafNode(pos + glm::ivec3(x, y, z));
+						
+			VoxelOctree * node = m_node->FindLeafNode(chunkMin + glm::ivec3(x, y, z));
 
 			if (node && node->m_flag & OCTREE_ACTIVE)
-			{
 				m_seam_nodes.push_back(node);
-			}
 		}
 	}
 
-	for (int z = 0; z < CHUNK_SIZE; z++)
+	for (int z = 0; z <= max; z++)
 	{
-		for (int y = 0; y < CHUNK_SIZE; y++)
+		for (int y = 0; y <= max; y++)
 		{
 			int x = max;
-			VoxelOctree * node = m_node->FindLeafNode(pos + glm::ivec3(x, y, z));
+
+			VoxelOctree * node = m_node->FindLeafNode(chunkMin + glm::ivec3(x, y, z));
 
 			if (node && node->m_flag & OCTREE_ACTIVE)
-			{
 				m_seam_nodes.push_back(node);
-			}
 		}
 	}
-
-	for (int z = 0; z < CHUNK_SIZE - 1; z++)
+	for (int z = 0; z <= max; z++)
 	{
-		for (int x = 0; x < CHUNK_SIZE - 1; x++)
+		for (int x = 0; x <= max; x++)
 		{
 			int y = max;
-			VoxelOctree * node = m_node->FindLeafNode(pos + glm::ivec3(x, y, z));
+
+			VoxelOctree * node = m_node->FindLeafNode(chunkMin + glm::ivec3(x, y, z));
 
 			if (node && node->m_flag & OCTREE_ACTIVE)
-			{
 				m_seam_nodes.push_back(node);
-			}
 		}
 	}
 
 	if (m_neighbor[FRONT])
 	{
 		//find nodes on min border of neighbors
-		for (int x = 0; x < CHUNK_SIZE; x++)
+		for (int x = 0; x <= CHUNK_SIZE; x++)
 		{
-			for (int y = 0; y < CHUNK_SIZE; y++)
+			for (int y = 0; y <= CHUNK_SIZE; y++)
 			{
 				int z = min;
 				VoxelOctree * node = m_neighbor[FRONT]->m_node->FindLeafNode(m_neighbor[FRONT]->m_node->m_min + glm::ivec3(x, y, z));
@@ -262,12 +259,32 @@ void VoxelChunk::FindSeamNodes()
 		}
 	}
 
+	//min nodes of right neighbor
+	if (m_neighbor[RIGHT])
+	{
+		for (int z = 0; z <= CHUNK_SIZE; z++)
+		{
+			for (int y = 0; y <= CHUNK_SIZE; y++)
+			{
+				int x = min;
+
+				VoxelOctree * node = m_neighbor[RIGHT]->m_node->FindLeafNode(m_neighbor[RIGHT]->m_node->m_min + glm::ivec3(x, y, z));
+				if (node )
+				{
+					m_seam_nodes.push_back(node);
+				}
+
+			}
+		}
+	}
+
+
 	if (m_neighbor[TOP])
 	{
 		//find nodes on min border of neighbors
-		for (int x = 0; x < CHUNK_SIZE; x++)
+		for (int x = 0; x <= CHUNK_SIZE; x++)
 		{
-			for (int z = 0; z < CHUNK_SIZE; z++)
+			for (int z = 0; z <= CHUNK_SIZE; z++)
 			{
 				int y = min;
 				VoxelOctree * node = m_neighbor[TOP]->m_node->FindLeafNode(m_neighbor[TOP]->m_node->m_min + glm::ivec3(x, y, z));
@@ -280,31 +297,59 @@ void VoxelChunk::FindSeamNodes()
 		}
 	}
 
-	//min nodes of right neighbor
-	if (m_neighbor[RIGHT])
+	if (m_neighbor[TOP] && m_neighbor[TOP]->m_neighbor[RIGHT])
 	{
-		for (int z = 0; z < CHUNK_SIZE; z++)
+		VoxelChunk *top_right = m_neighbor[TOP]->m_neighbor[RIGHT];
+
+		for (int z = 0; z <= max; z++)
 		{
-			for (int y = 0; y < CHUNK_SIZE; y++)
-			{
-				int x = min;
+			int x = min;
+			int y = min;
 
-				VoxelOctree * node = m_neighbor[RIGHT]->m_node->FindLeafNode(m_neighbor[RIGHT]->m_node->m_min + glm::ivec3(x, y, z));
-				if (z == 0 && node)
-				{
-					int a = 2;
-				}
-				if (node )
-				{
-					m_seam_nodes.push_back(node);
-				}
+			VoxelOctree * node = top_right->m_node->FindLeafNode(top_right->m_node->m_min + glm::ivec3(x, y, z));
 
-			}
+			if (node)
+				m_seam_nodes.push_back(node);
 		}
+
 	}
 
+	if (m_neighbor[TOP] && m_neighbor[TOP]->m_neighbor[FRONT])
+	{
+		VoxelChunk *chunk = m_neighbor[TOP]->m_neighbor[FRONT];
+
+		for (int x = 0; x <= max; x++)
+		{
+			int z = min;
+			int y = min;
+
+			VoxelOctree * node = chunk->m_node->FindLeafNode(chunk->m_node->m_min + glm::ivec3(x, y, z));
+
+			if (node)
+				m_seam_nodes.push_back(node);
+		}
+
+	}
+
+	if (m_neighbor[TOP] && m_neighbor[TOP]->m_neighbor[FRONT_RIGHT])
+	{
+		VoxelChunk *chunk = m_neighbor[TOP]->m_neighbor[FRONT_RIGHT];
+
+		for (int y = 0; y <= max; y++)
+		{
+			int z = min;
+			int x = min;
+
+			VoxelOctree * node = chunk->m_node->FindLeafNode(chunk->m_node->m_min + glm::ivec3(x, y, z));
+
+			if (node)
+				m_seam_nodes.push_back(node);
+		}
+
+	}
 	//finally find xz diagonal neighbor
-	for (int y = 0; y < CHUNK_SIZE; y++)
+
+	for (int y = 0; y <= CHUNK_SIZE; y++)
 	{
 		if (!m_neighbor[FRONT_RIGHT])
 			break;
@@ -347,27 +392,14 @@ void VoxelChunk::DeleteSeamTree(VoxelOctree *node)
 /***Edit world ***/
 void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
 {
-	//DestroyVoxel(world_pos, m_node);
-	glm::ivec3 min = m_node->m_min;
-	glm::ivec3 max = min + CHUNK_SIZE - 1;
-
 	if (world_pos.y <= 1)
 	{
 		return;
 	}
-	if (world_pos.x == min.x || world_pos.y == min.y || world_pos.z == min.z ||
-		world_pos.x == max.x || world_pos.y == max.y || world_pos.z == max.z)
-	{
-		glm::ivec3 neighborPos = min - face * CHUNK_SIZE;
-		for (int i = 0; i < 6; i++)
-		{
-			if (m_neighbor[i] && neighborPos == m_neighbor[i]->m_node->m_min)
-			{
-				m_neighbor[i]->DestroyVoxel(world_pos, face);
-				break;
-			}
-		}
-	}
+
+	//DestroyVoxel(world_pos, m_node);
+	glm::ivec3 min = m_node->m_min;
+	glm::ivec3 max = min + CHUNK_SIZE - 1;
 
 	m_csgOpPos.push_back(world_pos);
 	m_node->BuildTree(m_csgOpPos);
@@ -377,10 +409,6 @@ void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
 
 	m_node->GenerateVertexIndices(m_vertices);
 	m_node->ContourCellProc(m_tri_indices);
-
-	GenerateSeam();
-
-	BindMesh();
 }
 
 void VoxelChunk::RebuildTree(glm::ivec3 world_pos)
@@ -390,27 +418,4 @@ void VoxelChunk::RebuildTree(glm::ivec3 world_pos)
 	//traverse tree, find chunk
 	bool found = false;
 
-	//while (!found)
-	//{
-	//	int index = 0;
-
-	//	//check which child the next node is in 
-	//	int child_size = node->m_size >> 1;
-
-	//	//octal search
-	//	int x = pos.x >= node->m_min.x && pos.x < node->m_min.x + child_size ? 0 : 1;
-	//	int y = pos.y >= node->m_min.y && pos.y < node->m_min.y + child_size ? 0 : 1;
-	//	int z = pos.z >= node->m_min.z && pos.z < node->m_min.z + child_size ? 0 : 1;
-
-	//	//calculate index 
-	//	index = 4 * x + 2 * y + z;
-
-	//	node = node->m_children[index];
-
-	//	if (!node || ~node->m_flag & OCTREE_ACTIVE || ~node->m_flag & OCTREE_INUSE)
-	//		return NULL;
-
-	//	if (node->m_type == Node_Leaf)
-	//		found = true;
-	//}
 }

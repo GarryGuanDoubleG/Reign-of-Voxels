@@ -336,8 +336,67 @@ bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
 
 void VoxelManager::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
 {
+	if (world_pos.y <= 1)
+	{
+		return;
+	}
+
 	VoxelChunk * chunk = m_octreeRoot->FindChunk(world_pos);
 
-	chunk->DestroyVoxel(world_pos, face);
+	//DestroyVoxel(world_pos, m_node);
+	glm::ivec3 min = chunk->m_node->m_min;
+	glm::ivec3 max = min + VoxelChunk::CHUNK_SIZE - 1;
 
+	chunk->m_csgOpPos.push_back(world_pos);
+
+	if (world_pos.x == min.x || world_pos.y == min.y || world_pos.z == min.z ||
+		world_pos.x == max.x || world_pos.y == max.y || world_pos.z == max.z)
+	{
+		glm::ivec3 neighborPos = world_pos - face;
+		VoxelChunk *neighbor = chunk->m_node->FindChunk(neighborPos);
+
+		VoxelOctree *leaf_node = NULL;
+		if (!neighbor || ~neighbor->m_node->m_flag & OCTREE_ACTIVE)
+		{
+			leaf_node = InitNode(neighborPos, 1);
+			m_octreeRoot->AssignLeafNode(leaf_node);
+
+			neighbor = m_octreeRoot->FindChunk(neighborPos);
+			neighbor->m_node->BuildTree(neighborPos);
+
+			neighbor->m_csgOpPos.push_back(neighborPos);
+		}
+		else
+		{
+			neighbor->m_csgOpPos.push_back(neighborPos);
+			neighbor->m_node->BuildTree(neighbor->m_csgOpPos);
+		}
+
+		neighbor->m_vertices.clear();
+		neighbor->m_tri_indices.clear();
+
+		neighbor->m_node->GenerateVertexIndices(neighbor->m_vertices);
+		neighbor->m_node->ContourCellProc(neighbor->m_tri_indices);
+
+		neighbor->GenerateSeam();
+		neighbor->BindMesh();
+	}
+
+	chunk->m_csgOpPos.push_back(world_pos);
+	chunk->m_node->BuildTree(chunk->m_csgOpPos);
+
+	chunk->m_vertices.clear();
+	chunk->m_tri_indices.clear();
+
+	chunk->m_node->GenerateVertexIndices(chunk->m_vertices);
+	chunk->m_node->ContourCellProc(chunk->m_tri_indices);
+
+	chunk->GenerateSeam();
+	chunk->BindMesh();
 }
+
+
+//void VoxelManager::GenerateWater()
+//{
+//
+//}

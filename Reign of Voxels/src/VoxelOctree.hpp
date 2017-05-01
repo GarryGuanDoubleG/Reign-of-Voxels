@@ -80,7 +80,8 @@ public:
 
 	void InitChildren();
 	void InitOctree(int size, VoxelManager *manager); // length of each side of the world
-
+	
+	bool AssignLeafNode(VoxelOctree *node);
 	void AssignNeighbors();//assign neighbors to chunks
 
 	//create vertices for world
@@ -115,10 +116,13 @@ private:
 
 	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos);
 	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos, const std::vector<glm::vec3> &csgOperationPos);
+	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos, const glm::vec3 &csgOperationPos);
 
 	bool BuildTree();
+	bool BuildTree(const glm::vec3 &csgOperationPos);
 	bool BuildTree(const std::vector<glm::vec3> &csgOperationPos);
 
 	bool BuildLeafNode();
+	bool BuildLeafNode(const glm::vec3 &csgOperationPos);
 	bool BuildLeafNode(const std::vector<glm::vec3> &csgOperationPos);
 };
