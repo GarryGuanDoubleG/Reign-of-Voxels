@@ -35,7 +35,6 @@ struct OctreeDrawInfo
 
 	int				index;
 	int				corners;
-	float			densities[8];
 	GLint			type;
 	glm::vec3		position;
 	glm::vec3		averageNormal;
@@ -65,7 +64,7 @@ private:
 
 	OctreeNodeType m_type;
 	OctreeDrawInfo * m_drawInfo;
-
+	float			m_densities[8];
 	//active nodes have children
 	//inactive are added to free node linked list
 	union

@@ -355,25 +355,45 @@ void VoxelManager::DestroyVoxel(glm::ivec3 csgPos, glm::ivec3 face)
 	VoxelOctree *diffNode = chunk->m_node->FindLeafNode(csgPos);
 	diffNode->BuildLeafNode(csgPos);
 	
-	glm::ivec3 neighborPos = csgPos - face;
-	VoxelOctree *newNode = m_octreeRoot->FindLeafNode(neighborPos);
-
-	if (!newNode)
+	for (int i = 0; i < 6; i++)
 	{
-		newNode = InitNode(csgPos - face, 1);
+		glm::ivec3 neighborPos = csgPos + g_neighbors[i];
+		VoxelOctree *newNode = m_octreeRoot->FindLeafNode(neighborPos);
 
-		if (m_octreeRoot->AssignLeafNode(newNode))
+		if (!newNode)
 		{
-			std::cout << "Assigned leaf\n";
+			newNode = InitNode(neighborPos, 1);
+
+			if (m_octreeRoot->AssignLeafNode(newNode))
+			{
+				std::cout << "Assigned leaf\n";
+			}
+
+			newNode->BuildLeafNode();
 		}
-	}
-	else
-	{
-		delete newNode->m_drawInfo;
-		newNode->m_drawInfo = NULL;
+
+		for (int j = 0; j < 6; j++)
+		{
+			glm::ivec3 newNodeneighborPos = newNode->m_min + g_neighbors[j];
+			VoxelOctree *newNodeNeighbor = m_octreeRoot->FindLeafNode(newNodeneighborPos);
+
+			if (!newNodeNeighbor)
+			{
+				newNodeNeighbor = InitNode(newNodeneighborPos, 1);
+
+				if (m_octreeRoot->AssignLeafNode(newNodeNeighbor))
+				{
+					std::cout << "Assigned leaf\n";
+				}
+				newNodeNeighbor->BuildLeafNode();
+			}
+
+			newNodeNeighbor->BuildLeafNode(csgPos);
+		}
+
+		newNode->BuildLeafNode(csgPos);
 	}
 
-	newNode->BuildLeafNode(diffNode, csgPos, face);
 
 	//diffNode->DestroyNode();
 

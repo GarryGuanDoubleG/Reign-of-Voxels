@@ -68,14 +68,14 @@ float Density_Func(const glm::vec3& worldPosition, const glm::vec3 csgPos)
 	if (!AABBContainsPoint(glm::vec3(1), glm::vec3(256 - 1), worldPosition))
 		return 1;
 
-	const float heightScale = 1.0f / VoxelOctree::maxHeight;
-	float perlinMapVal = GetPerlinMapValue(worldPosition.x, worldPosition.z) / 256.0f;
+	//const float heightScale = 1.0f / VoxelOctree::maxHeight;
+	//float perlinMapVal = GetPerlinMapValue(worldPosition.x, worldPosition.z) / 256.0f;
 
-	perlinMapVal = perlinMapVal == 0.0 ? 1.0f / 256.0f : perlinMapVal;
+	//perlinMapVal = perlinMapVal == 0.0 ? 1.0f / 256.0f : perlinMapVal;
 
-	const float terrain = worldPosition.y - (perlinMapVal * VoxelOctree::maxHeight);
-	float csgCube = Cuboid(worldPosition, csgPos, glm::vec3(1.0f));;
+	//const float terrain = worldPosition.y - (perlinMapVal * VoxelOctree::maxHeight);
+	float csgCube = Cuboid(worldPosition, csgPos + .5f, glm::vec3(.5f));;
 
 
-	return glm::max(-csgCube, terrain);
+	return csgCube;
 }

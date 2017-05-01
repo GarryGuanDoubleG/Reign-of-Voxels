@@ -1,9 +1,6 @@
 {
-<<<<<<< Updated upstream
+
   "resolution": 128,
-=======
-  "resolution": 512,
->>>>>>> Stashed changes
   "screen_width": 1280,
   "screen_height": 720,
   "minimap_size":  256
