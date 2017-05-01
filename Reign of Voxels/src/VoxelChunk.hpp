@@ -79,7 +79,8 @@ public:
 	void DeleteSeamTree(VoxelOctree *node);
 
 	void RebuildTree(glm::ivec3 world_pos);
-	void DestroyVoxel(glm::ivec3 world_pos);
+
+	void DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face);
 	void DestroyVoxel(glm::ivec3 world_pos, VoxelOctree *node);
 	//free chunks have pointer to next free chunk
 	//active chunks have pointer to octree node

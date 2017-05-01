@@ -736,7 +736,7 @@ void GameScene::SelectionInput(sf::Event event)
 		{
 			if (PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit, face))
 			{
-				m_voxelManager->DestroyVoxel(hit);
+				m_voxelManager->DestroyVoxel(hit, face);
 			}	
 		}
 	}

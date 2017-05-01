@@ -862,6 +862,11 @@ bool VoxelOctree::BuildLeafNode(const std::vector<glm::vec3> &csgOperationPos)
 {
 	int corners = 0;
 
+	if (glm::distance(csgOperationPos[0],glm::vec3(m_min)) == 2.0f)
+	{
+		int a = 2l;
+	}
+
 	for (int i = 0; i < 8; i++)
 	{
 		glm::ivec3 cornerPos = m_min + CHILD_MIN_OFFSETS[i];
