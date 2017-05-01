@@ -18,6 +18,7 @@ static std::mutex g_render_list_mutex;
 VoxelManager * VoxelOctree::voxelManager;
 
 std::vector<glm::vec3> g_terrainGrassPos;
+std::vector<VoxelOctree *> g_terrainWater;
 
 const int MATERIAL_AIR = 0;
 const int MATERIAL_SOLID = 1;
@@ -140,6 +141,7 @@ void VoxelOctree::DestroyNode()
 }
 
 /***dual contouring ***/
+
 glm::vec3 ApproximateZeroCrossingPosition(const glm::vec3& p0, const glm::vec3& p1)
 {
 	// approximate the zero crossing by finding the min value along the edge
@@ -210,6 +212,7 @@ glm::vec3 ApproximateZeroCrossingPosition(const glm::vec3& p0, const glm::vec3& 
 
 	return p0 + ((p1 - p0) * t);
 }
+
 
 glm::vec3 VoxelOctree::CalculateSurfaceNormal(const glm::vec3 &pos)
 {
@@ -759,10 +762,9 @@ void VoxelOctree::InitOctree(int worldSize, VoxelManager *manager)
 	this->BuildTree();
 	//this->SimplifyOctree(-0.5f);
 	this->AssignNeighbors();
+
 	this->GenerateMeshFromOctree();
 	this->GenerateSeams();
-	this->UploadMesh();
-	this->UploadGrass();
 
 	std::cout << "Build time is " << build_time.getElapsedTime().asSeconds() << std::endl;
 }
@@ -803,8 +805,14 @@ int VoxelOctree::AddTerrainType(const OctreeDrawInfo *drawInfo)
 		type = WATER;
 	}
 
+	if (type == WATER)
+	{
+		g_terrainWater.push_back(this);
+	}
+
 	return type;
 }
+
 
 bool VoxelOctree::BuildLeafNode()
 {
@@ -1074,6 +1082,101 @@ bool VoxelOctree::BuildLeafNode(const glm::vec3 &csgOperationPos)
 	return true;
 }
 
+
+bool VoxelOctree::BuildWaterTree()
+{
+	bool active = false;
+
+	int i = 0;
+
+	//base case
+	//region matches chunk size
+	if (m_size == 1)
+	{
+		return BuildWaterNode();
+	}
+
+	//activate 8 children
+	InitChildren();
+
+	//recursively descend tree to find the active nodes
+	for (int i = 0; i < 8; i++)
+	{
+		m_type = Node_Internal;
+
+		//skip nodes above the max world height
+		if (m_children[i]->m_min.y <= (VoxelOctree::maxHeight)
+			&& m_children[i]->BuildWaterTree())
+		{
+			m_childMask |= 1 << i;
+		}
+		else
+		{
+			m_childMask &= ~(1 << i);
+			m_children[i]->DestroyNode();
+			m_children[i] = NULL;
+		}
+
+	}
+	if (m_childMask)
+	{
+		m_flag |= OCTREE_ACTIVE;//if at least one child is active, then active
+
+		if (m_size == VoxelChunk::CHUNK_SIZE)
+		{
+			if (!m_chunk)
+			{
+				m_chunk = voxelManager->CreateChunk(m_min, this);
+				render_list.push_back(m_chunk);
+			}
+		}
+	}
+
+	return m_childMask;
+}
+bool VoxelOctree::BuildWaterNode()
+{
+	int corners = 0;
+
+	for (int i = 0; i < 8; i++)
+	{
+		glm::ivec3 cornerPos = m_min + CHILD_MIN_OFFSETS[i];
+		const float density = Density_PlanarFunc(glm::vec3(cornerPos));
+		const int material = density < 0.f ? MATERIAL_SOLID : MATERIAL_AIR;
+		corners |= (material << i);
+	}
+
+	if (corners == 0 || corners == 255)
+	{
+		// voxel is full inside or outside the volume
+		//m_type = Node_Leaf;
+		m_flag &= ~(OCTREE_ACTIVE);
+
+		return false;
+	}
+
+	OctreeDrawInfo* drawInfo = new OctreeDrawInfo;
+	drawInfo->position = glm::vec3(m_min) + .5f;	
+	drawInfo->averageNormal = glm::vec3(0, 1, 0);
+	drawInfo->corners = corners;
+
+	drawInfo->type = WATER;
+
+	m_type = Node_Leaf;
+
+	if (m_drawInfo)
+	{
+		delete m_drawInfo;
+	}
+
+	m_drawInfo = drawInfo;
+
+	m_flag |= OCTREE_ACTIVE;
+	m_flag |= OCTREE_LEAF;
+
+	return true;
+}
+
 bool VoxelOctree::BuildTree()
 {
 	bool active = false;
@@ -1221,7 +1324,6 @@ bool VoxelOctree::BuildTree(const std::vector<glm::vec3> &csgOperationPos)
 
 	return m_childMask;
 }
-
 
 
 bool VoxelOctree::AssignLeafNode(VoxelOctree *node)
@@ -1408,6 +1510,9 @@ void VoxelOctree::DrawGrass()
 	glBindVertexArray(0);
 }
 
+
+//TODO MOVE DRAW FUNCTION TO CHUNKS
+//MOVE GLOBAL LIST OF CHUNKS TO voxel manager
 void VoxelOctree::Draw()
 {
 	for (int i = 0; i < render_list.size(); i++)
@@ -1419,9 +1524,10 @@ void VoxelOctree::Draw()
 	}
 }
 
+
+
 void VoxelOctree::Draw(GLint shader)
 {
-
 	for (int i = 0; i < render_list.size(); i++)
 	{
 		if (render_list[i] && render_list[i]->m_flag & CHUNK_FLAG_INUSE)
@@ -1431,4 +1537,16 @@ void VoxelOctree::Draw(GLint shader)
 			render_list[i]->Render();
 		}
 	}
+}
+
+void VoxelOctree::DrawWater(GLint shader)
+{
+	for (int i = 0; i < render_list.size(); i++)
+	{
+		if (render_list[i] && render_list[i]->m_flag & CHUNK_FLAG_INUSE)
+		{
+			render_list[i]->RenderWater();
+		}
+	}
+
 }

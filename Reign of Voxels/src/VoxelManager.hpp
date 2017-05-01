@@ -7,6 +7,19 @@
 
 class VoxelManager
 {
+private:
+	int m_worldSize; //size of one side of cubic world region
+	int m_maxChunks;
+	int m_maxOctNodes;
+
+	VoxelChunk * m_chunkPool;//array of chunks
+	VoxelChunk * m_freeChunkHead;//head ptr to free chunk list
+
+	std::vector<VoxelChunk *> m_water_chunks;
+
+	VoxelOctree *m_octreeRoot; // ptr to octree root node
+	VoxelOctree *m_nextFreeNode;//linked list of inactive nodes
+
 public:
 	VoxelManager(int worldSize);
 	~VoxelManager();
@@ -16,8 +29,12 @@ public:
 	void GenerateVoxels();
 	void GenerateChunks();
 
+	bool IsWaterChunk(int x, int z);
+	void GenerateWater();
+
 	void RenderWorld(bool draw_textured, Camera * player_cam);
 	void RenderGrass(Camera * player_cam);
+	void RenderWater(Camera *player_cam);
 	void RenderVoxels(bool draw_textured, Camera * player_cam);
 	void RenderVoxelTextured(Camera *player_cam);
 	void RenderMinimap(Camera * player_cam);
@@ -34,19 +51,7 @@ public:
 	//free octree node
 	void		 destroyOctreeNode(VoxelOctree * node);
 
+
 	bool BlockWorldPosActive(glm::vec3 world_pos);
 	void DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face);
-private:
-
-	int m_worldSize; //size of one side of cubic world region
-	int m_maxChunks;
-	int m_maxOctNodes;
-
-	VoxelChunk * m_chunkPool;//array of chunks
-	VoxelChunk * m_freeChunkHead;//head ptr to free chunk list
-
-	VoxelOctree *m_octreeRoot; // ptr to octree root node
-	VoxelOctree *m_nextFreeNode;//linked list of inactive nodes
-
-	Model *m_cube;
 };

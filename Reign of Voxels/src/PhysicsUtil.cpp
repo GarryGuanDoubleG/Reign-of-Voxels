@@ -98,6 +98,7 @@ bool PhysicsUtil::WorldRayCast(VoxelManager * voxelManager, const Ray &ray,
 		if (voxelManager->BlockWorldPosActive(cube_pos))
 		{
 			std::cout << "Face : " << face.x << " " << face.y << " " << face.z << std::endl;
+			std::cout << "Cube : " << cube_pos.x << " " << cube_pos.y << " " << cube_pos.z << std::endl;
 			outHit = cube_pos + face;
 			return true;
 		}

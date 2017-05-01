@@ -112,15 +112,22 @@ private:
 
 	void Draw();
 	void DrawGrass();
+	void DrawWater(GLint shader);
+
 	static void Draw(GLint shader);
 
 	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos);
 	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos, const std::vector<glm::vec3> &csgOperationPos);
 	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos, const glm::vec3 &csgOperationPos);
 
+	//TODO reduce redundan code
+	//pass in the density function instead
 	bool BuildTree();
 	bool BuildTree(const glm::vec3 &csgOperationPos);
 	bool BuildTree(const std::vector<glm::vec3> &csgOperationPos);
+
+	bool BuildWaterTree();
+	bool BuildWaterNode();
 
 	bool BuildLeafNode();
 	bool BuildLeafNode(const glm::vec3 &csgOperationPos);

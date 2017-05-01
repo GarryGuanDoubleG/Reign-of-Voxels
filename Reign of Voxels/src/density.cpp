@@ -19,6 +19,16 @@ float Cuboid(const glm::vec3& worldPosition, const glm::vec3& origin, const glm:
 	return glm::min(m, glm::length(max(d, glm::vec3(0.f))));
 }
 
+//axis aligned plane
+float Density_PlanarFunc(const glm::vec3 &worldPosition)
+{
+	const int PLANE = 3;
+
+	const float terrain = Density_Func(worldPosition);
+	const float terrain_plane = worldPosition.y - PLANE;
+
+	return glm::max(-terrain, terrain_plane);
+}
 
 float Density_Func(const glm::vec3& worldPosition)
 {
@@ -28,16 +38,13 @@ float Density_Func(const glm::vec3& worldPosition)
 	perlinMapVal = perlinMapVal == 0.0 ? 1.0f / 256.0f : perlinMapVal;
 
 	const float terrain = worldPosition.y - (perlinMapVal * VoxelOctree::maxHeight);
-	//float terrain = worldPosition.x - 33.0f;
-	//float terrainy = worldPosition.y - 48.0f;
-	//float terrainz = worldPosition.z - 33.0f;
-
-
-	//const float cube = Cuboid(worldPosition, glm::ivec3(48), glm::ivec3(32, 32, 32));
 	
 	return terrain;
-	//return glm::max(-cube, terrain);
-	//return glm::min(terrain, glm::min(terrainy, terrainz));
+
+	//const float terrain = worldPosition.y - (perlinMapVal * VoxelOctree::maxHeight);
+	//const float plane = worldPosition.y - 6.0f;
+
+	//return glm::max(terrain, plane);
 }
 
 float Density_Func(const glm::vec3& worldPosition, const std::vector<glm::vec3> &csgOperationPos)

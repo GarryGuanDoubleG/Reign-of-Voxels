@@ -1,25 +1,18 @@
 #version 400 core
-layout (location = 0) in vec3 verts;
-layout (location = 1) in vec3 normal;
-layout (location = 2) in int textureID;
+layout (location = 0) in vec2 position;
+layout (location = 1) in vec2 uv;
 
-out vec3 vs_normal;
-out vec3 FragPos;
-flat out int texID;
+out vec2 UV;
 
-//out vec2 UV;
-//uniforms
-uniform mat4 model;
-uniform mat4 view;
-uniform mat4 projection;
+uniform vec2 scale;
+uniform vec2 pos;
 
-void main(void)
+
+void main()
 {
-	gl_Position = projection * view * model * vec4(verts,1.0f);
+	vec2 scaledPos = position;
+	scaledPos = (scaledPos + vec2(1.0, -1.0)) * scale;
+	scaledPos = scaledPos - vec2(1.0 , -1.0);
 
-	mat3 normalMatrix = transpose(inverse(mat3(model)));
-	vs_normal = normalMatrix * normal;	
-
-	FragPos = vec3(model * vec4(verts,1.0f));
-	texID = textureID;
-}
+    gl_Position = vec4(scaledPos.xy, 0.0f, 1.0f);
+} 

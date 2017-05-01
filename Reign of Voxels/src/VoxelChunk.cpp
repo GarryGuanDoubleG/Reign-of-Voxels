@@ -88,6 +88,47 @@ void VoxelChunk::BindMesh()
 	glEnableVertexAttribArray(2);
 	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, textureID));
 
+	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
+	if ((m_water_vertices.size() == 0) || m_water_indices.size() == 0)
+	{
+		return;
+	}
+
+	glDeleteVertexArrays(1, &m_water_vao);
+	glDeleteBuffers(1, &m_water_vbo);
+	glDeleteBuffers(1, &m_water_ebo);
+}
+
+void VoxelChunk::BindWaterPlanes()
+{
+	if ((m_water_vertices.size() == 0) || m_water_vertices.size() == 0)
+	{
+		return;
+	}
+
+	glGenVertexArrays(1, &m_water_vao);
+	glBindVertexArray(m_water_vao);
+
+	glGenBuffers(1, &m_water_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_water_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VoxelVertex) * m_water_vertices.size(), &m_water_vertices[0], GL_STATIC_DRAW);
+
+	glGenBuffers(1, &m_water_ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_water_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * m_water_indices.size(), &m_water_indices[0], GL_STATIC_DRAW);
+
+	//location 0 should be verts
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)0);
+	//now normals
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, normal));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, textureID));
 
 	glBindVertexArray(0);
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -113,16 +154,6 @@ int inline VoxelChunk::GetIndex(int x, int y, int z)
 void VoxelChunk::AssignNeighbor(VoxelChunk * neighbor, int side)
 {
 	m_neighbor[side] = neighbor;
-}
-
-void VoxelChunk::Render()
-{
-	if (~m_flag & CHUNK_FLAG_ACTIVE || !m_render_mode)
-		return;
-
-	glBindVertexArray(m_vao);
-	glDrawElements(GL_TRIANGLES, m_tri_indices.size(), GL_UNSIGNED_INT, 0);
-	glBindVertexArray(0);
 }
 
 void VoxelChunk::GenerateSeam()
@@ -191,6 +222,7 @@ void VoxelChunk::GenerateSeam()
 
 	//DeleteSeamTree(NULL);
 }
+
 
 void VoxelChunk::FindSeamNodes()
 {
@@ -411,11 +443,23 @@ void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
 	m_node->ContourCellProc(m_tri_indices);
 }
 
-void VoxelChunk::RebuildTree(glm::ivec3 world_pos)
+
+void VoxelChunk::Render()
 {
-	//VoxelOctree *node = this;
+	if (~m_flag & CHUNK_FLAG_ACTIVE || !m_render_mode)
+		return;
 
-	//traverse tree, find chunk
-	bool found = false;
+	glBindVertexArray(m_vao);
+	glDrawElements(GL_TRIANGLES, m_tri_indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
+}
 
+void VoxelChunk::RenderWater()
+{
+	if (~m_flag & CHUNK_FLAG_ACTIVE || !m_render_mode)
+		return;
+
+	glBindVertexArray(m_water_vao);
+	glDrawElements(GL_TRIANGLES, m_water_indices.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
 }

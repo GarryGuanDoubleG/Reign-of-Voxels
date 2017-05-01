@@ -38,17 +38,32 @@ class VoxelChunk
 	friend class VoxelOctree;
 
 private:
-	std::vector<GLuint> m_tri_indices;//order to draw vertices
+
+	//free chunks have pointer to next free chunk
+	//active chunks have pointer to octree node
+	union
+	{
+		VoxelChunk * m_next;
+		VoxelOctree *m_node;
+	};
+
+	VoxelOctree* m_water_tree;
+
 	std::vector<VoxelVertex> m_vertices;
+	std::vector<VoxelVertex> m_water_vertices;
+
+	std::vector<GLuint> m_tri_indices;//order to draw vertices
+	std::vector<GLuint> m_water_indices;//order to draw vertices
 
 	//used to stitch neighboring chunks
 	std::vector<VoxelOctree *> m_seam_nodes;
+	
 
 	std::vector<glm::vec3> m_csgOpPos;
 
-	GLuint	m_vao,
-		m_vbo,
-		m_ebo;
+	GLuint	m_vao, m_vbo, m_ebo;
+	GLuint	m_water_vao, m_water_vbo, m_water_ebo;
+
 
 	sf::Uint8 m_flag;//bool for active
 
@@ -60,7 +75,7 @@ public:
 	VoxelChunk();
 
 	//dimensions of chunk
-	static const int CHUNK_SIZE = 4;
+	static const int CHUNK_SIZE = 16;
 	static const int CHUNK_SIZE_SQ = CHUNK_SIZE * CHUNK_SIZE;
 	static const int CHUNK_SIZE_CUBED = CHUNK_SIZE_SQ * CHUNK_SIZE;
 
@@ -73,22 +88,14 @@ public:
 	void AssignNeighbor(VoxelChunk * neighbor, int side);
 
 	void Render();
+	void RenderWater();
 
 	void FindSeamNodes();
 	void GenerateSeam();
+
 	void DeleteSeamTree(VoxelOctree *node);
-
-	void RebuildTree(glm::ivec3 world_pos);
-
 	void DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face);
-	void DestroyVoxel(glm::ivec3 world_pos, VoxelOctree *node);
-	//free chunks have pointer to next free chunk
-	//active chunks have pointer to octree node
-	union
-	{
-		VoxelChunk * m_next;
-		VoxelOctree *m_node;
-	};
+
 
 	//used for rendering closer chunks first
 	float distToCam;
@@ -97,9 +104,12 @@ public:
 		return distToCam < other.distToCam;
 	}
 private:
+
 	void AddTrianglesIndices(GLuint indice);
 	void AddVertices(VoxelVertex voxelVert);
+
 	void BindMesh();
+	void BindWaterPlanes();
 
 	int GetIndex(int x, int y, int z);
 };
