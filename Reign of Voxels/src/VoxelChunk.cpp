@@ -2,6 +2,15 @@
 #include "VoxelOctree.hpp"
 #include "model.hpp"
 
+const glm::ivec3 g_neighbors[6] =
+{
+	glm::ivec3(-1,0,0),
+	glm::ivec3(1,0,0),
+	glm::ivec3(0,-1,0),
+	glm::ivec3(0, 1,0),
+	glm::ivec3(0,0,-1),
+	glm::ivec3(0,0, 1)
+};
 
 VoxelChunk::VoxelChunk() : m_flag(0)
 {
@@ -115,8 +124,6 @@ void VoxelChunk::Render()
 	glDrawElements(GL_TRIANGLES, m_tri_indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
-
-
 
 void VoxelChunk::GenerateSeam()
 {
@@ -337,49 +344,32 @@ void VoxelChunk::DeleteSeamTree(VoxelOctree *node)
 	delete node;
 }
 
-
-void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos, VoxelOctree *node)
-{
-	if (node->m_type == Node_Leaf)
-	{
-		node->DestroyNode();
-		return;
-	}
-
-	int child_size = node->m_size >> 1;
-
-	int x = world_pos.x >= node->m_min.x && world_pos.x < node->m_min.x + child_size ? 0 : 1;
-	int y = world_pos.y >= node->m_min.y && world_pos.y < node->m_min.y + child_size ? 0 : 1;
-	int z = world_pos.z >= node->m_min.z && world_pos.z < node->m_min.z + child_size ? 0 : 1;
-
-	int index = 4 * x + 2 * y + z;
-
-	DestroyVoxel(world_pos, node->m_children[index]);
-	node->m_childMask &= ~(1 << index);
-
-	if (node->m_childMask == 0)
-	{
-		node->DestroyNode();
-	}
-}
 /***Edit world ***/
-void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos)
+void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
 {
 	//DestroyVoxel(world_pos, m_node);
+	glm::ivec3 min = m_node->m_min;
+	glm::ivec3 max = min + CHUNK_SIZE - 1;
 
 	if (world_pos.y <= 1)
+	{
 		return;
+	}
+	if (world_pos.x == min.x || world_pos.y == min.y || world_pos.z == min.z ||
+		world_pos.x == max.x || world_pos.y == max.y || world_pos.z == max.z)
+	{
+		glm::ivec3 neighborPos = min - face * CHUNK_SIZE;
+		for (int i = 0; i < 6; i++)
+		{
+			if (m_neighbor[i] && neighborPos == m_neighbor[i]->m_node->m_min)
+			{
+				m_neighbor[i]->DestroyVoxel(world_pos, face);
+				break;
+			}
+		}
+	}
 
-	m_csgOpPos.clear();
 	m_csgOpPos.push_back(world_pos);
-
-	//VoxelOctree *targetNode = m_node->FindLeafNode(world_pos);
-	//if (!targetNode)
-	//{
-	//	slog("No node hit");
-	//	return;
-	//}
-	//targetNode->BuildLeafNode();
 	m_node->BuildTree(m_csgOpPos);
 
 	m_vertices.clear();
@@ -388,7 +378,7 @@ void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos)
 	m_node->GenerateVertexIndices(m_vertices);
 	m_node->ContourCellProc(m_tri_indices);
 
-	//GenerateSeam();
+	GenerateSeam();
 
 	BindMesh();
 }

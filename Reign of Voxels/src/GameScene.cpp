@@ -28,11 +28,13 @@ GameScene::GameScene()
 	m_hud = new HUD();
 
 	//main player camera
-	m_camera = new Camera(glm::vec3(256, 64, 256), glm::vec3(256, 0, 255));
+	int resolution = GetConfigSetting("resolution");
+
+	m_camera = new Camera(glm::vec3(resolution / 2, 64, resolution / 2), glm::vec3(0, 0, 0));
 	m_camera->SetToPersp();
 
 	//Generate vertice and types for voxels
-	m_voxelManager = new VoxelManager(GetConfigSetting("resolution"));
+	m_voxelManager = new VoxelManager(resolution);
 	m_voxelManager->GenerateVoxels();
 
 	InitMinimap();
@@ -736,7 +738,7 @@ void GameScene::SelectionInput(sf::Event event)
 		{
 			if (PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit, face))
 			{
-				m_voxelManager->DestroyVoxel(hit);
+				m_voxelManager->DestroyVoxel(hit, face);
 			}	
 		}
 	}

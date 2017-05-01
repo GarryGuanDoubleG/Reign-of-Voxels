@@ -35,7 +35,8 @@ public:
 	void		 destroyOctreeNode(VoxelOctree * node);
 
 	bool BlockWorldPosActive(glm::vec3 world_pos);
-	void DestroyVoxel(glm::ivec3 world_pos);
+	void DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face);
+
 private:
 
 	int m_worldSize; //size of one side of cubic world region

@@ -334,9 +334,9 @@ bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
 	return true;
 }
 
-void VoxelManager::DestroyVoxel(glm::ivec3 world_pos)
+void VoxelManager::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
 {
 	VoxelChunk * chunk = m_octreeRoot->FindChunk(world_pos);
 
-	chunk->DestroyVoxel(world_pos);
+	chunk->DestroyVoxel(world_pos, face);
 }
