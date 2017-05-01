@@ -28,13 +28,13 @@ GameScene::GameScene()
 	m_hud = new HUD();
 
 	//main player camera
-	int resolution = GetConfigSetting("resolution");
+	int worldSize = GetConfigSetting("resolution");
 
-	m_camera = new Camera(glm::vec3(resolution / 2, 64, resolution / 2), glm::vec3(0, 0, 0));
+	m_camera = new Camera(glm::vec3(worldSize / 2, 64, worldSize / 2 ), glm::vec3(0, 0, 0));
 	m_camera->SetToPersp();
 
 	//Generate vertice and types for voxels
-	m_voxelManager = new VoxelManager(resolution);
+	m_voxelManager = new VoxelManager(worldSize);
 	m_voxelManager->GenerateVoxels();
 
 	InitMinimap();

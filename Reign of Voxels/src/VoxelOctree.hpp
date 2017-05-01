@@ -59,10 +59,10 @@ private:
 	glm::ivec3 m_min;
 	int m_size;
 
-	//leaf node
-	VoxelChunk	*m_chunk;
-	OctreeNodeType m_type;
 
+	VoxelChunk	*m_chunk;
+
+	OctreeNodeType m_type;
 	OctreeDrawInfo * m_drawInfo;
 
 	//active nodes have children
@@ -76,19 +76,22 @@ public:
 	VoxelOctree();
 
 	void InitNode(glm::ivec3 minPos, int size);
+	void InitLeaf(glm::ivec3 position);
+
 	void DestroyNode();
 
 	void InitChildren();
 	void InitOctree(int size, VoxelManager *manager); // length of each side of the world
 
 	void AssignNeighbors();//assign neighbors to chunks
-
+	bool AssignLeafNode(VoxelOctree *node);
 	//create vertices for world
 	VoxelOctree* SimplifyOctree(float threshold);
 
 	VoxelOctree * FindLeafNode(glm::vec3 pos);
 	VoxelOctree * FindChunkNode(glm::vec3 pos);
 	VoxelChunk * FindChunk(glm::vec3 pos);
+	VoxelOctree * FindNode(glm::vec3 pos, int size);
 
 	static const int maxHeight = 64;
 	static std::vector<VoxelChunk *> render_list;//list of leaf nodes
@@ -113,12 +116,18 @@ private:
 	void DrawGrass();
 	static void Draw(GLint shader);
 
+	glm::vec3 ApproximateZeroCrossingPosition(const glm::vec3& p0, const glm::vec3& p1);
+	glm::vec3 ApproximateZeroCrossingPosition(const glm::vec3& p0, const glm::vec3& p1, const glm::vec3 &csgOperationPos);
+
 	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos);
 	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos, const std::vector<glm::vec3> &csgOperationPos);
+	glm::vec3 CalculateSurfaceNormal(const glm::vec3 &pos, const glm::vec3 &csgOperationPos);
 
 	bool BuildTree();
 	bool BuildTree(const std::vector<glm::vec3> &csgOperationPos);
 
 	bool BuildLeafNode();
 	bool BuildLeafNode(const std::vector<glm::vec3> &csgOperationPos);
+	bool BuildLeafNode(const glm::vec3 csgOperation);
+	bool BuildLeafNode(VoxelOctree * diffNode, const glm::vec3 csgOperation, const glm::vec3 face);
 };

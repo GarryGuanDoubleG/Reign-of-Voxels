@@ -370,7 +370,11 @@ void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
 	}
 
 	m_csgOpPos.push_back(world_pos);
-	m_node->BuildTree(m_csgOpPos);
+
+
+	VoxelOctree *diffNode = m_node->FindLeafNode(world_pos);
+	diffNode->BuildLeafNode(world_pos);
+	
 
 	m_vertices.clear();
 	m_tri_indices.clear();

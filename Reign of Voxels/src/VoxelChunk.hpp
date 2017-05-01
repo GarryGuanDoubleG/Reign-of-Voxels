@@ -60,7 +60,7 @@ public:
 	VoxelChunk();
 
 	//dimensions of chunk
-	static const int CHUNK_SIZE = 16;
+	static const int CHUNK_SIZE = 8;
 	static const int CHUNK_SIZE_SQ = CHUNK_SIZE * CHUNK_SIZE;
 	static const int CHUNK_SIZE_CUBED = CHUNK_SIZE_SQ * CHUNK_SIZE;
 
@@ -79,8 +79,9 @@ public:
 	void DeleteSeamTree(VoxelOctree *node);
 
 	void RebuildTree(glm::ivec3 world_pos);
-	void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face);
-	void DestroyVoxel(glm::ivec3 world_pos, VoxelOctree *node);
+
+	void DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face);
+
 	//free chunks have pointer to next free chunk
 	//active chunks have pointer to octree node
 	union

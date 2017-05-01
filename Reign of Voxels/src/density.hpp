@@ -5,3 +5,5 @@ float Density_Func(const glm::vec3& worldPosition);
 
 
 float Density_Func(const glm::vec3& worldPosition, const std::vector<glm::vec3> &csgOperationPos);
+
+float Density_Func(const glm::vec3& worldPosition, const glm::vec3 csgPos);

@@ -8,6 +8,18 @@
 
 std::mutex g_free_chunk_guard;
 
+const glm::ivec3 g_neighbors[] =
+{
+	// needs to match the vertMap from Dual Contouring impl
+	glm::ivec3(-1, 0, 0),
+	glm::ivec3(1, 0, 0),
+	glm::ivec3(0, -1, 0),
+	glm::ivec3(0, 1, 0),
+	glm::ivec3(0, 0, -1),
+	glm::ivec3(0, 0, 1),
+
+};
+
 VoxelManager::VoxelManager(int worldSize)
 {
 	//TODO load voxel world from json
@@ -334,9 +346,44 @@ bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
 	return true;
 }
 
-void VoxelManager::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
-{
-	VoxelChunk * chunk = m_octreeRoot->FindChunk(world_pos);
 
-	chunk->DestroyVoxel(world_pos, face);
+void VoxelManager::DestroyVoxel(glm::ivec3 csgPos, glm::ivec3 face)
+{
+	VoxelChunk * chunk = m_octreeRoot->FindChunk(csgPos);
+
+	//rebuilds leaf node by performing cuboid diff operation
+	VoxelOctree *diffNode = chunk->m_node->FindLeafNode(csgPos);
+	diffNode->BuildLeafNode(csgPos);
+	
+	glm::ivec3 neighborPos = csgPos - face;
+	VoxelOctree *newNode = m_octreeRoot->FindLeafNode(neighborPos);
+
+	if (!newNode)
+	{
+		newNode = InitNode(csgPos - face, 1);
+
+		if (m_octreeRoot->AssignLeafNode(newNode))
+		{
+			std::cout << "Assigned leaf\n";
+		}
+	}
+	else
+	{
+		delete newNode->m_drawInfo;
+		newNode->m_drawInfo = NULL;
+	}
+
+	newNode->BuildLeafNode(diffNode, csgPos, face);
+
+	//diffNode->DestroyNode();
+
+	chunk->m_vertices.clear();
+	chunk->m_tri_indices.clear();
+
+	chunk->m_node->GenerateVertexIndices(chunk->m_vertices);
+	chunk->m_node->ContourCellProc(chunk->m_tri_indices);
+
+	chunk->GenerateSeam();
+
+	chunk->BindMesh();
 }
