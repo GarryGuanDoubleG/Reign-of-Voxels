@@ -1,0 +1,12 @@
+{
+  "worker": {
+    "model": "worker",
+    "health": 100,
+    "thinkRate": 1,
+    "speed": 1,
+    "AABBmin": [ 0.0, 0.0, 0.0 ],
+    "AABBmax": [ 0.5, 1.0, 0.5 ]
+  }
+
+}
+

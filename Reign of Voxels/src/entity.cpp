@@ -10,7 +10,7 @@ Entity::~Entity()
 
 }
 
-void Entity::Init(GLint modelID, glm::vec3 position, AABB aabb)
+void Entity::Init(GLint modelID, glm::vec3 position, AABB aabb, int health, int speed, int thinkRate)
 {
 	m_flag = 0;
 	m_flag |= ENTITY_ACTIVE;
@@ -18,7 +18,8 @@ void Entity::Init(GLint modelID, glm::vec3 position, AABB aabb)
 	m_modelID = modelID;
 	m_position = position;
 
-	m_speed = 1.0f;
+	m_speed = speed;
+	m_thinkRate = thinkRate;
 
 	m_aabb = aabb;
 
@@ -29,7 +30,7 @@ void Entity::Init(GLint modelID, glm::vec3 position, AABB aabb)
 void Entity::Destroy()
 {
 	//clear flags
-	m_flag >> 8;
+	m_flag = m_flag >> 8;
 }
 
 glm::vec3 Entity::GetPosition()

@@ -414,8 +414,8 @@ void GameScene::RenderModel(Entity *entity)
 	glUseProgram(shader);
 
 	glm::mat4 model(1.0f);
-	model = glm::scale(model, glm::vec3(.01f, .01f, .01f));
 	model = glm::translate(glm::mat4(1.0f), entity->GetPosition());
+	model = glm::scale(model, glm::vec3(.1f, .1f, .1f));
 	//model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
 
 	glm::vec3 light_pos(256, 512.0f, 256);
@@ -525,7 +525,6 @@ void GameScene::RenderHealthBar(Entity *entity)
 	model = glm::scale(model, glm::vec3(billboardSize, 1));
 
 	glUniform2fv(glGetUniformLocation(shader, "billboardSize"), 1, &billboardSize[0]);
-
 	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
@@ -538,11 +537,11 @@ void GameScene::RenderHealthBar(Entity *entity)
 
 	glUniform1i(glGetUniformLocation(shader, "billboardTex"), 0);
 
+
 	glBindVertexArray(m_quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-
-	glActiveTexture(GL_TEXTURE0);
 	glBindVertexArray(0);
+	glActiveTexture(GL_TEXTURE0);
 }
 
 void GameScene::RenderMinimap()
@@ -880,16 +879,21 @@ void GameScene::SelectionInput(sf::Event event)
 void GameScene::CreateEntity()
 {
 	Entity *entity = m_next_free_entity;
-
 	m_next_free_entity = entity->m_nextFree;
 
-	int id = entity - m_entity_list;
+	Json def = GetEntityDef("worker");
 
-	int size = 1;
-	//TODO move this to a json file
-	AABB bounds = { glm::vec3(-4.0f, 0.0f, -4.0f), glm::vec3(3.0f, 12.5f, 3.0f) };
+	int health = def["health"];
+	int speed = def["speed"];
+	int thinkRate = def["thinkRate"];
+	GLuint model = GetModelID(def["model"]);
 
-	entity->Init(GetModelID("worker"), glm::vec3(size*id, 64, size*id), bounds);
+	Json data = def["AABBmin"];
+	glm::vec3 min = glm::vec3(def["AABBmin"][0], def["AABBmin"][1], def["AABBmin"][2]);
+	glm::vec3 max = glm::vec3(def["AABBmax"][0], def["AABBmax"][1], def["AABBmax"][2]);
 
+	AABB aabb = { min, max};
+
+	entity->Init(model, glm::vec3(0, 64, 0), aabb, health, speed, thinkRate);
 	entity->m_nextFree = NULL;
 }

@@ -47,10 +47,20 @@ void ResourceManager::LoadResources()
 		data.clear();
 		in >> data;
 		LoadTextures(data);
+		LoadSkybox(data);
 		in.close();
 	}
 
+	std::string entity_def = resources["entity"];
+	in.open(entity_def);
 
+	if (in.is_open())
+	{
+		data.clear();
+		in >> data;
+		LoadEntityDef(data);
+		in.close();
+	}
 }
 
 void ResourceManager::LoadConfig()
@@ -116,6 +126,17 @@ void ResourceManager::LoadModels(Json data)
 	}
 }
 
+void ResourceManager::LoadEntityDef(Json data)
+{
+	m_entity_defs = data;
+}
+
+void ResourceManager::LoadSkybox(Json &data)
+{
+	std::string path = data["skybox"]["path"];
+	m_textures.insert(std::pair<std::string, GLuint>("skybox", LoadSkyBox(path.c_str())));
+}
+
 void ResourceManager::LoadTextures(Json &data)
 {
 	for (Json::iterator it = data.begin(); it != data.end(); ++it)
@@ -123,15 +144,8 @@ void ResourceManager::LoadTextures(Json &data)
 		Json obj = *it;
 
 		std::string path = obj["path"];
+		m_textures.insert(std::pair<std::string, GLuint>(it.key(), LoadTexture(path.c_str())));
 
-		if (it.key() == "skybox")
-		{
-			m_textures.insert(std::pair<std::string, GLuint>(it.key(), LoadSkyBox(path.c_str())));
-		}
-		else
-		{
-			m_textures.insert(std::pair<std::string, GLuint>(it.key(), LoadTexture(path.c_str())));
-		}
 		if (obj.find("normal") != obj.end())
 		{
 			std::string normal = obj["normal"];
@@ -145,8 +159,6 @@ void ResourceManager::LoadFonts(Json &data)
 
 }
 
-
-
 GLint ResourceManager::GetModelID(std::string name)
 {
 	return m_model_keys[name];
@@ -156,8 +168,6 @@ Model * ResourceManager::GetModel(GLint id)
 {
 	return m_models[id];
 }
-
-
 
 GLuint ResourceManager::GetTextureID(std::string name)
 {
@@ -186,8 +196,6 @@ Model * GetModel(GLint id)
 {
 	return g_resourceManager->GetModel(id);
 }
-
-
 int ResourceManager::GetConfigSetting(std::string key)
 {
 	return m_configSettings[key];
@@ -196,4 +204,14 @@ int ResourceManager::GetConfigSetting(std::string key)
 int GetConfigSetting(std::string key)
 {
 	return g_resourceManager->GetConfigSetting(key);
+}
+
+Json ResourceManager::GetEntityDef(std::string key)
+{
+	return m_entity_defs[key];
+}
+
+Json GetEntityDef(std::string key)
+{
+	return g_resourceManager->GetEntityDef(key);
 }

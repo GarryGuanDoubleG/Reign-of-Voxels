@@ -1,18 +1,20 @@
 {
   "worker": {
     "path": "Resources\\models\\worker\\chr_knight.fbx",
-    "anim":
-    {
+    "anim": {
       "hook_punch": "Resources\\models\\worker\\hook_punch.fbx",
       "walking": "Resources\\models\\worker\\walking.fbx",
       "jogging": "Resources\\models\\worker\\jogging.fbx"
-    }
+    },
+    "scale": [ 0.1, 0.1, 0.1 ]
   },
   "cube": {
-    "path": "Resources\\models\\cube.obj"
+    "path": "Resources\\models\\cube.obj",
+    "scale": [ 1.0, 1.0, 1.0 ]
   },
 
   "sphere": {
-    "path" : "Resources\\models\\sphere.obj"
+    "path": "Resources\\models\\sphere.obj",
+    "scale": [ 1.0, 1.0, 1.0 ]
   }
 }

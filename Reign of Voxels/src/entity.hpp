@@ -45,7 +45,7 @@ public:
 	Entity();
 	~Entity();
 
-	void Init(GLint modelID, glm::vec3 position, AABB aabb);
+	void Init(GLint modelID, glm::vec3 position, AABB aabb, int health, int speed, int thinkRate);
 	void Destroy();
 
 	glm::vec3 GetPosition();
