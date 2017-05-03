@@ -32,6 +32,7 @@ struct OctreeDrawInfo
 		, corners(0)
 	{
 	}
+	float			densities[25];
 
 	int				index;
 	int				corners;

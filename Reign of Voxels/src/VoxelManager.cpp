@@ -303,15 +303,21 @@ void VoxelManager::RenderWater(GLuint reflectionTex, GLuint refractionTex, Camer
 {
 	GLuint shader = GetShader("water");
 	glUseProgram(shader);
+	glEnable(GL_DEPTH_TEST);
 
 	glm::vec3 light_pos = glm::vec3(256, 512, 256);
 	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	glm::mat4 model(1.0f);
+
 	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
 
+
+	float moveSpeed = Game::clock.getElapsedTime().asSeconds() * 0.03f;
+	//moveSpeed = fmod(moveSpeed, 5.0f);
+	glUniform1f(glGetUniformLocation(shader, "moveSpeed"), moveSpeed);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, reflectionTex);
@@ -319,8 +325,15 @@ void VoxelManager::RenderWater(GLuint reflectionTex, GLuint refractionTex, Camer
 	glActiveTexture(GL_TEXTURE0 + 1);
 	glBindTexture(GL_TEXTURE_2D, refractionTex);
 
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, GetTextureID("water_dudv"));
+
 	glUniform1i(glGetUniformLocation(shader, "reflectionTex"), 0);
 	glUniform1i(glGetUniformLocation(shader, "refractionTex"), 1);
+	glUniform1i(glGetUniformLocation(shader, "dudvMap"), 1);
+	glUniform3fv(glGetUniformLocation(shader, "cameraPos"), 1, &player_cam->GetPosition()[0]);
+
+	int loc = glGetUniformLocation(shader, "cameraPos");
 
 	m_octreeRoot->DrawWater();
 
@@ -536,8 +549,6 @@ void VoxelManager::GenerateWater()
 
 	for(int i = 0; i < m_water_chunks.size(); i++)
 	{
-		int MAX_WATER_HEIGHT = 3;
-
 		VoxelChunk *chunk = m_water_chunks[i];
 
 		glm::ivec3 chunkMin = chunk->m_node->m_min;

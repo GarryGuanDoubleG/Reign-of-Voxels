@@ -92,19 +92,16 @@ void VoxelChunk::BindMesh()
 	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 	glBindBuffer(GL_ARRAY_BUFFER, 0);
 
-	if ((m_water_vertices.size() == 0) || m_water_indices.size() == 0)
-	{
-		return;
-	}
 
-	glDeleteVertexArrays(1, &m_water_vao);
-	glDeleteBuffers(1, &m_water_vbo);
-	glDeleteBuffers(1, &m_water_ebo);
 }
 
 void VoxelChunk::BindWaterPlanes()
 {
-	if ((m_water_vertices.size() == 0) || m_water_vertices.size() == 0)
+	glDeleteVertexArrays(1, &m_water_vao);
+	glDeleteBuffers(1, &m_water_vbo);
+	glDeleteBuffers(1, &m_water_ebo);
+
+	if ((m_water_vertices.size() == 0) || m_water_indices.size() == 0)
 	{
 		return;
 	}
@@ -456,7 +453,7 @@ void VoxelChunk::Render()
 
 void VoxelChunk::RenderWater()
 {
-	if (~m_flag & CHUNK_FLAG_ACTIVE || !m_render_mode)
+	if (~m_flag & CHUNK_FLAG_ACTIVE || m_water_indices.size() == 0)
 		return;
 
 	glBindVertexArray(m_water_vao);

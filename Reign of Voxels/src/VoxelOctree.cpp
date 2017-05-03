@@ -16,7 +16,7 @@ std::vector<VoxelChunk *> VoxelOctree::render_list; //list of leaf nodes
 static std::mutex g_render_list_mutex;
 
 VoxelManager * VoxelOctree::voxelManager;
-
+unsigned int g_node_count = 0;
 std::vector<glm::vec3> g_terrainGrassPos;
 std::vector<VoxelOctree *> g_terrainWater;
 
@@ -767,6 +767,7 @@ void VoxelOctree::InitOctree(int worldSize, VoxelManager *manager)
 	this->GenerateSeams();
 
 	std::cout << "Build time is " << build_time.getElapsedTime().asSeconds() << std::endl;
+	std::cout << "Leaf Nodes: " << g_node_count << std::endl;
 }
 
 void VoxelOctree::InitChildren()
@@ -893,6 +894,8 @@ bool VoxelOctree::BuildLeafNode()
 
 	m_type = Node_Leaf;
 	
+	g_node_count++;
+
 	if (m_drawInfo)
 	{
 		delete m_drawInfo;

@@ -9,6 +9,9 @@
   "water": {
     "path": "Resources\\textures\\water2.png"
   },
+  "waterdudv": {
+    "path":  "Resources\\textures\\waterdudv.png"
+  },
   "snow": {
     "path": "Resources\\textures\\snow.png"
   },
@@ -21,7 +24,8 @@
   "skybox1": {
     "path": "Resources\\textures\\skybox\\front.jpg"
   },
-  "minimap_alpha":{
+  "minimap_alpha": {
     "path": "Resources\\textures\\minimap_alpha.png"
   }
+
 }

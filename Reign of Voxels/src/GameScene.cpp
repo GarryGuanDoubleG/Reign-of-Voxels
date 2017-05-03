@@ -341,6 +341,7 @@ void GameScene::Render()
 	sf::Clock timer;
 
 	RenderChunkAABB();
+	RenderWater();
 	RenderWorld();
 	RenderEntities();
 
@@ -351,10 +352,8 @@ void GameScene::Render()
 	{
 		RenderSkybox();
 	}
-
 	RenderMouseBox();
 	RenderMinimap();
-	RenderWater();
 
 	m_hud->Render();
 
