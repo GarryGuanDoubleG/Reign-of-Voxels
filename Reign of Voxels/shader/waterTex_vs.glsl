@@ -13,6 +13,8 @@ uniform mat4 model;
 uniform mat4 view;
 uniform mat4 projection;
 
+uniform vec4 plane;
+
 void main(void)
 {
 	gl_Position = projection * view * model * vec4(verts,1.0f);
@@ -22,4 +24,6 @@ void main(void)
 
 	FragPos = vec3(model * vec4(verts,1.0f));
 	texID = textureID;
+
+	gl_ClipDistance[0] = dot(vec4(FragPos, 1.0f), plane);
 }

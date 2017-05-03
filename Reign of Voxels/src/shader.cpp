@@ -158,6 +158,7 @@ GLuint GetShader(std::string name)
 	if (g_shader_map.find(name) == g_shader_map.end())
 	{
 		slog("Could not find Shader: %s", name.c_str());
+		assert(0);
 	}
 
 	return g_shader_map[name];

@@ -30,10 +30,12 @@ public:
 	* @return the projection matrix
 	*/
 	glm::mat4 GetProj();
-
 	glm::vec3 GetRight();
 	glm::vec3 GetUp();
 	glm::vec3 GetForward();
+	glm::vec3 GetRotation();
+	glm::vec3 GetPosition();
+
 
 	/**
 	* @brief adjusts camera on user input
@@ -41,16 +43,12 @@ public:
 	*/
 	void HandleInput(sf::Event event);
 
-	glm::vec3 GetRotation();
-	glm::vec3 GetPosition();
-	void SetPosition(glm::vec3 position);
-
 	void SwitchProjection();
 
-	void SetToPersp();
-
-	//uses ortho
 	void SetToOrtho(glm::mat4 ortho);
+	void SetToPersp();
+	void SetPosition(glm::vec3 position);
+	void InvertPitch();
 
 	//checks if object is within frustum
 	bool PointInCamera(glm::vec3 &point);

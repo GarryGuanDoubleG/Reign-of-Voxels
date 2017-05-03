@@ -23,6 +23,7 @@
 GameScene::GameScene()
 {
 	m_flags |= RENDER_GROUND_MODE;
+	m_worldChanged = true;
 
 	//hud handler
 	m_hud = new HUD();
@@ -37,6 +38,7 @@ GameScene::GameScene()
 	m_voxelManager->GenerateVoxels();
 
 	InitMinimap();
+	InitWater();
 	InitRayVertex();
 	InitSkybox();
 
@@ -50,9 +52,6 @@ GameScene::GameScene()
 	//head of free list
 	m_next_free_entity = m_entity_list;
 
-
-	m_worldChanged = true;
-
 	Game::instance().getEventSystem().addObserver(this);
 }
 /**
@@ -62,6 +61,21 @@ GameScene::GameScene()
 GameScene::~GameScene()
 {
 	Game::instance().getEventSystem().removeObserver(this);
+}
+GLuint GameScene::CreateColorTextureAttachment()
+{
+	GLuint texture;
+	//Color Texture Attachment
+	glGenTextures(1, &texture);
+	glBindTexture(GL_TEXTURE_2D, texture);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Game::screen_width, Game::screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
+	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, texture, 0);
+
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	return texture;
 }
 
 void GameScene::InitRayVertex()
@@ -103,7 +117,7 @@ void GameScene::InitMinimap()
 	float worldSize = GetConfigSetting("resolution");
 
 	m_minimapCam = new Camera(glm::vec3(worldSize / 2, 256, worldSize / 2), glm::vec3(127.5, 0, 127.5));
-	m_minimapCam->SetToOrtho(glm::ortho(worldSize / 2.0f, -worldSize / 2.0f, worldSize / 2.0f, -worldSize / 2.0f, 0.1f, 1000.0f));
+	m_minimapCam->SetToOrtho(glm::ortho(-worldSize / 2.0f, worldSize / 2.0f, -worldSize / 2.0f, worldSize / 2.0f, 0.1f, 1000.0f));
 
 	m_minimapScale = glm::vec2(minimap_size / (float) Game::screen_width, minimap_size / (float) Game::screen_height);
 	//bind quad vertices
@@ -127,15 +141,43 @@ void GameScene::InitMinimap()
 	//Frame Buffer
 	glGenFramebuffers(1, &m_minimapFBO);
 	glBindFramebuffer(GL_FRAMEBUFFER, m_minimapFBO);
+	m_minimapTexture = CreateColorTextureAttachment();
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
 
-	glGenTextures(1, &m_minimapTexture);
-	glBindTexture(GL_TEXTURE_2D, m_minimapTexture);
+void GameScene::InitWater()
+{
+	//Reflection fbo texture depth buffer
+	glGenFramebuffers(1, &m_waterReflectFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_waterReflectFBO);
 
-	glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, Game::screen_width, Game::screen_height, 0, GL_RGB, GL_UNSIGNED_BYTE, NULL);
-	glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D, m_minimapTexture, 0);
+	//Color Texture Attachment
+	m_waterReflectTex = CreateColorTextureAttachment();
 
+	glGenRenderbuffers(1, &m_waterReflectDepthBuff);
+	glBindRenderbuffer(GL_RENDERBUFFER, m_waterReflectDepthBuff);
+
+	glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT, Game::screen_width, Game::screen_height);
+	glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, GL_RENDERBUFFER, m_waterReflectDepthBuff);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+
+	/********Refraction*************/
+	glGenFramebuffers(1, &m_waterRefractFBO);
+	glBindFramebuffer(GL_FRAMEBUFFER, m_waterRefractFBO);
+
+	m_waterRefractTex = CreateColorTextureAttachment();
+
+	glGenTextures(1, &m_waterRefractDepthTex);
+	glBindTexture(GL_TEXTURE_2D, m_waterRefractDepthTex);
+
+	glTexImage2D(GL_TEXTURE_2D, 0, GL_DEPTH_COMPONENT32, Game::screen_width, Game::screen_height, 0, GL_DEPTH_COMPONENT, GL_FLOAT, NULL);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
 	glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+
+	glFramebufferTexture(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT, m_waterRefractDepthTex, 0);
 
 	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
@@ -268,6 +310,8 @@ void GameScene::SceneFrame()
 {
 	Update();
 	Render();
+
+	m_worldChanged = false;
 }
 
 void GameScene::Update()
@@ -310,6 +354,7 @@ void GameScene::Render()
 
 	RenderMouseBox();
 	RenderMinimap();
+	RenderWater();
 
 	m_hud->Render();
 
@@ -473,8 +518,6 @@ void GameScene::RenderMinimap()
 
 		//rebind original
 		glBindFramebuffer(GL_FRAMEBUFFER, 0);
-
-		m_worldChanged = false;
 	}
 
 	GLuint alphaTex = GetTextureID("minimap_alpha");
@@ -487,6 +530,7 @@ void GameScene::RenderMinimap()
 	glUniform2fv(glGetUniformLocation(shader, "scale"), 1, &m_minimapScale[0]);
 	glUniform1i(glGetUniformLocation(shader, "screenTexture"), 0);
 	glUniform1i(glGetUniformLocation(shader, "alphaMask"), 1);
+	glUniform2fv(glGetUniformLocation(shader, "screen_pos"), 1, &glm::vec2(0, 0)[0]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, m_minimapTexture);
@@ -495,10 +539,16 @@ void GameScene::RenderMinimap()
 	glBindTexture(GL_TEXTURE_2D, alphaTex);
 	
 	glDrawArrays(GL_TRIANGLES, 0, 6);
-	
-	glActiveTexture(GL_TEXTURE0);
 
 	glBindVertexArray(0);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glActiveTexture(GL_TEXTURE1);
+	glBindTexture(GL_TEXTURE_2D, 0);
+
+	glUseProgram(0);
 }
 
 void GameScene::RenderRayCast()
@@ -565,6 +615,7 @@ void GameScene::RenderChunkAABB()
 	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
 
+	//TODO should honestly instance render this
 	for (int x = 0; x < resolution; x += VoxelChunk::CHUNK_SIZE)
 	{
 		for (int y = 0; y < resolution; y += VoxelChunk::CHUNK_SIZE)
@@ -579,6 +630,46 @@ void GameScene::RenderChunkAABB()
 			}
 		}
 	}
+}
+
+void GameScene::RenderWaterTextures()
+{
+	GLfloat bg_color[] = { 0.3f, 0.3f, 0.3f, 0.3f };
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_waterReflectFBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearBufferfv(GL_COLOR, 0, bg_color);
+	glEnable(GL_CLIP_DISTANCE0);
+
+	float water_height = 10.0f;
+	float distanceToWater = 2 * (m_camera->GetPosition().y - water_height);
+
+	glm::vec3 position = m_camera->GetPosition();
+	position.y -= distanceToWater;
+	m_camera->SetPosition(glm::vec3(position));
+	m_camera->InvertPitch();
+
+	RenderSkybox();
+	m_voxelManager->RenderWaterTexture(glm::vec4(0, 1, 0, -water_height), m_camera);
+
+	glBindFramebuffer(GL_FRAMEBUFFER, m_waterRefractFBO);
+	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+	glClearBufferfv(GL_COLOR, 0, bg_color);
+
+	m_camera->InvertPitch();
+	position.y += distanceToWater;
+	m_camera->SetPosition(position);
+	m_voxelManager->RenderWaterTexture(glm::vec4(0, -1, 0, water_height), m_camera);
+
+	//rebind original
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
+	glDisable(GL_CLIP_DISTANCE0);
+}
+
+void GameScene::RenderWater()
+{
+	RenderWaterTextures();
+	m_voxelManager->RenderWater(m_waterReflectTex, m_waterRefractTex, m_camera);
 }
 
 /**

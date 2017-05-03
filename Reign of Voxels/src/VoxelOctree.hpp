@@ -112,7 +112,7 @@ private:
 
 	void Draw();
 	void DrawGrass();
-	void DrawWater(GLint shader);
+	void DrawWater();
 
 	static void Draw(GLint shader);
 

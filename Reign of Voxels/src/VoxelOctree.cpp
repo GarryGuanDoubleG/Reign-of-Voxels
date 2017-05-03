@@ -177,7 +177,7 @@ glm::vec3 ApproximateZeroCrossingPosition(const glm::vec3& p0, const glm::vec3& 
 	while (currentT <= 1.f)
 	{
 		const glm::vec3 p = p0 + ((p1 - p0) * currentT);
-		const float density = glm::abs(Density_Func(p));
+		const float density = glm::abs(Density_Func(p, csgOperationPos));
 		if (density < minValue)
 		{
 			minValue = density;
@@ -800,7 +800,7 @@ int VoxelOctree::AddTerrainType(const OctreeDrawInfo *drawInfo)
 			g_terrainGrassPos.push_back(drawInfo->position);
 		}
 	}
-	else if (terrainColor.b > 200)
+	else if (terrainColor.b > WATER_RGB)
 	{
 		type = WATER;
 	}
@@ -1137,6 +1137,13 @@ bool VoxelOctree::BuildWaterTree()
 bool VoxelOctree::BuildWaterNode()
 {
 	int corners = 0;
+
+	if (m_min.y < WATER_HEIGHT - 1)
+	{
+		m_flag &= ~(OCTREE_ACTIVE);
+
+		return false;
+	}
 
 	for (int i = 0; i < 8; i++)
 	{
@@ -1539,7 +1546,7 @@ void VoxelOctree::Draw(GLint shader)
 	}
 }
 
-void VoxelOctree::DrawWater(GLint shader)
+void VoxelOctree::DrawWater()
 {
 	for (int i = 0; i < render_list.size(); i++)
 	{

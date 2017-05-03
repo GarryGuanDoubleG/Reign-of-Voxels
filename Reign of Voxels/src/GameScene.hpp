@@ -51,6 +51,15 @@ private:
 	GLuint m_minimapVAO;//quad
 	GLuint m_minimapVBO;//quad
 
+	GLuint m_waterReflectFBO;
+	GLuint m_waterRefractFBO;
+	GLuint m_waterReflectTex;
+	GLuint m_waterRefractTex;
+	GLuint m_waterReflectDepthBuff;
+	GLuint m_waterRefractDepthTex;
+
+
+
 	Model * m_model; // test model, get rid of it once entities work
 
 	bool wire_frame = false;
@@ -84,7 +93,9 @@ public:
 	*/
 	virtual void onNotify(Event event, sf::Event &input);
 private:
+	GLuint CreateColorTextureAttachment();
 
+	void InitWater();
 	void InitRayVertex();
 	void InitMinimap();
 	void InitSkybox();
@@ -117,6 +128,9 @@ private:
 	void RenderAABB(Entity *entity, GLuint shader);
 	void RenderRayCast();
 	void RenderChunkAABB();
+
+	void RenderWaterTextures();
+	void RenderWater();
 
 	/**
 	* @brief Renders a scaled down version of world

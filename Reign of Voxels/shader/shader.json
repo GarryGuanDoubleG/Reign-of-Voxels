@@ -51,6 +51,14 @@
   "quad": {
     "vs": "shader/quad_vs.glsl",
     "fs": "shader/quad_fs.glsl"
+  },
+  "water_texture": {
+    "vs": "shader/waterTex_vs.glsl",
+    "fs": "shader/waterTex_fs.glsl"
+  },
+  "water": {
+    "vs": "shader/water_vs.glsl",
+    "fs": "shader/water_fs.glsl"
   }
 
 }

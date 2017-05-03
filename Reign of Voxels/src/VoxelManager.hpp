@@ -4,6 +4,11 @@
 #include "camera.hpp"
 #include "model.hpp"
 
+#define GRASS_RGB 200
+#define WATER_RGB 159.75
+#define DIRT_RBG 128
+
+#define WATER_HEIGHT 10.0f
 
 class VoxelManager
 {
@@ -33,12 +38,12 @@ public:
 	void GenerateWater();
 
 	void RenderWorld(bool draw_textured, Camera * player_cam);
+	void RenderWaterTexture(glm::vec4 water_plane, Camera *player_cam);
+	void RenderWater(GLuint reflectionTex, GLuint refractionTex, Camera*player_cam);
 	void RenderGrass(Camera * player_cam);
-	void RenderWater(Camera *player_cam);
 	void RenderVoxels(bool draw_textured, Camera * player_cam);
 	void RenderVoxelTextured(Camera *player_cam);
 	void RenderMinimap(Camera * player_cam);
-
 
 	VoxelChunk *CreateChunk(glm::vec3 worldPosition, VoxelOctree *node);
 	void		destroyChunk(VoxelChunk * chunk);

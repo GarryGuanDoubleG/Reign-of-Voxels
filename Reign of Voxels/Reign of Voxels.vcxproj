@@ -131,6 +131,10 @@
     <None Include="shader\voxelTex_vs.glsl" />
     <None Include="shader\voxel_fs.glsl" />
     <None Include="shader\voxel_vs.glsl" />
+    <None Include="shader\waterTex_fs.glsl" />
+    <None Include="shader\waterTex_vs.glsl" />
+    <None Include="shader\water_fs.glsl" />
+    <None Include="shader\water_vs.glsl" />
   </ItemGroup>
   <PropertyGroup Label="Globals">
     <ProjectGuid>{B9458FBC-D18D-4A29-A3EB-46770D004C78}</ProjectGuid>

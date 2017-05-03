@@ -75,9 +75,6 @@ void VoxelManager::GenerateVoxels()
 
 	//bind water
 	GenerateWater();
-
-
-
 }
 
 void VoxelManager::GenerateChunks()
@@ -163,7 +160,7 @@ void VoxelManager::RenderWorld(bool draw_textured, Camera * player_cam)
 {
 	RenderVoxels(draw_textured, player_cam);
 
-	RenderWater(player_cam);
+	//RenderWaterTexture(player_cam);
 	RenderGrass(player_cam);
 }
 
@@ -198,12 +195,16 @@ void VoxelManager::RenderMinimap(Camera * player_cam)
 	glActiveTexture(GL_TEXTURE0 + 3);
 	glBindTexture(GL_TEXTURE_2D, dirt);
 
-	glActiveTexture(GL_TEXTURE0);
-
 	GLint samplers[4] = { 0, 1, 2, 3 };
 	glUniform1iv(glGetUniformLocation(voxel_shader, "voxelTexture"), 4, &samplers[0]);
 
 	m_octreeRoot->Draw();
+
+	for (int i = 0; i < 4; i++)
+	{
+		glActiveTexture(GL_TEXTURE0 + i);
+		glBindTexture(GL_TEXTURE_2D, 0);
+	}
 }
 
 void VoxelManager::RenderGrass(Camera * player_cam)
@@ -246,32 +247,88 @@ void VoxelManager::RenderGrass(Camera * player_cam)
 	glDepthFunc(GL_LESS);
 }
 
-void VoxelManager::RenderWater(Camera *player_cam)
+void VoxelManager::RenderWaterTexture(glm::vec4 water_plane, Camera *player_cam)
 {
-	GLuint voxel_shader = GetShader("voxel");
+	GLuint shader = GetShader("water_texture");
 
-	glUseProgram(voxel_shader);
+	glUseProgram(shader);
 
 	glm::vec3 light_pos = glm::vec3(256, 512, 256);
 	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
 
 	glm::mat4 model(1.0f);
+	//glm::mat4 model = glm::scale(glm::mat4(1.0f), glm::vec3(4.0f, 2.0f, 4.0f));
 
-	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(voxel_shader, "model"), 1, GL_FALSE, &model[0][0]);
-
-	glm::vec3 voxel_color(0.8f, 0.0f, 0.3f);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
 
 	//lighting
-	glUniform3fv(glGetUniformLocation(voxel_shader, "viewPos"), 1, &player_cam->GetPosition()[0]);
-	glUniform3fv(glGetUniformLocation(voxel_shader, "lightPos"), 1, &light_pos[0]);
-	glUniform3fv(glGetUniformLocation(voxel_shader, "lightColor"), 1, &light_color[0]);
+	glUniform3fv(glGetUniformLocation(shader, "viewPos"), 1, &player_cam->GetPosition()[0]);
+	glUniform3fv(glGetUniformLocation(shader, "lightPos"), 1, &light_pos[0]);
+	glUniform3fv(glGetUniformLocation(shader, "lightColor"), 1, &light_color[0]);
 
-	//voxels
-	glUniform3fv(glGetUniformLocation(voxel_shader, "voxelColor"), 1, &voxel_color[0]);
+	//water plane
+	glUniform4fv(glGetUniformLocation(shader, "plane"), 1, &water_plane[0]);
+	// Now set the sampler to the correct texture unit
 
-	VoxelOctree::Draw(voxel_shader);
+	// And finally bind the texture
+	//textures
+	GLuint grass = GetTextureID("grass");
+	GLuint water = GetTextureID("water");
+	GLuint snow = GetTextureID("snow");
+	GLuint dirt = GetTextureID("dirt");
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, grass);
+
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, water);
+
+	glActiveTexture(GL_TEXTURE0 + 2);
+	glBindTexture(GL_TEXTURE_2D, snow);
+
+	glActiveTexture(GL_TEXTURE0 + 3);
+	glBindTexture(GL_TEXTURE_2D, dirt);
+
+	glActiveTexture(GL_TEXTURE0);
+
+	GLint samplers[4] = { 0, 1, 2, 3 };
+	glUniform1iv(glGetUniformLocation(shader, "voxelTexture"), 4, &samplers[0]);
+
+	m_octreeRoot->Draw();
+}
+
+void VoxelManager::RenderWater(GLuint reflectionTex, GLuint refractionTex, Camera *player_cam)
+{
+	GLuint shader = GetShader("water");
+	glUseProgram(shader);
+
+	glm::vec3 light_pos = glm::vec3(256, 512, 256);
+	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
+
+	glm::mat4 model(1.0f);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
+
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, reflectionTex);
+
+	glActiveTexture(GL_TEXTURE0 + 1);
+	glBindTexture(GL_TEXTURE_2D, refractionTex);
+
+	glUniform1i(glGetUniformLocation(shader, "reflectionTex"), 0);
+	glUniform1i(glGetUniformLocation(shader, "refractionTex"), 1);
+
+	m_octreeRoot->DrawWater();
+
+	glActiveTexture(GL_TEXTURE0);
+	//glBindTexture(GL_TEXTURE_2D, 0);
+
+	//glActiveTexture(GL_TEXTURE0 + 1);
+	//glBindTexture(GL_TEXTURE_2D, 0);
 }
 
 void VoxelManager::RenderVoxels(bool draw_textured, Camera * player_cam)
@@ -401,9 +458,12 @@ void VoxelManager::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
 			m_octreeRoot->AssignLeafNode(leaf_node);
 
 			neighbor = m_octreeRoot->FindChunk(neighborPos);
-			neighbor->m_node->BuildTree(neighborPos);
+			if (neighbor)
+			{
+				neighbor->m_node->BuildTree(neighborPos);
 
-			neighbor->m_csgOpPos.push_back(neighborPos);
+				neighbor->m_csgOpPos.push_back(neighborPos);
+			}
 		}
 		else
 		{
@@ -445,7 +505,7 @@ bool VoxelManager::IsWaterChunk(int x, int z)
 		{
 			sf::Color color = GetPerlinColorValue(i, j);
 
-			if (color.b >= 200)
+			if (color.b >= WATER)
 			{
 				waterChunk = true;
 			}
@@ -465,8 +525,11 @@ void VoxelManager::GenerateWater()
 		{					
 			if (IsWaterChunk(x,z))
 			{
-				VoxelChunk* chunk = m_octreeRoot->FindChunk(glm::ivec3(x, 1, z));
-				m_water_chunks.push_back(chunk);
+				VoxelChunk* chunk = m_octreeRoot->FindChunk(glm::ivec3(x, WATER_HEIGHT, z));
+				if (chunk)
+				{
+					m_water_chunks.push_back(chunk);
+				}
 			}
 		}
 	}

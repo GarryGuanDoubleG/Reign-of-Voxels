@@ -4,7 +4,7 @@ out vec4 color;
 
 uniform sampler2D screenTexture;
 uniform sampler2D alphaMask;
-uniform sampler2D heightmap;
+//uniform sampler2D heightmap;
 
 
 void main()

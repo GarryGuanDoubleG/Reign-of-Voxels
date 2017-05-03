@@ -109,6 +109,21 @@ glm::vec3 Camera::GetPosition()
 void Camera::SetPosition(glm::vec3 position)
 {
 	m_pos = position;
+	m_view_mat = glm::lookAt(m_pos, m_pos + m_forward, m_up);
+}
+
+void Camera::InvertPitch()
+{
+	m_pitch *= -1;
+
+	m_forward.x = cos(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+	m_forward.y = sin(glm::radians(m_pitch));
+	m_forward.z = sin(glm::radians(m_yaw)) * cos(glm::radians(m_pitch));
+
+	m_forward = glm::normalize(m_forward);
+
+	m_view_mat = glm::lookAt(m_pos, m_pos + m_forward, m_up);
+
 }
 
 glm::vec3 Camera::GetRotation()

@@ -22,7 +22,7 @@ float Cuboid(const glm::vec3& worldPosition, const glm::vec3& origin, const glm:
 //axis aligned plane
 float Density_PlanarFunc(const glm::vec3 &worldPosition)
 {
-	const int PLANE = 3;
+	const int PLANE = 10;
 
 	const float terrain = Density_Func(worldPosition);
 	const float terrain_plane = worldPosition.y - PLANE;
