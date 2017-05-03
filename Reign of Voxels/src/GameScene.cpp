@@ -121,16 +121,17 @@ void GameScene::InitMinimap()
 
 	m_minimapScale = glm::vec2(minimap_size / (float) Game::screen_width, minimap_size / (float) Game::screen_height);
 	//bind quad vertices
-	glGenVertexArrays(1, &m_minimapVAO);
-	glBindVertexArray(m_minimapVAO);
+	glGenVertexArrays(1, &m_quadVAO);
+	glBindVertexArray(m_quadVAO);
 
-	glGenBuffers(1, &m_minimapVBO);
-	glBindBuffer(GL_ARRAY_BUFFER, m_minimapVBO);
+	glGenBuffers(1, &m_quadVBO);
+	glBindBuffer(GL_ARRAY_BUFFER, m_quadVBO);
 	glBufferData(GL_ARRAY_BUFFER, sizeof(quadVertices), quadVertices, GL_STATIC_DRAW);
 
 	glEnableVertexAttribArray(0);
 	glVertexAttribPointer(0, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)0);
 
+	//uv
 	glEnableVertexAttribArray(1);
 	glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 4 * sizeof(GLfloat), (GLvoid*)(2 * sizeof(GLfloat)));
 
@@ -499,8 +500,49 @@ void GameScene::RenderEntities()
 	for (int i = 0; i < MAX_ENTITES; i++)
 	{
 		if (m_entity_list[i].IsActive())
+		{
 			RenderModel(&m_entity_list[i]);
+			RenderHealthBar(&m_entity_list[i]);
+		}
 	}
+}
+
+void GameScene::RenderHealthBar(Entity *entity)
+{
+	GLuint shader = GetShader("health");
+
+	glUseProgram(shader);
+
+	glm::vec2 billboardSize(50, .50f);
+	int time = Game::clock.getElapsedTime().asMilliseconds() / 250.0f;
+	float healthW = (float)((entity->GetHealth() + time) % entity->GetMaxHealth()) / (float)entity->GetMaxHealth();
+
+	healthW *= 25.0f;
+	billboardSize.x = healthW;
+
+	glm::mat4 model(1.0f);
+	model = glm::translate(glm::mat4(1.0f), entity->GetPosition() + glm::vec3(0, entity->GetAABB().max.y + 5, 0));
+	model = glm::scale(model, glm::vec3(billboardSize, 1));
+
+	glUniform2fv(glGetUniformLocation(shader, "billboardSize"), 1, &billboardSize[0]);
+
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+	
+	GLuint healthTex = GetTextureID("health_bar");
+	GLuint healthGrayTex = GetTextureID("health_bar_gray");
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, healthTex);
+
+	glUniform1i(glGetUniformLocation(shader, "billboardTex"), 0);
+
+	glBindVertexArray(m_quadVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	glActiveTexture(GL_TEXTURE0);
+	glBindVertexArray(0);
 }
 
 void GameScene::RenderMinimap()
@@ -524,7 +566,7 @@ void GameScene::RenderMinimap()
 
 	glUseProgram(shader);
 
-	glBindVertexArray(m_minimapVAO);
+	glBindVertexArray(m_quadVAO);
 
 	glUniform2fv(glGetUniformLocation(shader, "scale"), 1, &m_minimapScale[0]);
 	glUniform1i(glGetUniformLocation(shader, "screenTexture"), 0);
@@ -670,6 +712,7 @@ void GameScene::RenderWater()
 	RenderWaterTextures();
 	m_voxelManager->RenderWater(m_waterReflectTex, m_waterRefractTex, m_camera);
 }
+
 
 /**
 *@brief Listens to user input events and handles it

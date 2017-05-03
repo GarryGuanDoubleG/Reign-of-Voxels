@@ -17,39 +17,14 @@
 
 class Entity
 {
-public:
-	Entity();
-	~Entity();
-
-	void Init(GLint modelID, glm::vec3 position, AABB aabb);
-	void Destroy();
-
-	glm::vec3 GetPosition();
-	AABB GetAABB();
-
-	GLuint GetModelID();
-
-	void Update();
-
-	void MoveTo(glm::vec3 target_pos);
-	
-
-	bool IsActive();
-
-	void SetSelected(bool selected);
-	bool IsSelected();
-
-	Entity *m_nextFree;
-private:
-	void Think();
-
-	/********Member Variables ********/
+		/********Member Variables ********/
 	sf::Uint8 m_flag;
 
 	GLint m_modelID;
 
 	//stats
 	int m_health;
+	int m_maxHealth;
 
 	//update funcs
 	int m_thinkTimer;
@@ -65,4 +40,31 @@ private:
 	float m_animStart;
 
 	AABB m_aabb;
+
+public:
+	Entity();
+	~Entity();
+
+	void Init(GLint modelID, glm::vec3 position, AABB aabb);
+	void Destroy();
+
+	glm::vec3 GetPosition();
+	AABB GetAABB();
+
+	void Update();
+
+	void MoveTo(glm::vec3 target_pos);
+
+	bool IsActive();
+
+	void SetSelected(bool selected);
+	bool IsSelected();
+
+	int		GetHealth();
+	int		GetMaxHealth();
+	GLuint	GetModelID();
+
+	Entity *m_nextFree;
+private:
+	void Think();
 };

@@ -3,9 +3,9 @@
     "fs": "shader/mouseBox_fs.glsl",
     "vs": "shader/mouseBox_vs.glsl"
   },
-  "grass": {
-    "fs": "shader/grass_fs.glsl",
-    "vs": "shader/grass_vs.glsl"
+  "billboard": {
+    "fs": "shader/billboard_fs.glsl",
+    "vs": "shader/billboard_vs.glsl"
   },
   "model": {
     "fs": "shader/model_fs.glsl",
@@ -59,7 +59,10 @@
   "water": {
     "vs": "shader/water_vs.glsl",
     "fs": "shader/water_fs.glsl"
+  },
+  "health": {
+    "vs": "shader/health_vs.glsl",
+    "fs": "shader/health_fs.glsl"
   }
-
 }
 

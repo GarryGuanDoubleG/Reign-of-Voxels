@@ -22,7 +22,8 @@ void Entity::Init(GLint modelID, glm::vec3 position, AABB aabb)
 
 	m_aabb = aabb;
 
-	//MoveTo(glm::vec3(256.0f, 32.0f, 256.0f));
+	m_health = 100;
+	m_maxHealth = 100;
 }
 
 void Entity::Destroy()
@@ -45,7 +46,14 @@ GLuint Entity::GetModelID()
 {
 	return m_modelID;
 }
-
+int Entity::GetHealth()
+{
+	return m_health;
+}
+int	Entity::GetMaxHealth()
+{
+	return m_maxHealth;
+}
 
 void Entity::Update()
 {

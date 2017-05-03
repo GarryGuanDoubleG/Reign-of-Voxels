@@ -1141,20 +1141,22 @@ bool VoxelOctree::BuildWaterNode()
 {
 	int corners = 0;
 
-	if (m_min.y < WATER_HEIGHT - 1)
-	{
-		m_flag &= ~(OCTREE_ACTIVE);
+	//if (m_min.y != WATER_HEIGHT - 1)
+	//{
+	//	m_flag &= ~(OCTREE_ACTIVE);
 
-		return false;
-	}
+	//	return false;
+	//}
 
 	for (int i = 0; i < 8; i++)
 	{
 		glm::ivec3 cornerPos = m_min + CHILD_MIN_OFFSETS[i];
 		const float density = Density_PlanarFunc(glm::vec3(cornerPos));
+
 		const int material = density < 0.f ? MATERIAL_SOLID : MATERIAL_AIR;
 		corners |= (material << i);
 	}
+	
 
 	if (corners == 0 || corners == 255)
 	{

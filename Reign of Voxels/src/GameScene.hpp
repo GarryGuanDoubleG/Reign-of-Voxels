@@ -48,8 +48,8 @@ private:
 	GLuint m_minimapFBO;
 	GLuint m_minimapRBO;
 	GLuint m_minimapTexture;
-	GLuint m_minimapVAO;//quad
-	GLuint m_minimapVBO;//quad
+	GLuint m_quadVAO;//quad
+	GLuint m_quadVBO;//quad
 
 	GLuint m_waterReflectFBO;
 	GLuint m_waterRefractFBO;
@@ -120,7 +120,7 @@ private:
 	* @brief Renders the voxel terrain
 	*/
 	void RenderWorld();
-
+	void RenderHealthBar(Entity *entity);
 	void RenderEntities();
 	void RenderModel(Entity *entity);
 	void RenderMouseBox();

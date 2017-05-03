@@ -27,7 +27,8 @@ float Density_PlanarFunc(const glm::vec3 &worldPosition)
 	const float terrain = Density_Func(worldPosition);
 	const float terrain_plane = worldPosition.y - PLANE;
 
-	return glm::max(-terrain, terrain_plane);
+	//return  glm::min(terrain, glm::max(-terrain, terrain_plane));
+	return terrain_plane;
 }
 
 float Density_Func(const glm::vec3& worldPosition)

@@ -20,7 +20,9 @@ void main(void)
 	clipSpace = projection * view  * vec4(verts, 1.0f);
 	gl_Position = clipSpace;
 
-	dudvCoords = (clipSpace.xy / 2 + .5f) * tiling;
+	//vec3 verts_normalized = normalize(verts);
+	vec3 verts_normalized = normalize(clipSpace.xyz/clipSpace.w) / 2.0 + 0.5;
+	dudvCoords = vec2(verts_normalized.x, verts_normalized.y) * tiling;
 	cameraVector = cameraPos - verts.xzy;
 }
 

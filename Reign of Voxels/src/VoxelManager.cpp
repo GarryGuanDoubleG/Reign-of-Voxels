@@ -209,7 +209,7 @@ void VoxelManager::RenderMinimap(Camera * player_cam)
 
 void VoxelManager::RenderGrass(Camera * player_cam)
 {
-	GLuint shader = GetShader("grass");
+	GLuint shader = GetShader("billboard");
 	glUseProgram(shader);
 	
 	glDepthFunc(GL_ALWAYS);
@@ -303,7 +303,7 @@ void VoxelManager::RenderWater(GLuint reflectionTex, GLuint refractionTex, Camer
 {
 	GLuint shader = GetShader("water");
 	glUseProgram(shader);
-	glEnable(GL_DEPTH_TEST);
+	//glEnable(GL_DEPTH_TEST);
 
 	glm::vec3 light_pos = glm::vec3(256, 512, 256);
 	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -429,6 +429,7 @@ void VoxelManager::RenderVoxelTextured(Camera *player_cam)
 
 	m_octreeRoot->Draw();
 }
+
 
 bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
 {
@@ -558,6 +559,7 @@ void VoxelManager::GenerateWater()
 
 		water_root->m_chunk = chunk;
 		water_root->BuildWaterTree();
+
 		water_root->GenerateVertexIndices(chunk->m_water_vertices);
 		water_root->ContourCellProc(chunk->m_water_indices);
 

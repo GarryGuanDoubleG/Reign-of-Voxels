@@ -26,6 +26,11 @@
   },
   "minimap_alpha": {
     "path": "Resources\\textures\\minimap_alpha.png"
+  },
+  "health_bar": {
+    "path": "Resources\\textures\\health_bar.png"
+  },
+  "health_bar_grey": {
+    "path":  "Resources\\textures\\health_bar_grey.png"
   }
-
 }

@@ -320,12 +320,6 @@
     <None Include="shader\voxelTex_vs.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="shader\grass_vs.glsl">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="shader\grass_fs.glsl">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="shader\skybox_vs.glsl">
       <Filter>Shaders</Filter>
     </None>
@@ -357,6 +351,18 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="shader\water_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\billboard_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\billboard_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\health_vs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\health_fs.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>
