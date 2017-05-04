@@ -4,6 +4,7 @@
   "hud": "Resources\\gui\\HUD.json",
   "textures": "Resources\\textures\\texture.json",
   "config": "Resources\\config.json",
-  "entity": "Resources\\entity.json"
+  "entity": "Resources\\entity.json",
+  "structures": "Resources\\structures.json"
 }
 

@@ -11,6 +11,10 @@
     "fs": "shader/model_fs.glsl",
     "vs": "shader/model_vs.glsl"
   },
+  "unlit": {
+    "vs": "shader/unlit_object_vs.glsl",
+    "fs": "shader/unlit_object_fs.glsl"
+  },
   "object": {
     "fs": "shader/object_fs.glsl",
     "vs": "shader/object_vs.glsl"

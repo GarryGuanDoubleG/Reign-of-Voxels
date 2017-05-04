@@ -36,7 +36,7 @@ void Mesh::Draw(GLuint shader) const
 		glActiveTexture(GL_TEXTURE0 + i); // Active proper texture unit before binding
 										  // Retrieve texture number (the N in diffuse_textureN)
 
-		std::string textUniform = "texture_diffuse" + std::to_string(i);
+		std::string textUniform = "colorTex";
 
 		GLuint location = glGetUniformLocation(shader, textUniform.c_str());
 		// Now set the sampler to the correct texture unit

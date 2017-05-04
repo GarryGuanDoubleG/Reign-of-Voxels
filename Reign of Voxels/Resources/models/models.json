@@ -8,11 +8,26 @@
     },
     "scale": [ 0.1, 0.1, 0.1 ]
   },
+
+  "castle": {
+    "path": "Resources\\models\\castle\\castle.obj",
+    "scale": [ 1, 1, 1 ],
+    "frames": [
+      "castle1.obj",
+      "castle2.obj",
+      "castle3.obj",
+      "castle4.obj",
+      "castle5.obj",
+      "castle6.obj",
+      "castle7.obj",
+      "castle8.obj",
+      "castle9.obj"
+    ]
+  },
   "cube": {
     "path": "Resources\\models\\cube.obj",
     "scale": [ 1.0, 1.0, 1.0 ]
   },
-
   "sphere": {
     "path": "Resources\\models\\sphere.obj",
     "scale": [ 1.0, 1.0, 1.0 ]

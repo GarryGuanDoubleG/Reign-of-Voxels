@@ -44,13 +44,17 @@ GameScene::GameScene()
 
 	//allocate memeory for all entities
 	m_entity_list = new Entity[MAX_ENTITES];
-
-	//set free list
 	for (int i = 0; i < MAX_ENTITES - 1; i++)
 		m_entity_list[i].m_nextFree = &m_entity_list[i + 1];
-
-	//head of free list
+	//set free list
 	m_next_free_entity = m_entity_list;
+
+	//set structures list
+	m_structure_list = new Structure[MAX_STRUCTURES];
+	for (int i = 0; i < MAX_STRUCTURES - 1; i++)
+		m_structure_list[i].m_nextFree = &m_structure_list[i + 1];
+	m_next_free_struct = m_structure_list;
+
 
 	Game::instance().getEventSystem().addObserver(this);
 }
@@ -323,9 +327,14 @@ void GameScene::Update()
 			m_entity_list[i].Update();
 	}
 
+	for (int i = 0; i < MAX_STRUCTURES; i++)
+	{
+		if (m_structure_list[i].IsActive())
+			m_structure_list[i].Update();		
+	}
+
 	m_camera->Update();
 }
-
 
 /**
 *@brief Handles drawing the game scene
@@ -342,8 +351,9 @@ void GameScene::Render()
 	sf::Clock timer;
 
 	RenderChunkAABB();
-	RenderWater();
+
 	RenderWorld();
+	RenderWater();
 	RenderEntities();
 
 	if(m_flags & RAY_CAST_MODE)
@@ -402,7 +412,7 @@ void GameScene::RenderAABB(Entity *entity, GLuint shader)
 
 void GameScene::RenderModel(Entity *entity)
 {
-	Model *ent_model = GetModel(entity->GetModelID());
+	Model *ent_model = GetModel(entity->GetEntityModelID());
 	
 	GLuint shader;
 
@@ -415,8 +425,7 @@ void GameScene::RenderModel(Entity *entity)
 
 	glm::mat4 model(1.0f);
 	model = glm::translate(glm::mat4(1.0f), entity->GetPosition());
-	model = glm::scale(model, glm::vec3(.1f, .1f, .1f));
-	//model = glm::scale(model, glm::vec3(6.0f, 6.0f, 6.0f));
+	model = glm::scale(model, GetModelScale(entity->GetEntityModelID()));
 
 	glm::vec3 light_pos(256, 512.0f, 256);
 	glm::vec3 light_color(1.0f, 1.0f, 1.0f);
@@ -452,6 +461,7 @@ void GameScene::RenderModel(Entity *entity)
 	if(m_flags & AABB_MODE)
 		RenderAABB(entity, shader);
 }
+
 void GameScene::RenderSkybox()
 {	
 	GLuint shader = GetShader("skybox");
@@ -505,6 +515,16 @@ void GameScene::RenderEntities()
 			RenderHealthBar(&m_entity_list[i]);
 		}
 	}
+
+	for (int i = 0; i < MAX_STRUCTURES; i++)
+	{
+		if (m_structure_list[i].IsActive())
+		{
+			RenderModel(&m_structure_list[i]);
+			RenderHealthBar(&m_structure_list[i]);
+		}
+	}
+
 }
 
 void GameScene::RenderHealthBar(Entity *entity)
@@ -513,35 +533,55 @@ void GameScene::RenderHealthBar(Entity *entity)
 
 	glUseProgram(shader);
 
-	glm::vec2 billboardSize(50, .50f);
-	int time = Game::clock.getElapsedTime().asMilliseconds() / 250.0f;
+
+	int time = Game::clock.getElapsedTime().asMilliseconds() / 100.0f;
 	float healthW = (float)((entity->GetHealth() + time) % entity->GetMaxHealth()) / (float)entity->GetMaxHealth();
 
-	healthW *= 25.0f;
-	billboardSize.x = healthW;
+	healthW *= entity->GetAABB().max.x;
 
-	glm::mat4 model(1.0f);
-	model = glm::translate(glm::mat4(1.0f), entity->GetPosition() + glm::vec3(0, entity->GetAABB().max.y + 5, 0));
-	model = glm::scale(model, glm::vec3(billboardSize, 1));
-
-	glUniform2fv(glGetUniformLocation(shader, "billboardSize"), 1, &billboardSize[0]);
-	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
-	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
-	
 	GLuint healthTex = GetTextureID("health_bar");
 	GLuint healthGrayTex = GetTextureID("health_bar_gray");
+
+	glm::vec2 billboardSize(entity->GetAABB().max.x, .1f);
+	glm::vec3 billboardPos = entity->GetPosition();
+	billboardPos += glm::vec3(entity->GetAABB().max.x * -.5f, entity->GetAABB().max.y + 1, 0);
+
+	
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
+
+	//billboard stuff
+	glUniform3fv(glGetUniformLocation(shader, "cameraRight"), 1, &m_camera->GetRight()[0]);
+	glUniform3fv(glGetUniformLocation(shader, "cameraUp"), 1, &m_camera->GetUp()[0]);
+	glUniform3fv(glGetUniformLocation(shader, "billboardCenter"), 1, &billboardPos[0]);
+	glUniform2fv(glGetUniformLocation(shader, "billboardSize"), 1, &billboardSize[0]);
+
+	glUniform1i(glGetUniformLocation(shader, "billboardTex"), 0);
+	glUniform2fv(glGetUniformLocation(shader, "billboardSize"), 1, &billboardSize[0]);
+
+	//draw healthbar background
+	glActiveTexture(GL_TEXTURE0);
+	glBindTexture(GL_TEXTURE_2D, healthGrayTex);
+	glBindVertexArray(m_quadVAO);
+	glDrawArrays(GL_TRIANGLES, 0, 6);
+
+	//draw health bar
+
+	glEnable(GL_DEPTH_TEST);
+	glDepthFunc(GL_ALWAYS);
+	
+	billboardSize.x = healthW;
+	glUniform2fv(glGetUniformLocation(shader, "billboardSize"), 1, &billboardSize[0]);
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, healthTex);
 
 	glUniform1i(glGetUniformLocation(shader, "billboardTex"), 0);
-
-
-	glBindVertexArray(m_quadVAO);
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 	glBindVertexArray(0);
 	glActiveTexture(GL_TEXTURE0);
+
+	glDepthFunc(GL_LEQUAL);
 }
 
 void GameScene::RenderMinimap()
@@ -629,6 +669,8 @@ void GameScene::RenderMouseBox()
 	
 	glm::mat4 model(1.0f);
 	model = glm::translate(glm::mat4(1.0f), glm::vec3(m_selection_box));
+
+	glUniform3fv(glGetUniformLocation(shader, "boxColor"), 1, &glm::vec3(1.0f, .3f, .3f)[0]);
 
 	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
@@ -752,6 +794,9 @@ void GameScene::HandleInput(sf::Event event)
 	{
 		switch (event.key.code)
 		{
+		case sf::Keyboard::Num3:
+			CreateStructure();
+			break;
 		case sf::Keyboard::Insert:
 			wire_frame = !wire_frame;
 			break;
@@ -895,5 +940,29 @@ void GameScene::CreateEntity()
 	AABB aabb = { min, max};
 
 	entity->Init(model, glm::vec3(0, 64, 0), aabb, health, speed, thinkRate);
+	entity->m_nextFree = NULL;
+}
+
+void GameScene::CreateStructure()
+{
+	Structure *entity = m_next_free_struct;
+	m_next_free_struct = entity->m_nextFree;
+
+	std::string name = "castle";
+
+	Json def = GetStructDef(name);
+
+	int health = def["health"];
+	int speed = def["speed"];
+	int thinkRate = def["thinkRate"];
+
+
+	Json data = def["AABBmin"];
+	glm::vec3 min = glm::vec3(def["AABBmin"][0], def["AABBmin"][1], def["AABBmin"][2]);
+	glm::vec3 max = glm::vec3(def["AABBmax"][0], def["AABBmax"][1], def["AABBmax"][2]);
+
+	AABB aabb = { min, max };
+
+	entity->Init(glm::vec3(0, 24, 0), aabb, health, speed, thinkRate, name);
 	entity->m_nextFree = NULL;
 }

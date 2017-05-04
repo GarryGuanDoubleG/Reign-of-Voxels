@@ -1,6 +1,8 @@
 #pragma once
 #include "events.hpp"
 #include "json.hpp"
+#include "entity.hpp"
+
 using Json = nlohmann::json; /**< convenience specified by nlohmann himself */  
 /**
 * observer class that listens for event calls
@@ -28,6 +30,8 @@ public:
 	* @param input the input given
 	*/
 	virtual void onNotify(Event event, sf::Event &input) {};
+
+	virtual void onNotify(Event event, Entity *entity) {};
 private:
 	//doubly ll for constant time removal
 	Observer * m_next; /**< next observer to notify*/  

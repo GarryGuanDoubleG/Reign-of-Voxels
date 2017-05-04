@@ -1,6 +1,5 @@
 #pragma once
-#include "SFML\Graphics.hpp"
-
+#include "ResourceManager.hpp"
 #include "3dmath.hpp"
 
 //flags
@@ -17,7 +16,8 @@
 
 class Entity
 {
-		/********Member Variables ********/
+protected:
+	/********Member Variables ********/
 	sf::Uint8 m_flag;
 
 	GLint m_modelID;
@@ -45,13 +45,14 @@ public:
 	Entity();
 	~Entity();
 
-	void Init(GLint modelID, glm::vec3 position, AABB aabb, int health, int speed, int thinkRate);
+	virtual void Init(GLint modelID, glm::vec3 position, AABB aabb, int health, int speed, int thinkRate);
 	void Destroy();
 
 	glm::vec3 GetPosition();
 	AABB GetAABB();
 
-	void Update();
+	virtual void Update();
+	virtual void Think();
 
 	void MoveTo(glm::vec3 target_pos);
 
@@ -62,9 +63,7 @@ public:
 
 	int		GetHealth();
 	int		GetMaxHealth();
-	GLuint	GetModelID();
+	GLuint	GetEntityModelID();
 
 	Entity *m_nextFree;
-private:
-	void Think();
 };

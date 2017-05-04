@@ -1,17 +1,15 @@
 #pragma once
-#include "SFML\Graphics.hpp"
-
+#include "ResourceManager.hpp"
 #include "scene.hpp"
 #include "LightSource.hpp"
 
-#include "ResourceManager.hpp"
-#include "entity.hpp"
+#include "structures.hpp"
 #include "camera.hpp"
 #include "HUD.hpp"
 #include "VoxelManager.hpp"
 
 #define MAX_ENTITES 400
-
+#define MAX_STRUCTURES 100
 /**
 * GameScene class that manages rendering the voxel world. Inherits from abstract class Scene
 */
@@ -23,6 +21,10 @@ private:
 	//entites
 	Entity *m_entity_list;/**<object pool of entities. */
 	Entity *m_next_free_entity; /**<head of free list for entites*/
+
+	Structure *m_structure_list;
+	Structure *m_next_free_struct;
+
 	GLuint m_entity_count;
 
 	std::vector<Ray> m_rays;
@@ -40,7 +42,7 @@ private:
 	Camera *m_camera; /**<player camera*/
 
 	
-					  //minimap
+	//minimap
 	Camera *m_minimapCam; /**<camera used to display minimap*/
 	glm::vec2 m_minimapScale;
 	
@@ -58,10 +60,6 @@ private:
 	GLuint m_waterReflectDepthBuff;
 	GLuint m_waterRefractDepthTex;
 
-
-
-	Model * m_model; // test model, get rid of it once entities work
-
 	bool wire_frame = false;
 	bool draw_textured = false;
 	bool m_worldChanged;
@@ -69,6 +67,7 @@ private:
 	//TODO move to a player class
 	glm::ivec3 m_selection_box;
 	glm::ivec3 m_selection_face;
+
 public:
 	/**
 	* constructor
@@ -141,5 +140,6 @@ private:
 	* @brief Loads model into global array
 	*/
 	void CreateEntity();
+	void CreateStructure();
 
 };

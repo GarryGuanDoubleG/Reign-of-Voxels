@@ -37,10 +37,11 @@ void main(void)
 	vec4 reflectColor = texture(reflectionTex, reflectUV);
 	vec4 refractColor = texture(refractionTex, refractUV);
 
-	vec3 viewVector = normalize(cameraVector);
-	float refractionFactor = dot(viewVector,  vec3(0.0,1.0, 0.0));
-	refractionFactor = (refractionFactor + 1) / 2.0f;
+	//vec3 viewVector = normalize(cameraVector);
+	//float refractionFactor = dot(viewVector,  vec3(0.0,1.0, 0.0));
+	//refractionFactor = (refractionFactor + 1) / 2.0f;
 
-	color = mix(reflectColor, refractColor, refractionFactor);
+	color = mix(reflectColor, refractColor, .15f);
+	color.a = 1.0f;
 	//color = mix(color, vec4(0.0, 0.3, 0.5, 1.0),  0.2);
 }

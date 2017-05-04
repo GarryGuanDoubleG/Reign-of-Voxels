@@ -1,5 +1,5 @@
-#include "game.hpp"
 #include "entity.hpp"
+#include "game.hpp"
 
 Entity::Entity()
 {
@@ -43,7 +43,7 @@ AABB Entity::GetAABB()
 	return m_aabb;
 }
 
-GLuint Entity::GetModelID()
+GLuint Entity::GetEntityModelID()
 {
 	return m_modelID;
 }

@@ -1,0 +1,16 @@
+{
+  "music": {
+    "menu": "Resources\\sounds\\menu.ogg",
+    "game": "Resources\\sounds\\medieval.ogg",
+    "ambient":  "Resources\\sounds\\ambient.ogg"
+  },
+
+  "sound": {
+    "click": {
+      "path": ""
+    }
+  }
+ 
+
+}
+
