@@ -33,7 +33,7 @@ void Structure::Update()
 {
 	if (m_structFlag & STRUCT_BUILDING_MODE)
 	{
-		float delta_time = Game::clock.getElapsedTime().asSeconds() - m_animStart;
+		float delta_time = Game::clock.getElapsedTime().asSeconds() - m_buildInfo->animStartTime;
 		int buildFrame = delta_time / m_buildInfo->tickRate;
 
 		if (buildFrame > m_buildInfo->maxFrame)

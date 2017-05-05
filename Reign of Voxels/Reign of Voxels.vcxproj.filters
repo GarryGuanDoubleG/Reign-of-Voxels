@@ -132,6 +132,9 @@
     <ClCompile Include="src\structure.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="src\player.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actor.hpp">
@@ -257,6 +260,12 @@
     <ClInclude Include="src\structures.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="src\player.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\Physics.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="packages.config" />
@@ -371,21 +380,6 @@
     <None Include="shader\health_fs.glsl">
       <Filter>Shaders</Filter>
     </None>
-    <None Include="..\..\..\..\web\CS490\back\db.php">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\..\web\CS490\back\login.php">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\..\web\CS490\back\questions.php">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\..\web\CS490\back\score.php">
-      <Filter>Shaders</Filter>
-    </None>
-    <None Include="..\..\..\..\web\CS490\back\test.php">
-      <Filter>Shaders</Filter>
-    </None>
     <None Include="..\..\..\..\web\CS490\back\back.php">
       <Filter>Shaders</Filter>
     </None>
@@ -399,6 +393,12 @@
       <Filter>Shaders</Filter>
     </None>
     <None Include="shader\unlight_object_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\transparentObject_fs.glsl">
+      <Filter>Shaders</Filter>
+    </None>
+    <None Include="shader\transparentObject_vs.glsl">
       <Filter>Shaders</Filter>
     </None>
   </ItemGroup>

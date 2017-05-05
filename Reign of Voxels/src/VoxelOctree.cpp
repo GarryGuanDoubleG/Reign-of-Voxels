@@ -267,7 +267,7 @@ glm::vec3 VoxelOctree::CalculateSurfaceNormal(const glm::vec3 &pos, const glm::v
 	return glm::normalize(glm::vec3(dx, dy, dz));
 }
 
-
+//TODO move this to voxel manager
 void VoxelOctree::GenerateMeshFromOctree()
 {
 	for (int i = 0; i < render_list.size(); i++)
@@ -762,9 +762,6 @@ void VoxelOctree::InitOctree(int worldSize, VoxelManager *manager)
 	this->BuildTree();
 	//this->SimplifyOctree(-0.5f);
 	this->AssignNeighbors();
-
-	this->GenerateMeshFromOctree();
-	this->GenerateSeams();
 
 	std::cout << "Build time is " << build_time.getElapsedTime().asSeconds() << std::endl;
 	std::cout << "Leaf Nodes: " << g_node_count << std::endl;

@@ -19,6 +19,10 @@
     "fs": "shader/object_fs.glsl",
     "vs": "shader/object_vs.glsl"
   },
+  "transparentObject": {
+    "vs": "shader/transparentObject_vs.glsl",
+    "fs": "shader/transparentObject_fs.glsl"
+  },
   "voxel": {
     "vs": "shader/voxel_vs.glsl",
     "fs": "shader/voxel_fs.glsl"
@@ -68,5 +72,7 @@
     "vs": "shader/health_vs.glsl",
     "fs": "shader/health_fs.glsl"
   }
+
+
 }
 

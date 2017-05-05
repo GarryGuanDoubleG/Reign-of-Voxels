@@ -38,7 +38,17 @@ void LoadHudWidget(Json &data, HUDWidget &widget)
 	widget.rect.size.x = (float)data["width"];
 	widget.rect.size.y = (float)data["height"];
 
-	if (data["position"] == "bottom_right")
+	if (data.find("name") != data.end())
+	{
+		std::string name = data["name"];
+		widget.name = name;
+	}
+
+	if (data["position"].is_array())
+	{
+		widget.rect.position = glm::vec2(data["position"][0], data["position"][1]);
+	}
+	else if (data["position"] == "bottom_right")
 	{
 		widget.rect.position.x = (float)Game::screen_width - widget.rect.size.x;
 		widget.rect.position.y = (float)Game::screen_height  - widget.rect.size.y;
@@ -62,19 +72,9 @@ void HUD::Init()
 	else 
 		slog("Failed to open HUD %s", HUD_PATH);
 
-	//3 by 3 grid with options from selected unit
-	if (layout.find("action_grid") != layout.end())
+	for (Json::iterator it = layout.begin(); it != layout.end(); ++it)
 	{
-		Json data = layout["action_grid"];
-		HUDWidget widget;
-
-		LoadHudWidget(data, widget);
-		m_widgets.push_back(widget);
-	}
-
-	if (layout.find("unit_display") != layout.end())
-	{
-		Json data = layout["unit_display"];
+		Json data = *it;
 		HUDWidget widget;
 
 		LoadHudWidget(data, widget);
@@ -172,5 +172,21 @@ void HUD::Render()
 
 void HUD::HandleInput(sf::Event event)
 {
+	if (event.type == sf::Event::MouseButtonPressed)
+	{
+		sf::Vector2i mouse_pos(event.mouseButton.x, event.mouseButton.y);
 
+		for (int i = 0; i < m_widgets.size(); i++)
+		{
+			if (m_widgets[i].rect.position.x <= mouse_pos.x &&
+				m_widgets[i].rect.position.y <= mouse_pos.y &&
+				mouse_pos.x < m_widgets[i].rect.position.x + m_widgets[i].rect.size.x &&
+				mouse_pos.y < m_widgets[i].rect.position.y + m_widgets[i].rect.size.y)
+			{
+				Game::instance().getEventSystem().Notify(GameButton, m_widgets[i].name);
+			}
+		}
+
+
+	}
 }

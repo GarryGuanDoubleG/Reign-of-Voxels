@@ -8,7 +8,8 @@ enum Event
 	JoinPlayer, /**< Another player joins same lobby  */  
 	LeavePlayer, /**< Someone in lobby left */  
 	ClientInput, /**< Player input locally */  
-	ServerInput,/**<  Player input sent from server*/  
+	ServerInput,/**<  Player input sent from server*/ 
+	GameButton,
 	Chat, /**<  Player typed something in chat*/  
 	Start, /**< Player starts the game*/  
 	InitGame, /**< Server response to inform all players to initiate game*/  

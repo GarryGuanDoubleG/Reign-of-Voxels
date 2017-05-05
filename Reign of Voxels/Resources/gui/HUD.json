@@ -2,15 +2,15 @@
   "unit_display": {
     "texture": "Resources/textures/unit_display.png",
     "position": "bottom_center",
-    "width": 640,
+    "width": 1280,
     "height": 128
   },
-  "action_grid":{
-    "texture": "Resources/textures/3grid.png",
-    "position": "bottom_right",
-    "width": 320,
-    "height": 128
-  }
 
-
+  "castle_button":{
+    "texture": "Resources\\textures\\gui\\castle_button.png",
+    "position": [ 1714, 10 ],
+    "width": 196,
+    "height": 196,
+    "name": "castle"
+  }  
 }

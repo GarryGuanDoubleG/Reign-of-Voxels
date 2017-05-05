@@ -68,6 +68,9 @@ private:
 	glm::ivec3 m_selection_box;
 	glm::ivec3 m_selection_face;
 
+	//TODO Move to player class
+	GLuint m_buildModeModelID;
+	std::string m_buildModeName;
 public:
 	/**
 	* constructor
@@ -91,6 +94,7 @@ public:
 	*@param input the input from client or server
 	*/
 	virtual void onNotify(Event event, sf::Event &input);
+	virtual void onNotify(Event event, std::string &input);
 private:
 	GLuint CreateColorTextureAttachment();
 
@@ -111,6 +115,7 @@ private:
 	*/
 	virtual void HandleInput(sf::Event event);
 	virtual void SelectionInput(sf::Event event);
+	virtual void HandleBuildModeInput(sf::Event event);
 	/**
 	*@brief Handles drawing the game scene
 	*/
@@ -123,6 +128,7 @@ private:
 	void RenderEntities();
 	void RenderModel(Entity *entity);
 	void RenderMouseBox();
+	void RenderBuildMode();
 	void RenderSkybox();
 	void RenderAABB(Entity *entity, GLuint shader);
 	void RenderRayCast();
@@ -140,6 +146,6 @@ private:
 	* @brief Loads model into global array
 	*/
 	void CreateEntity();
-	void CreateStructure();
+	void CreateStructure(std::string structName);
 
 };

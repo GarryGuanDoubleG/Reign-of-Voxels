@@ -16,6 +16,7 @@
 #define RENDER_CHUNK_MODE 16
 
 #define SELECTION_MODE 64
+#define BUILD_MODE 128
 /**
 * constructor
 * Subscribes to event system and sets up a camera and loads models
@@ -351,26 +352,20 @@ void GameScene::Render()
 	sf::Clock timer;
 
 	RenderChunkAABB();
-
 	RenderWorld();
 	RenderWater();
 	RenderEntities();
 
-	if(m_flags & RAY_CAST_MODE)
-		RenderRayCast();
+	if (m_flags & RAY_CAST_MODE) RenderRayCast();
+	if (m_flags & RENDER_SKYBOX_MODE) RenderSkybox();
+	if (m_flags & BUILD_MODE)RenderBuildMode();
 
-	if (m_flags & RENDER_SKYBOX_MODE)
-	{
-		RenderSkybox();
-	}
 	RenderMouseBox();
 	RenderMinimap();
 
 	m_hud->Render();
 
 	Game::instance().getWindow()->display();
-
-	//std::cout << "FPS " << timer.getElapsedTime().asSeconds() << std::endl;
 }
 
 void GameScene::RenderAABB(Entity *entity, GLuint shader)
@@ -533,10 +528,9 @@ void GameScene::RenderHealthBar(Entity *entity)
 
 	glUseProgram(shader);
 
-
 	int time = Game::clock.getElapsedTime().asMilliseconds() / 100.0f;
-	float healthW = (float)((entity->GetHealth() + time) % entity->GetMaxHealth()) / (float)entity->GetMaxHealth();
-
+	
+	float healthW = entity->GetHealth() / entity->GetMaxHealth();
 	healthW *= entity->GetAABB().max.x;
 
 	GLuint healthTex = GetTextureID("health_bar");
@@ -620,13 +614,8 @@ void GameScene::RenderMinimap()
 	
 	glDrawArrays(GL_TRIANGLES, 0, 6);
 
-	glBindVertexArray(0);
-
 	glActiveTexture(GL_TEXTURE0);
-	glBindTexture(GL_TEXTURE_2D, 0);
-
-	glActiveTexture(GL_TEXTURE1);
-	glBindTexture(GL_TEXTURE_2D, 0);
+	glBindVertexArray(0);
 
 	glUseProgram(0);
 }
@@ -677,6 +666,27 @@ void GameScene::RenderMouseBox()
 	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
 
 	cube->Draw(shader);
+}
+
+void GameScene::RenderBuildMode()
+{
+	GLuint shader = GetShader("transparentObject");
+
+	glUseProgram(shader);
+
+	glm::mat4 model;
+	model = glm::translate(glm::mat4(1.0f), glm::vec3(m_selection_box + m_selection_face));
+	model = glm::scale(model, GetModelScale(m_buildModeModelID));
+
+	//mvp matrices
+	glUniformMatrix4fv(glGetUniformLocation(shader, "model"), 1, GL_FALSE, &model[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &m_camera->GetViewMat()[0][0]);
+	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &m_camera->GetProj()[0][0]);
+
+	glm::vec4 colorMod(.85f, .25f, .25f, .7f);
+	glUniform4fv(glGetUniformLocation(shader, "colorMod"), 1, &colorMod[0]);
+
+	GetModel(m_buildModeModelID)->Draw(shader);
 }
 
 void GameScene::RenderChunkAABB()
@@ -766,6 +776,20 @@ void GameScene::onNotify(Event event, sf::Event &input)
 	HandleInput(input);
 }
 
+void GameScene::onNotify(Event event, std::string &input)
+{
+	switch (event)
+	{
+	case GameButton:
+		m_flags |= BUILD_MODE;
+		m_buildModeModelID = GetModelID(input);
+		m_buildModeName = input;
+		break;
+	default:
+		break;
+	}
+}
+
 void GameScene::EntityRayCollision(Ray ray)
 {
 	for (int i = 0; i < MAX_ENTITES; i++)
@@ -795,7 +819,7 @@ void GameScene::HandleInput(sf::Event event)
 		switch (event.key.code)
 		{
 		case sf::Keyboard::Num3:
-			CreateStructure();
+			CreateStructure("castle");
 			break;
 		case sf::Keyboard::Insert:
 			wire_frame = !wire_frame;
@@ -837,13 +861,36 @@ void GameScene::HandleInput(sf::Event event)
 		}
 	}
 
+	Ray ray;
+	glm::ivec3 face(0.0f);
+	glm::vec3 hit;
+
+	if (event.type == sf::Event::MouseMoved)
+	{
+		sf::Vector2i mouse_pos(sf::Mouse::getPosition(*Game::instance().getWindow()));
+
+		//TODO thread ray intersection
+		PhysicsUtil::ScreenPosToWorldRay(m_camera->GetPosition(), mouse_pos,
+			glm::vec2((float)Game::screen_width, (float)Game::screen_height), m_camera->GetViewMat(),
+			m_camera->GetProj(), ray);
+
+		if (PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit, face))
+		{
+			m_selection_box = glm::ivec3(hit);
+			m_selection_face = face;
+		}
+	}
+
+	if (m_flags & BUILD_MODE)
+	{
+		HandleBuildModeInput(event);
+	}
 	else if (m_flags & SELECTION_MODE)
 	{
 		SelectionInput(event);
 	}
 	else if (event.type == sf::Event::MouseButtonPressed)
 	{
-		Ray ray;
 		sf::Vector2i mouse_pos(event.mouseButton.x, event.mouseButton.y);
 
 		//TODO thread ray intersection
@@ -874,6 +921,8 @@ void GameScene::HandleInput(sf::Event event)
 			}
 		}
 	}
+
+	m_hud->HandleInput(event);
 }
 
 void GameScene::SelectionInput(sf::Event event)
@@ -885,21 +934,7 @@ void GameScene::SelectionInput(sf::Event event)
 	glm::ivec3 face(0.0f);
 	glm::vec3 hit;
 
-	if (event.type == sf::Event::MouseMoved)
-	{
-		sf::Vector2i mouse_pos(sf::Mouse::getPosition(*Game::instance().getWindow()));
-
-		//TODO thread ray intersection
-		PhysicsUtil::ScreenPosToWorldRay(m_camera->GetPosition(), mouse_pos,
-			glm::vec2((float)Game::screen_width, (float)Game::screen_height), m_camera->GetViewMat(),
-			m_camera->GetProj(), ray);
-
-		if (PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit, face))
-		{
-			m_selection_box = glm::ivec3(hit);
-		}
-	}
-	else if(event.type == sf::Event::MouseButtonPressed)
+	if(event.type == sf::Event::MouseButtonPressed)
 	{
 		sf::Vector2i mouse_pos(event.mouseButton.x, event.mouseButton.y);
 
@@ -920,6 +955,23 @@ void GameScene::SelectionInput(sf::Event event)
 	}
 
 }
+
+void GameScene::HandleBuildModeInput(sf::Event event)
+{
+	if (event.type != sf::Event::MouseButtonPressed)
+		return;
+	if(event.mouseButton.button == sf::Mouse::Left)
+	{
+		CreateStructure(m_buildModeName);
+		m_flags &= ~BUILD_MODE;
+	}
+	else
+	{
+		m_flags &= ~BUILD_MODE;
+	}
+
+}
+
 
 void GameScene::CreateEntity()
 {
@@ -943,19 +995,16 @@ void GameScene::CreateEntity()
 	entity->m_nextFree = NULL;
 }
 
-void GameScene::CreateStructure()
+void GameScene::CreateStructure(std::string structName)
 {
 	Structure *entity = m_next_free_struct;
 	m_next_free_struct = entity->m_nextFree;
 
-	std::string name = "castle";
-
-	Json def = GetStructDef(name);
+	Json def = GetStructDef(structName);
 
 	int health = def["health"];
 	int speed = def["speed"];
 	int thinkRate = def["thinkRate"];
-
 
 	Json data = def["AABBmin"];
 	glm::vec3 min = glm::vec3(def["AABBmin"][0], def["AABBmin"][1], def["AABBmin"][2]);
@@ -963,6 +1012,6 @@ void GameScene::CreateStructure()
 
 	AABB aabb = { min, max };
 
-	entity->Init(glm::vec3(0, 24, 0), aabb, health, speed, thinkRate, name);
+	entity->Init(m_selection_box + m_selection_face, aabb, health, speed, thinkRate, structName);
 	entity->m_nextFree = NULL;
 }

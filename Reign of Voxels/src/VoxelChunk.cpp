@@ -27,7 +27,6 @@ void VoxelChunk::Init(glm::vec3 position, VoxelOctree * node)
 
 	m_node = node;
 
-
 	memset(m_neighbor, NULL, sizeof(m_neighbor));
 }
 

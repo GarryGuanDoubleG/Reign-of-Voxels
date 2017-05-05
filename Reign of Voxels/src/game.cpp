@@ -73,9 +73,6 @@ void Game::GraphicsInit()
 	glEnable(GL_BLEND);
 	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
 
-	//glDisableClientState(GL_COLOR_ARRAY);
-	//glDisableClientState(GL_TEXTURE_COORD_ARRAY);
-
 }
 /*
 * @brief initializes the game from graphics to loading scene and managing client connection

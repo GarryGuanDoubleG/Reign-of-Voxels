@@ -32,6 +32,8 @@ public:
 	virtual void onNotify(Event event, sf::Event &input) {};
 
 	virtual void onNotify(Event event, Entity *entity) {};
+
+	virtual void onNotify(Event event, std::string &input) {};
 private:
 	//doubly ll for constant time removal
 	Observer * m_next; /**< next observer to notify*/  

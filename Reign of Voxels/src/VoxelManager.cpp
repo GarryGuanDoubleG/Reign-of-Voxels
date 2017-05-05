@@ -67,7 +67,10 @@ void VoxelManager::GenerateVoxels()
 	m_octreeRoot->InitNode(rootMinPos, m_worldSize);//activate root octree node
 		
 	//start building tree and voxel data
+	//creates an octree up until the size of the chunk. Chunk stores the vertex data
 	m_octreeRoot->InitOctree(m_worldSize, this);
+	m_octreeRoot->GenerateMeshFromOctree();
+	m_octreeRoot->GenerateSeams();
 
 	//bind the terrain
 	m_octreeRoot->UploadMesh();
@@ -132,7 +135,6 @@ VoxelOctree *VoxelManager::getRootNode()
 {
 	return m_octreeRoot;
 }
-
 
 VoxelOctree *VoxelManager::InitNode(glm::ivec3 minPos, int size)
 {
@@ -430,7 +432,6 @@ void VoxelManager::RenderVoxelTextured(Camera *player_cam)
 	m_octreeRoot->Draw();
 }
 
-
 bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
 {
 	VoxelOctree * node = m_octreeRoot->FindLeafNode(world_pos);
@@ -507,7 +508,6 @@ void VoxelManager::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
 	chunk->GenerateSeam();
 	chunk->BindMesh();
 }
-
 
 bool VoxelManager::IsWaterChunk(int x, int z)
 {

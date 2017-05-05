@@ -39,13 +39,12 @@ float Density_Func(const glm::vec3& worldPosition)
 	perlinMapVal = perlinMapVal == 0.0 ? 1.0f / 256.0f : perlinMapVal;
 
 	const float terrain = worldPosition.y - (perlinMapVal * VoxelOctree::maxHeight);
-	
-	return terrain;
+	//return terrain;
 
-	//const float terrain = worldPosition.y - (perlinMapVal * VoxelOctree::maxHeight);
-	//const float plane = worldPosition.y - 6.0f;
+	float cuboid = Cuboid(worldPosition, glm::vec3(32, 44, 32), glm::vec3(32.0f));
 
-	//return glm::max(terrain, plane);
+
+	return glm::max(-cuboid, terrain);
 }
 
 float Density_Func(const glm::vec3& worldPosition, const std::vector<glm::vec3> &csgOperationPos)

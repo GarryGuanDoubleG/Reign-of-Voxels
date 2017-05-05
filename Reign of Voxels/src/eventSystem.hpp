@@ -40,6 +40,8 @@ public:
 	* @param input player input
 	*/
 	void Notify(Event event, sf::Event &input);
+
+	void Notify(Event event, std::string &input);
 private:
 	Observer * m_head; /**< head of linked list */  
 };

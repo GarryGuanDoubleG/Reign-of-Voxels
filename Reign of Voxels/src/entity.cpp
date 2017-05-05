@@ -63,7 +63,7 @@ void Entity::Update()
 		m_velocity = glm::normalize(m_target - m_position) * m_speed;
 		if (glm::distance(m_position, m_target) > 1.0f)
 		{
-			m_position += m_velocity;
+			m_position += m_velocity * Game::delta_time;
 		}			
 		else
 		{

@@ -59,3 +59,15 @@ void EventSystem::Notify(Event event, sf::Event &input)
 		current = current->m_next;
 	}
 }
+
+
+void EventSystem::Notify(Event event, std::string &input)
+{
+	Observer * current = m_head;
+
+	while (current)
+	{
+		current->onNotify(event, input);
+		current = current->m_next;
+	}
+}

@@ -14,15 +14,14 @@ typedef struct Vertex2D
 
 typedef struct HUDWidget
 {
+	std::string name;
+
 	Rectf rect;
 
 	GLuint textureID;
-	GLuint vao,
-		vbo,
-		ebo;
+	GLuint vao,vbo, ebo;
 
 	Vertex2D vertices[4];
-
 	GLuint indices[6];
 };
 
