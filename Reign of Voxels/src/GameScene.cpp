@@ -14,6 +14,7 @@
 #define RENDER_GROUND_MODE 4
 #define RENDER_SKYBOX_MODE 8
 #define RENDER_CHUNK_MODE 16
+#define RENDER_WATER_MODE 32
 
 #define SELECTION_MODE 64
 #define BUILD_MODE 128
@@ -760,8 +761,11 @@ void GameScene::RenderWaterTextures()
 
 void GameScene::RenderWater()
 {
-	RenderWaterTextures();
-	m_voxelManager->RenderWater(m_waterReflectTex, m_waterRefractTex, m_camera);
+	if (m_flags & RENDER_WATER_MODE)
+	{
+		RenderWaterTextures();
+		m_voxelManager->RenderWater(m_waterReflectTex, m_waterRefractTex, m_camera);
+	}
 }
 
 
@@ -838,6 +842,9 @@ void GameScene::HandleInput(sf::Event event)
 			break;
 		case sf::Keyboard::F1:
 			m_flags ^= RENDER_CHUNK_MODE;
+			break;
+		case sf::Keyboard::F2:
+			m_flags ^= RENDER_WATER_MODE;
 			break;
 		case sf::Keyboard::U:
 			m_flags ^= AABB_MODE;

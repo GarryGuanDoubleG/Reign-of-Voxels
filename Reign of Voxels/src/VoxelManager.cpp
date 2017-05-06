@@ -32,7 +32,7 @@ VoxelManager::VoxelManager(int worldSize)
 	}
 
 	//Allocate space for Octree. 2^(3h + 1) - 1 nodes
-	int maxOctree = (int)log2(m_worldSize) - 1;
+	int maxOctree = (int)log2(m_worldSize);
 	maxOctree = (1 << (3 * maxOctree)); //2^3 times for 8 child nodes
 
 	m_maxOctNodes = maxOctree;
