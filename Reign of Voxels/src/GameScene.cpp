@@ -15,9 +15,12 @@
 #define RENDER_SKYBOX_MODE 8
 #define RENDER_CHUNK_MODE 16
 #define RENDER_WATER_MODE 32
+#define RENDER_RIGIDBODY_MODE 64
 
-#define SELECTION_MODE 64
-#define BUILD_MODE 128
+#define SELECTION_MODE 128
+#define BUILD_MODE 256
+
+
 /**
 * constructor
 * Subscribes to event system and sets up a camera and loads models
@@ -35,9 +38,12 @@ GameScene::GameScene()
 	m_camera = new Camera(glm::vec3(resolution / 2, 64, resolution / 2), glm::vec3(0, 0, 0));
 	m_camera->SetToPersp();
 
+	m_physics = new Physics();
+	m_physics->m_world->setDebugDrawer(&m_physicsDrawer);
+	
 	//Generate vertice and types for voxels
 	m_voxelManager = new VoxelManager(resolution);
-	m_voxelManager->GenerateVoxels();
+	m_voxelManager->GenerateVoxels(m_physics);
 
 	InitMinimap();
 	InitWater();
@@ -56,7 +62,6 @@ GameScene::GameScene()
 	for (int i = 0; i < MAX_STRUCTURES - 1; i++)
 		m_structure_list[i].m_nextFree = &m_structure_list[i + 1];
 	m_next_free_struct = m_structure_list;
-
 
 	Game::instance().getEventSystem().addObserver(this);
 }
@@ -323,6 +328,8 @@ void GameScene::SceneFrame()
 
 void GameScene::Update()
 {
+	m_physics->m_world->stepSimulation(Game::delta_time);
+
 	for (int i = 0; i < MAX_ENTITES; i++)
 	{
 		if (m_entity_list[i].IsActive())
@@ -489,6 +496,12 @@ void GameScene::RenderWorld()
 		glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
 	else
 		glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+	if (m_flags & RENDER_RIGIDBODY_MODE)
+	{
+		m_physicsDrawer.SetMatrices(m_camera->GetViewMat(), m_camera->GetProj());
+		m_physics->m_world->debugDrawWorld();
+	}
 
 	if (m_flags & RENDER_GROUND_MODE)
 	{
@@ -784,11 +797,13 @@ void GameScene::onNotify(Event event, std::string &input)
 {
 	switch (event)
 	{
-	case GameButton:
+	case BuildButton:
 		m_flags |= BUILD_MODE;
 		m_buildModeModelID = GetModelID(input);
 		m_buildModeName = input;
 		break;
+	case UnitButton:
+		CreateEntity(input);
 	default:
 		break;
 	}
@@ -832,7 +847,7 @@ void GameScene::HandleInput(sf::Event event)
 			m_flags ^= SELECTION_MODE;
 			break;
 		case sf::Keyboard::R:
-			CreateEntity();
+			//CreateEntity();
 			break;
 		case sf::Keyboard::T:
 			m_rays.clear();
@@ -845,6 +860,9 @@ void GameScene::HandleInput(sf::Event event)
 			break;
 		case sf::Keyboard::F2:
 			m_flags ^= RENDER_WATER_MODE;
+			break;
+		case sf::Keyboard::F3:
+			m_flags ^= RENDER_RIGIDBODY_MODE;
 			break;
 		case sf::Keyboard::U:
 			m_flags ^= AABB_MODE;
@@ -980,12 +998,12 @@ void GameScene::HandleBuildModeInput(sf::Event event)
 }
 
 
-void GameScene::CreateEntity()
+void GameScene::CreateEntity(std::string unitName)
 {
 	Entity *entity = m_next_free_entity;
 	m_next_free_entity = entity->m_nextFree;
 
-	Json def = GetEntityDef("worker");
+	Json def = GetEntityDef(unitName);
 
 	int health = def["health"];
 	int speed = def["speed"];
@@ -997,9 +1015,12 @@ void GameScene::CreateEntity()
 	glm::vec3 max = glm::vec3(def["AABBmax"][0], def["AABBmax"][1], def["AABBmax"][2]);
 
 	AABB aabb = { min, max};
-
-	entity->Init(model, glm::vec3(0, 64, 0), aabb, health, speed, thinkRate);
-	entity->m_nextFree = NULL;
+	if (m_castle)
+	{
+		entity->Init(model, m_castle->GetPosition() + glm::vec3(0, 1, 5.0f), aabb, health, speed, thinkRate);
+		entity->m_rigidBody = m_physics->CubeRigidBody(aabb.max, entity->GetPosition(), 1);
+		entity->m_nextFree = NULL;
+	}
 }
 
 void GameScene::CreateStructure(std::string structName)
@@ -1019,6 +1040,14 @@ void GameScene::CreateStructure(std::string structName)
 
 	AABB aabb = { min, max };
 
-	entity->Init(m_selection_box + m_selection_face, aabb, health, speed, thinkRate, structName);
-	entity->m_nextFree = NULL;
+	if (structName == "castle")
+	{
+		if (!m_castle)
+		{
+			m_castle = entity;
+			entity->Init(m_selection_box + m_selection_face, aabb, health, speed, thinkRate, structName);
+			entity->m_rigidBody = m_physics->CubeRigidBody(aabb.max, entity->GetPosition(), 1);
+			entity->m_nextFree = NULL;
+		}
+	}
 }

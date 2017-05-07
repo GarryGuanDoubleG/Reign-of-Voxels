@@ -3,6 +3,7 @@
 #include <GL\glew.h>
 #include <SFML\OpenGL.hpp>
 
+#include "Physics.hpp"
 #include "model.hpp"
 #include "3dmath.hpp"
 //#include "VoxelOctree.hpp"
@@ -21,16 +22,6 @@
 
 class VoxelOctree;
 
-typedef struct VoxelVertex_S
-{
-	VoxelVertex_S() {};
-	VoxelVertex_S(glm::vec3 pos, glm::vec3 norm) : position(pos), normal(norm) {};
-	VoxelVertex_S(glm::vec3 pos, glm::vec3 norm, int type) : position(pos), normal(norm), textureID(type) {};
-
-	glm::vec3 position;
-	glm::vec3 normal;
-	GLint textureID;
-}VoxelVertex;
 
 class VoxelChunk
 {
@@ -55,20 +46,20 @@ private:
 	std::vector<GLuint> m_tri_indices;//order to draw vertices
 	std::vector<GLuint> m_water_indices;//order to draw vertices
 
+
 	//used to stitch neighboring chunks
 	std::vector<VoxelOctree *> m_seam_nodes;
 	
-
 	std::vector<glm::vec3> m_csgOpPos;
 
 	GLuint	m_vao, m_vbo, m_ebo;
 	GLuint	m_water_vao, m_water_vbo, m_water_ebo;
 
-
 	sf::Uint8 m_flag;//bool for active
 
 	VoxelChunk *m_neighbor[7];
 	
+	btRigidBody * m_rigidBody;
 public:
 	bool m_render_mode;
 
@@ -104,6 +95,7 @@ public:
 		return distToCam < other.distToCam;
 	}
 private:
+
 
 	void AddTrianglesIndices(GLuint indice);
 	void AddVertices(VoxelVertex voxelVert);

@@ -37,8 +37,10 @@ float Density_Func(const glm::vec3& worldPosition)
 	float perlinMapVal = GetPerlinMapValue(worldPosition.x, worldPosition.z);
 
 	perlinMapVal = perlinMapVal == 0.0 ? 1.0f / 256.0f : perlinMapVal * 0.0039 * VoxelOctree::maxHeight;
-
 	const float terrain = worldPosition.y - (perlinMapVal);
+	//const float terrain = worldPosition.y - 32;
+
+
 	return terrain;
 }
 

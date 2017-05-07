@@ -44,6 +44,12 @@ void LoadHudWidget(Json &data, HUDWidget &widget)
 		widget.name = name;
 	}
 
+	if (data.find("type") != data.end())
+	{
+		std::string type = data["type"];
+		widget.type = type;
+	}
+
 	if (data["position"].is_array())
 	{
 		widget.rect.position = glm::vec2(data["position"][0], data["position"][1]);
@@ -183,7 +189,16 @@ void HUD::HandleInput(sf::Event event)
 				mouse_pos.x < m_widgets[i].rect.position.x + m_widgets[i].rect.size.x &&
 				mouse_pos.y < m_widgets[i].rect.position.y + m_widgets[i].rect.size.y)
 			{
-				Game::instance().getEventSystem().Notify(GameButton, m_widgets[i].name);
+				if (m_widgets[i].type == "building")
+				{
+					Game::instance().getEventSystem().Notify(BuildButton, m_widgets[i].name);
+				}
+
+				else if(m_widgets[i].type == "unit")
+				{
+					Game::instance().getEventSystem().Notify(UnitButton, m_widgets[i].name);
+				}
+
 			}
 		}
 

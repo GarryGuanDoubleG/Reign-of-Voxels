@@ -3,6 +3,7 @@
 #include "VoxelOctree.hpp"
 #include "camera.hpp"
 #include "model.hpp"
+#include "Physics.hpp"
 
 #define GRASS_RGB 200
 #define WATER_RGB 159.75
@@ -31,8 +32,9 @@ public:
 
 	int GetWorldSize();
 
-	void GenerateVoxels();
+	void GenerateVoxels(Physics *physics);
 	void GenerateChunks();
+	void GenerateRigidBody(Physics *physics);
 
 	bool IsWaterChunk(int x, int z);
 	void GenerateWater();
@@ -44,6 +46,7 @@ public:
 	void RenderVoxels(bool draw_textured, Camera * player_cam);
 	void RenderVoxelTextured(Camera *player_cam);
 	void RenderMinimap(Camera * player_cam);
+
 
 	VoxelChunk *CreateChunk(glm::vec3 worldPosition, VoxelOctree *node);
 	void		destroyChunk(VoxelChunk * chunk);

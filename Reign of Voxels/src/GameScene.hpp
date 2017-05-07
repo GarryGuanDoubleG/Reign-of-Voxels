@@ -8,6 +8,7 @@
 #include "HUD.hpp"
 #include "VoxelManager.hpp"
 
+
 #define MAX_ENTITES 400
 #define MAX_STRUCTURES 100
 /**
@@ -29,18 +30,22 @@ private:
 
 	std::vector<Ray> m_rays;
 	GLuint m_raycast_vao,
-		m_raycast_vbo;
+			m_raycast_vbo;
 
 	GLuint m_cubemapVAO, m_cubemapVBO;
 	GLuint m_skyboxVAO, m_skyboxVBO;
 
 	HUD * m_hud;/**<HUD handler class that managers hud inputs and rendering*/
 
+
+	Physics *m_physics;
+	BulletDebugDrawer m_physicsDrawer;
+
+
 	VoxelManager * m_voxelManager; /**<Handles Voxel Generation, rendering, and interaction*/
 
-								   //main player camera
+	//main player camera
 	Camera *m_camera; /**<player camera*/
-
 	
 	//minimap
 	Camera *m_minimapCam; /**<camera used to display minimap*/
@@ -71,6 +76,8 @@ private:
 	//TODO Move to player class
 	GLuint m_buildModeModelID;
 	std::string m_buildModeName;
+
+	Structure *m_castle;
 public:
 	/**
 	* constructor
@@ -145,7 +152,7 @@ private:
 	/**
 	* @brief Loads model into global array
 	*/
-	void CreateEntity();
+	void CreateEntity(std::string unitName);
 	void CreateStructure(std::string structName);
 
 };

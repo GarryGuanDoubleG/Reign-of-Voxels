@@ -20,6 +20,7 @@ std::string GenerateTerrainMap(int resolution)
 	int mapResolution = resolution + 1;
 
 	module::Perlin mountainTerrain;
+	mountainTerrain.SetSeed(rand());
 	mountainTerrain.SetLacunarity(1.5f);
 	mountainTerrain.SetPersistence(.25f);
 	mountainTerrain.SetFrequency(2.0f);
@@ -57,7 +58,7 @@ std::string GenerateTerrainMap(int resolution)
 	heightMapBuilder.SetSourceModule(finalTerrain);
 	heightMapBuilder.SetDestNoiseMap(heightMap);
 	heightMapBuilder.SetDestSize(mapResolution, mapResolution);
-	heightMapBuilder.SetBounds(2.0, 6.0, 1.0, 5.0);
+	heightMapBuilder.SetBounds(0, 10.0, 1.0, 8.0);
 	heightMapBuilder.Build();
 
 

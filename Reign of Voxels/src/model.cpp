@@ -128,9 +128,9 @@ void Model::Draw(GLuint shader)
 		this->m_meshes[i].Draw(shader);
 }
 
-void Model::Draw(GLuint shader, float timeInSeconds)
+void Model::Draw(GLuint shader, std::string animation, float timeInSeconds)
 {
-	m_animController.SetAnimation(timeInSeconds, "hook_punch");
+	m_animController.SetAnimation(timeInSeconds, animation);
 	m_animController.BoneTransform(timeInSeconds);
 
 	glUniformMatrix4fv(glGetUniformLocation(shader, "gBones"), 

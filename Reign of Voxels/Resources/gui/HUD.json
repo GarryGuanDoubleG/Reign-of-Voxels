@@ -6,11 +6,21 @@
     "height": 128
   },
 
-  "castle_button":{
+  "castle_button": {
     "texture": "Resources\\textures\\gui\\castle_button.png",
     "position": [ 1714, 10 ],
     "width": 196,
     "height": 196,
+    "type":  "building",
     "name": "castle"
+  },
+
+  "worker_button":{
+    "texture": "Resources\\textures\\gui\\worker_button.png",
+    "position": [ 1714, 206 ],
+    "width": 196,
+    "height": 196,
+    "type":  "unit",
+    "name": "worker"
   }  
 }

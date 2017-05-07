@@ -9,7 +9,8 @@ enum Event
 	LeavePlayer, /**< Someone in lobby left */  
 	ClientInput, /**< Player input locally */  
 	ServerInput,/**<  Player input sent from server*/ 
-	GameButton,
+	BuildButton,
+	UnitButton,
 	Chat, /**<  Player typed something in chat*/  
 	Start, /**< Player starts the game*/  
 	InitGame, /**< Server response to inform all players to initiate game*/  

@@ -439,7 +439,6 @@ void VoxelChunk::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
 	m_node->ContourCellProc(m_tri_indices);
 }
 
-
 void VoxelChunk::Render()
 {
 	if (~m_flag & CHUNK_FLAG_ACTIVE || !m_render_mode)
@@ -449,7 +448,6 @@ void VoxelChunk::Render()
 	glDrawElements(GL_TRIANGLES, m_tri_indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
-
 void VoxelChunk::RenderWater()
 {
 	if (~m_flag & CHUNK_FLAG_ACTIVE || m_water_indices.size() == 0)
@@ -459,3 +457,5 @@ void VoxelChunk::RenderWater()
 	glDrawElements(GL_TRIANGLES, m_water_indices.size(), GL_UNSIGNED_INT, 0);
 	glBindVertexArray(0);
 }
+
+

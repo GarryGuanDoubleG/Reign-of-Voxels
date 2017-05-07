@@ -58,17 +58,23 @@ int	Entity::GetMaxHealth()
 
 void Entity::Update()
 {
+	btVector3 newPosition;
+	newPosition = m_rigidBody->getWorldTransform().getOrigin();
+
+	//TODO optimize this to not use glm
+	glm::vec3 position = glm::vec3(newPosition.getX(), newPosition.getY(), newPosition.getZ());
+	m_position = position;
+
 	if (m_flag & ENTITY_MOVING)
 	{
-		m_velocity = glm::normalize(m_target - m_position) * m_speed;
-		if (glm::distance(m_position, m_target) > 1.0f)
+		if (glm::distance(position, m_target) < .67f)
 		{
-			m_position += m_velocity * Game::delta_time;
-		}			
-		else
-		{
+			
+			m_rigidBody->setLinearVelocity(btVector3(0, 0, 0));
 			m_position = m_target;
 			m_flag &= ~ENTITY_MOVING;
+
+			m_state = idle;
 		}
 	}
 
@@ -89,8 +95,17 @@ void Entity::Think()
 
 void Entity::MoveTo(glm::vec3 target_pos)
 {
+	glm::vec3 direction = glm::normalize(target_pos - m_position);
+	btVector3 velocity = btVector3(direction.x, direction.y *.5f, direction.z) * m_speed;
+
+
+	m_rigidBody->activate(true);
+	m_rigidBody->setLinearVelocity(velocity);
+	//m_rigidBody->setLinearFactor(velocity * .3f);
 	m_target = target_pos;
 	m_flag |= ENTITY_MOVING;
+
+	m_state = walking;
 }
 
 

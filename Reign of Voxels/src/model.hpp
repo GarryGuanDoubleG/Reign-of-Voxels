@@ -63,7 +63,7 @@ public:
 	* @param shader compiled shader id to use to render
 	* @param time in seconds used to interpolate animation vertices
 	*/
-	void Draw(GLuint shader, float timeInSeconds);
+	void Draw(GLuint shader, std::string animation, float timeInSeconds);
 private:
 	/**
 	*@brief Load textures that are embedded into the model (.fbx)

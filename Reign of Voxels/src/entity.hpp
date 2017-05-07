@@ -1,5 +1,7 @@
 #pragma once
 #include "ResourceManager.hpp"
+#include "Physics.hpp"
+#include "States.hpp"
 #include "3dmath.hpp"
 
 //flags
@@ -33,6 +35,7 @@ protected:
 
 	//phyiscs and world space locations
 	glm::vec3 m_position;
+	glm::vec3 m_rotation;
 	glm::vec3 m_target;
 	glm::vec3 m_velocity;
 
@@ -41,7 +44,10 @@ protected:
 
 	AABB m_aabb;
 
+	State m_state;
 public:
+	btRigidBody *m_rigidBody;
+
 	Entity();
 	~Entity();
 
@@ -66,4 +72,5 @@ public:
 	GLuint	GetEntityModelID();
 
 	Entity *m_nextFree;
+
 };

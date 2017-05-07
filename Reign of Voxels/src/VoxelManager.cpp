@@ -4,6 +4,7 @@
 #include "VoxelNoise.hpp"
 #include "texture.hpp"
 #include "game.hpp"
+#include "Physics.hpp"
 #include "simple_logger.h"
 
 std::mutex g_free_chunk_guard;
@@ -32,7 +33,7 @@ VoxelManager::VoxelManager(int worldSize)
 	}
 
 	//Allocate space for Octree. 2^(3h + 1) - 1 nodes
-	int maxOctree = (int)log2(m_worldSize);
+	int maxOctree = (int)log2(m_worldSize) - 1;
 	maxOctree = (1 << (3 * maxOctree)); //2^3 times for 8 child nodes
 
 	m_maxOctNodes = maxOctree;
@@ -58,8 +59,7 @@ int VoxelManager::GetWorldSize()
 	return m_worldSize;
 }
 
-
-void VoxelManager::GenerateVoxels()
+void VoxelManager::GenerateVoxels(Physics *physics)
 {
 	glm::ivec3 rootMinPos(0.0f);
 
@@ -68,7 +68,12 @@ void VoxelManager::GenerateVoxels()
 		
 	//start building tree and voxel data
 	//creates an octree up until the size of the chunk. Chunk stores the vertex data
+
+	
 	m_octreeRoot->InitOctree(m_worldSize, this);
+
+	sf::Clock timer;
+
 	m_octreeRoot->GenerateMeshFromOctree();
 	m_octreeRoot->GenerateSeams();
 
@@ -78,13 +83,15 @@ void VoxelManager::GenerateVoxels()
 
 	//bind water
 	GenerateWater();
+	GenerateRigidBody(physics);
+
+	std::cout << " Time to build mesh: " << timer.getElapsedTime().asSeconds() << std::endl;
 }
 
 void VoxelManager::GenerateChunks()
 {
 	//TODO generate octree bottom up then assign to chunks
 	//chunks are SVO with cubic bound box
-
 	for (int x = 0; x < m_worldSize; x += VoxelChunk::CHUNK_SIZE)
 	{
 		for (int y = 0; y <= VoxelOctree::maxHeight; y += VoxelChunk::CHUNK_SIZE)
@@ -117,7 +124,6 @@ VoxelChunk * VoxelManager::CreateChunk(glm::vec3 worldPosition, VoxelOctree *nod
 
 	return chunk;
 }
-
 
 void VoxelManager::destroyChunk(VoxelChunk * chunk)
 {
@@ -554,7 +560,7 @@ void VoxelManager::GenerateWater()
 
 		glm::ivec3 chunkMin = chunk->m_node->m_min;
 
-		VoxelOctree *water_root = InitNode(chunkMin, 32);
+		VoxelOctree *water_root = InitNode(chunkMin, VoxelChunk::CHUNK_SIZE);
 		chunk->m_water_tree = water_root;
 
 		water_root->m_chunk = chunk;
@@ -566,4 +572,18 @@ void VoxelManager::GenerateWater()
 		chunk->BindWaterPlanes();
 	}
 
+}
+
+void VoxelManager::GenerateRigidBody(Physics *physics)
+{
+	for (int i = 0; i < VoxelOctree::render_list.size(); i++)
+	{
+		VoxelChunk *chunk = VoxelOctree::render_list[i];
+
+		if (chunk &&chunk->m_tri_indices.size() != 0 && chunk->m_vertices.size() != 0)
+		{
+			physics->TriRigidBody(chunk->m_node->m_min, 0, chunk->m_vertices, chunk->m_tri_indices);
+		}
+		
+	}
 }

@@ -37,6 +37,17 @@ typedef struct
 	glm::vec4 weights;
 }BoneVertex;
 
+typedef struct VoxelVertex_S
+{
+	VoxelVertex_S() {};
+	VoxelVertex_S(glm::vec3 pos, glm::vec3 norm) : position(pos), normal(norm) {};
+	VoxelVertex_S(glm::vec3 pos, glm::vec3 norm, int type) : position(pos), normal(norm), textureID(type) {};
+
+	glm::vec3 position;
+	glm::vec3 normal;
+	int textureID;
+}VoxelVertex;
+
 
 typedef struct
 {

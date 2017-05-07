@@ -15,6 +15,7 @@ typedef struct Vertex2D
 typedef struct HUDWidget
 {
 	std::string name;
+	std::string type;
 
 	Rectf rect;
 

@@ -90,7 +90,7 @@ const int edgeProcEdgeMask[3][2][5] = {
 	{ { 6,4,2,0,2 },{ 7,5,3,1,2 } },
 };
 
-const int processEdgeMask[3][4] = { { 3,2,1,0 },{ 7,5,6,4 },{ 11,10,9,8 } };
+const int g_processEdgeMask[3][4] = { { 3,2,1,0 },{ 7,5,6,4 },{ 11,10,9,8 } };
 
 VoxelOctree::VoxelOctree()
 	: m_flag(0),
@@ -216,7 +216,7 @@ glm::vec3 ApproximateZeroCrossingPosition(const glm::vec3& p0, const glm::vec3& 
 
 glm::vec3 VoxelOctree::CalculateSurfaceNormal(const glm::vec3 &pos)
 {
-	const float H = 0.05f;
+	const float H = 0.1f;
 
 	if (pos.y <= 1.0f)
 	{
@@ -332,7 +332,7 @@ void VoxelOctree::ContourProcessEdge(std::vector<GLuint> &m_tri_indices, VoxelOc
 
 	for (int i = 0; i < 4; i++)
 	{
-		const int edge = processEdgeMask[dir][i];
+		const int edge = g_processEdgeMask[dir][i];
 		const int c1 = edgevmap[edge][0];
 		const int c2 = edgevmap[edge][1];
 
@@ -352,7 +352,7 @@ void VoxelOctree::ContourProcessEdge(std::vector<GLuint> &m_tri_indices, VoxelOc
 		signChange[i] =
 			(m1 == MATERIAL_AIR && m2 != MATERIAL_AIR) ||
 			(m1 != MATERIAL_AIR && m2 == MATERIAL_AIR);
-
+		//TODO move to terrain type
 		if (node[i]->m_drawInfo->averageNormal.y > .95f && node[i]->m_drawInfo->type == DIRT)
 		{
 			g_terrainGrassPos.push_back(node[i]->m_drawInfo->position + glm::vec3((rand() % 10) / 10.0f, 0, (rand() % 10) / 10.0f));
@@ -789,24 +789,24 @@ int VoxelOctree::AddTerrainType(const OctreeDrawInfo *drawInfo)
 	GLint type = GRASS;
 	sf::Color terrainColor = GetPerlinColorValue(drawInfo->position.x, drawInfo->position.z);
 
-	if (terrainColor == sf::Color(224, 224, 0))
-	{
-		type = DIRT;
-		//flat area
-		if (drawInfo->averageNormal.y > .95f)
-		{
-			g_terrainGrassPos.push_back(drawInfo->position);
-		}
-	}
-	else if (terrainColor.b > WATER_RGB)
-	{
-		type = WATER;
-	}
+	//if (terrainColor == sf::Color(224, 224, 0))
+	//{
+	//	type = DIRT;
+	//	//flat area
+	//	if (drawInfo->averageNormal.y > .95f)
+	//	{
+	//		g_terrainGrassPos.push_back(drawInfo->position);
+	//	}
+	//}
+	//else if (terrainColor.b > WATER_RGB)
+	//{
+	//	type = WATER;
+	//}
 
-	if (type == WATER)
-	{
-		g_terrainWater.push_back(this);
-	}
+	//if (type == WATER)
+	//{
+	//	g_terrainWater.push_back(this);
+	//}
 
 	return type;
 }
