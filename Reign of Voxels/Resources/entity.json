@@ -8,7 +8,7 @@
     "attack": 10,
     "speed": 15,
     "AABBmin": [ 0.0, 0.0, 0.0 ],
-    "AABBmax": [ 0.5, 1.0, 0.5 ]
+    "AABBmax": [ 2.0, 4.0, 2.0 ]
   },
   "swordsman": {
     "id": 3,
@@ -19,7 +19,7 @@
     "attack":  40,
     "speed": 15,
     "AABBmin": [ 0.0, 0.0, 0.0 ],
-    "AABBmax": [ 0.5, 1.0, 0.5 ]
+    "AABBmax": [ 2.0, 4.0, 2.0 ]
   },
   "boss": {
     "id": 2,
@@ -30,7 +30,7 @@
     "attack": 25,
     "speed": 5,
     "AABBmin": [ 0.0, 10.0, 0.0 ],
-    "AABBmax": [ 2.5, 20.0, 2.5 ]
+    "AABBmax": [ 5.5, 20.0, 5.5 ]
   }
 
 }

@@ -6,7 +6,7 @@
       "walking": "Resources\\models\\worker\\walking.fbx",
       "jogging": "Resources\\models\\worker\\jogging.fbx"
     },
-    "scale": [ 0.1, 0.1, 0.1 ]
+    "scale": [ 0.25, 0.25, 0.25 ]
   },
 
   "boss": {

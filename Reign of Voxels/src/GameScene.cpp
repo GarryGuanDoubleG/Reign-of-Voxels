@@ -1071,7 +1071,7 @@ void GameScene::CreateEntity(std::string unitName)
 	AABB aabb = { min, max};
 	if (m_castle)
 	{
-		entity->Init(model, m_castle->GetPosition() + glm::vec3(0, 1, 5.0f), aabb, health, speed, thinkRate, attackRange, attack);
+		entity->Init(model, m_castle->GetPosition() + glm::vec3(0, 6, 8.5f), aabb, health, speed, thinkRate, attackRange, attack);
 		entity->m_rigidBody = m_physics->CubeRigidBody(aabb.max, entity->GetPosition(), 1);
 		entity->m_nextFree = NULL;
 	}
@@ -1135,8 +1135,8 @@ void GameScene::CreateBoss()
 		m_boss_alive = true;
 
 		m_boss = entity;
-		entity->Init(model, m_castle->GetPosition() + glm::vec3(0, 10, 35.0f), aabb, health, speed, thinkRate, attackRange, attack);
-		entity->m_rigidBody = m_physics->CubeRigidBody(aabb.max - aabb.min, entity->GetPosition() + 1.5f, 1);
+		entity->Init(model, m_castle->GetPosition() + glm::vec3(0, 10, -35.0f), aabb, health, speed, thinkRate, attackRange, attack);
+		entity->m_rigidBody = m_physics->CubeRigidBody(aabb.max - aabb.min, entity->GetPosition() + 1.5f, 9999);
 		entity->m_nextFree = NULL;
 		m_boss->m_enemy = m_castle;
 		m_boss->Attack(m_castle);

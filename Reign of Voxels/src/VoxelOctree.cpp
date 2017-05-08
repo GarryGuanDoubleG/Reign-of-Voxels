@@ -783,7 +783,7 @@ int VoxelOctree::AddTerrainType(const OctreeDrawInfo *drawInfo)
 {
 	GLint type = DIRT;
 	sf::Color terrainColor = GetPerlinColorValue(drawInfo->position.x, drawInfo->position.z);
-	if (drawInfo->position.y >= 2 && drawInfo->position.y <= 4)
+	if (drawInfo->position.y >= 2 && drawInfo->position.y <= 6)
 	{
 		type = GRASS;
 	}
