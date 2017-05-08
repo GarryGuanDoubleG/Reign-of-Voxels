@@ -349,7 +349,11 @@ void VoxelManager::RenderWater(GLuint reflectionTex, GLuint refractionTex, Camer
 
 	int loc = glGetUniformLocation(shader, "cameraPos");
 
-	m_waterRoot->DrawWater();
+	/*m_waterRoot->DrawWater();*/
+
+	glBindVertexArray(m_water_vao);
+	glDrawElements(GL_TRIANGLES, m_water_tri.size(), GL_UNSIGNED_INT, 0);
+	glBindVertexArray(0);
 
 	glActiveTexture(GL_TEXTURE0);
 	//glBindTexture(GL_TEXTURE_2D, 0);
@@ -561,47 +565,14 @@ bool VoxelManager::IsWaterChunk(int x, int z)
 
 void VoxelManager::GenerateWater()
 {
-	//find regions with water by looking at color map
-	//for (int x = 0; x < m_worldSize; x += VoxelChunk::CHUNK_SIZE)
-	//{
-	//	for (int z = 0; z < m_worldSize; z += VoxelChunk::CHUNK_SIZE)
-	//	{					
-	//		if (IsWaterChunk(x,z))
-	//		{
-	//			VoxelChunk* chunk = m_octreeRoot->FindChunk(glm::ivec3(x, WATER_HEIGHT, z));
-	//			if (chunk)
-	//			{
-	//				m_water_chunks.push_back(chunk);
-	//			}
-	//		}
-	//	}
-	//}
-
-	//for(int i = 0; i < m_water_chunks.size(); i++)
-	//{
-	//	VoxelChunk *chunk = m_water_chunks[i];
-
-	//	glm::ivec3 chunkMin = chunk->m_node->m_min;
-
-	//	VoxelOctree *water_root = InitNode(chunkMin, VoxelChunk::CHUNK_SIZE);
-	//	chunk->m_water_tree = water_root;
-
-	//	water_root->m_chunk = chunk;
-	//	water_root->BuildWaterTree();
-
-	//	water_root->GenerateSeams();
-	//	water_root->GenerateVertexIndices(chunk->m_water_vertices);
-	//	water_root->ContourCellProc(chunk->m_water_indices);
-
-	//	chunk->BindWaterPlanes();
-	//}
 	VoxelOctree *water_root = InitNode(glm::ivec3(0), m_worldSize);
 
 	water_root->BuildWaterTree();
 
-	water_root->GenerateSeams();
 	water_root->GenerateVertexIndices(m_water_verts);
 	water_root->ContourCellProc(m_water_tri);
+
+	BindWaterPlane();
 }
 
 void VoxelManager::GenerateRigidBody(Physics *physics)
@@ -616,4 +587,41 @@ void VoxelManager::GenerateRigidBody(Physics *physics)
 		}
 		
 	}
+}
+
+void VoxelManager::BindWaterPlane()
+{
+	//glDeleteVertexArrays(1, &m_water_vao);
+	//glDeleteBuffers(1, &m_water_vbo);
+	//glDeleteBuffers(1, &m_water_ebo);
+
+	if ((m_water_verts.size() == 0) || m_water_tri.size() == 0)
+	{
+		return;
+	}
+	glGenVertexArrays(1, &m_water_vao);
+	glBindVertexArray(m_water_vao);
+
+	glGenBuffers(1, &m_water_vbo);
+	glBindBuffer(GL_ARRAY_BUFFER, m_water_vbo);
+	glBufferData(GL_ARRAY_BUFFER, sizeof(VoxelVertex) * m_water_verts.size(), &m_water_verts[0], GL_STATIC_DRAW);
+
+	glGenBuffers(1, &m_water_ebo);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_water_ebo);
+	glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(GLuint) * m_water_tri.size(), &m_water_tri[0], GL_STATIC_DRAW);
+
+	//location 0 should be verts
+	glEnableVertexAttribArray(0);
+	glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)0);
+	//now normals
+	glEnableVertexAttribArray(1);
+	glVertexAttribPointer(1, 3, GL_FLOAT, GL_FALSE, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, normal));
+
+	glEnableVertexAttribArray(2);
+	glVertexAttribIPointer(2, 1, GL_INT, sizeof(VoxelVertex), (GLvoid*)offsetof(VoxelVertex, textureID));
+
+	glBindVertexArray(0);
+	glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+	glBindBuffer(GL_ARRAY_BUFFER, 0);
+
 }

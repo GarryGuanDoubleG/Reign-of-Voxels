@@ -31,11 +31,15 @@ private:
 
 	VoxelOctree *m_waterRoot;
 
+	GLuint m_water_vao, m_water_vbo, m_water_ebo;
+
 public:
 	VoxelManager(int worldSize);
 	~VoxelManager();
 
 	int GetWorldSize();
+
+	void BindWaterPlane();
 
 	void GenerateVoxels(Physics *physics);
 	void GenerateChunks();
