@@ -11,6 +11,7 @@
 
 //entity type
 #define ENTITY_AIR 8
+#define ENTITY_ATTACK 16
 
 /**
 *@brief axis aligned bounding box
@@ -25,8 +26,8 @@ protected:
 	GLint m_modelID;
 
 	//stats
-	int m_health;
-	int m_maxHealth;
+	float m_health;
+	float m_maxHealth;
 
 	//update funcs
 	int m_thinkTimer;
@@ -36,22 +37,30 @@ protected:
 	//phyiscs and world space locations
 	glm::vec3 m_position;
 	glm::vec3 m_rotation;
-	glm::vec3 m_target;
 	glm::vec3 m_velocity;
+	glm::vec3 m_forward;
 
 	float m_speed;
 	float m_animStart;
+	float m_attack;
+	float m_range;
+
+	float m_deathTimer;
 
 	AABB m_aabb;
 
 	State m_state;
 public:
 	btRigidBody *m_rigidBody;
+	std::string m_stateStr;
+	Entity *m_enemy;
+	glm::vec3 m_target;
+	bool m_boss;
 
 	Entity();
 	~Entity();
 
-	virtual void Init(GLint modelID, glm::vec3 position, AABB aabb, int health, int speed, int thinkRate);
+	virtual void Init(GLint modelID, glm::vec3 position, AABB aabb, int health, int speed, int thinkRate, int range, int attackDmg);
 	void Destroy();
 
 	glm::vec3 GetPosition();
@@ -59,6 +68,8 @@ public:
 
 	virtual void Update();
 	virtual void Think();
+	virtual void Attack(Entity *enemy);
+
 
 	void MoveTo(glm::vec3 target_pos);
 
@@ -67,8 +78,8 @@ public:
 	void SetSelected(bool selected);
 	bool IsSelected();
 
-	int		GetHealth();
-	int		GetMaxHealth();
+	float		GetHealth();
+	float		GetMaxHealth();
 	GLuint	GetEntityModelID();
 
 	Entity *m_nextFree;

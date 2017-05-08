@@ -21,6 +21,7 @@
   <ItemGroup>
     <ClCompile Include="src\3dmath.cpp" />
     <ClCompile Include="src\AnimationController.cpp" />
+    <ClCompile Include="src\audio.cpp" />
     <ClCompile Include="src\camera.cpp" />
     <ClCompile Include="src\client.cpp" />
     <ClCompile Include="src\density.cpp" />
@@ -62,6 +63,7 @@
   <ItemGroup>
     <ClInclude Include="src\Actor.hpp" />
     <ClInclude Include="src\AnimationController.hpp" />
+    <ClInclude Include="src\audio.hpp" />
     <ClInclude Include="src\camera.hpp" />
     <ClInclude Include="src\client.hpp" />
     <ClInclude Include="src\density.hpp" />
@@ -113,6 +115,7 @@
     <None Include="Resources\gui\menu.json" />
     <None Include="Resources\models\models.json" />
     <None Include="Resources\resources.json" />
+    <None Include="Resources\sounds\sound.json" />
     <None Include="Resources\structures.json" />
     <None Include="Resources\textures\texture.json" />
     <None Include="shader\billboard_fs.glsl" />

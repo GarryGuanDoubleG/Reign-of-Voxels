@@ -18,6 +18,8 @@ private:
 public:
 	Json m_entity_defs;
 	Json m_structureDefs;
+	Json m_music_defs;
+	Json m_sound_defs;
 
 	std::map<std::string, GLuint> m_textures;
 	std::map<std::string, GLuint> m_normalMaps;
@@ -71,5 +73,7 @@ glm::vec3 GetModelScale(GLint id);
 Json GetEntityDef(std::string key);
 Json GetStructDef(std::string key);
 
+std::string GetSoundDef(std::string key);
+std::string GetMusicDef(std::string key);
 
 int GetConfigSetting(std::string key);

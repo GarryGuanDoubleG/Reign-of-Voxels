@@ -352,11 +352,6 @@ void VoxelOctree::ContourProcessEdge(std::vector<GLuint> &m_tri_indices, VoxelOc
 		signChange[i] =
 			(m1 == MATERIAL_AIR && m2 != MATERIAL_AIR) ||
 			(m1 != MATERIAL_AIR && m2 == MATERIAL_AIR);
-		//TODO move to terrain type
-		if (node[i]->m_drawInfo->averageNormal.y > .95f && node[i]->m_drawInfo->type == DIRT)
-		{
-			g_terrainGrassPos.push_back(node[i]->m_drawInfo->position + glm::vec3((rand() % 10) / 10.0f, 0, (rand() % 10) / 10.0f));
-		}
 	}
 
 	if (signChange[minIndex])
@@ -786,8 +781,30 @@ void VoxelOctree::InitChildren()
 
 int VoxelOctree::AddTerrainType(const OctreeDrawInfo *drawInfo)
 {
-	GLint type = GRASS;
+	GLint type = DIRT;
 	sf::Color terrainColor = GetPerlinColorValue(drawInfo->position.x, drawInfo->position.z);
+	if (drawInfo->position.y >= 2 && drawInfo->position.y <= 4)
+	{
+		type = GRASS;
+	}
+	else if (drawInfo->position.y >= maxHeight - 8)
+	{
+		type = SNOW;
+	}
+	else if (drawInfo->position.y >= 5)
+	{
+		type = DIRT;
+	}
+	else if (drawInfo->position.y <= 2)
+	{
+		type = GRASS;
+		for (int i = 0; i < 3; i++)
+		{
+			float randomx = 4.0f / (float)(rand() % 8);
+			float randomz = 4.0f / (float)(rand() % 8);
+			g_terrainGrassPos.push_back(drawInfo->position + glm::vec3(randomx, 0, randomz));
+		}
+	}
 
 	//if (terrainColor == sf::Color(224, 224, 0))
 	//{

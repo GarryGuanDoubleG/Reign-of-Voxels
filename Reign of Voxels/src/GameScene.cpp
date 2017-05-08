@@ -1,6 +1,7 @@
 #include <fstream>
 #include <map>
 
+
 #include "game.hpp"
 #include "model.hpp"
 #include "GameScene.hpp"
@@ -45,10 +46,15 @@ GameScene::GameScene()
 	m_voxelManager = new VoxelManager(resolution);
 	m_voxelManager->GenerateVoxels(m_physics);
 
+	m_boss = NULL;
+
 	InitMinimap();
 	InitWater();
 	InitRayVertex();
 	InitSkybox();
+	
+	m_audio = new Audio();
+	m_audio->Init(m_camera->GetPosition(), m_camera->GetForward(), 100);
 
 	//allocate memeory for all entities
 	m_entity_list = new Entity[MAX_ENTITES];
@@ -63,6 +69,10 @@ GameScene::GameScene()
 		m_structure_list[i].m_nextFree = &m_structure_list[i + 1];
 	m_next_free_struct = m_structure_list;
 
+	m_castle_alive = false;
+	m_boss_alive = false;
+
+	m_audio->PlayMusic("game", 40);
 	Game::instance().getEventSystem().addObserver(this);
 }
 /**
@@ -342,6 +352,15 @@ void GameScene::Update()
 			m_structure_list[i].Update();		
 	}
 
+	if(m_boss && m_boss->GetHealth() <= 0)
+	{
+		m_hud->ActiveWidget("victory");
+	}
+	else if(m_castle && m_castle->GetHealth() < 0)
+	{
+		m_hud->ActiveWidget("defeat");
+	}
+
 	m_camera->Update();
 }
 
@@ -426,9 +445,12 @@ void GameScene::RenderModel(Entity *entity)
 
 	glUseProgram(shader);
 
+	//glm::mat4 glmRot = glm::lookAt(entity->GetPosition(), entity->m_target - entity->GetPosition(), glm::vec3(0.0f, 1.0f, 0.0f));
+
 	glm::mat4 model(1.0f);
-	model = glm::translate(glm::mat4(1.0f), entity->GetPosition());
 	model = glm::scale(model, GetModelScale(entity->GetEntityModelID()));
+	//model = glmRot * model;
+	model = glm::translate(glm::mat4(1.0f), entity->GetPosition()) * model;
 
 	glm::vec3 light_pos(256, 512.0f, 256);
 	glm::vec3 light_color(1.0f, 1.0f, 1.0f);
@@ -457,7 +479,7 @@ void GameScene::RenderModel(Entity *entity)
 	glUniform3fv(glGetUniformLocation(shader, "colorMod"), 1, &ent_color[0]);
 
 	if (ent_model->IsRigged())
-		ent_model->Draw(shader, Game::instance().clock.getElapsedTime().asSeconds());
+		ent_model->Draw(shader, entity->m_stateStr, Game::instance().clock.getElapsedTime().asSeconds());
 	else
 		ent_model->Draw(shader);
 
@@ -825,6 +847,31 @@ void GameScene::EntityRayCollision(Ray ray)
 	}
 }
 
+bool GameScene::BossRayCollision(Ray ray)
+{
+	if (!m_boss)
+	{
+		return false;
+	}
+
+	bool hit = AABBRayIntersection(m_boss->GetPosition(), m_boss->GetAABB(), ray);
+
+	if (!hit)
+		return false;
+
+	for (int i = 0; i < MAX_ENTITES; i++)
+	{
+		if (!m_entity_list[i].IsActive() || !m_entity_list[i].IsSelected())
+			continue;
+		if (&m_entity_list[i] == m_boss)
+			continue;
+
+		m_entity_list[i].Attack(m_boss);
+	}
+
+	return hit;
+}
+
 /**
 *@brief Handles user input
 *@param event the user input
@@ -847,7 +894,7 @@ void GameScene::HandleInput(sf::Event event)
 			m_flags ^= SELECTION_MODE;
 			break;
 		case sf::Keyboard::R:
-			//CreateEntity();
+			CreateBoss();
 			break;
 		case sf::Keyboard::T:
 			m_rays.clear();
@@ -931,18 +978,21 @@ void GameScene::HandleInput(sf::Event event)
 		}
 		else // right click
 		{
-			glm::vec3 hit;
-
-			if (PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit))
+			if (!BossRayCollision(ray))
 			{
-				std::cout << "Hit.x " << hit.x << "\nHit.y " << hit.y << "\nHit.z" << hit.z << std::endl;
-			}
-			for (int i = 0; i < MAX_ENTITES; i++)
-			{
-				if (!m_entity_list[i].IsActive() || !m_entity_list[i].IsSelected())
-					continue;
+				glm::vec3 hit;
 
-				m_entity_list[i].MoveTo(hit);
+				if (PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit))
+				{
+					std::cout << "Hit.x " << hit.x << "\nHit.y " << hit.y << "\nHit.z" << hit.z << std::endl;
+				}
+				for (int i = 0; i < MAX_ENTITES; i++)
+				{
+					if (!m_entity_list[i].IsActive() || !m_entity_list[i].IsSelected())
+						continue;
+
+					m_entity_list[i].MoveTo(hit);
+				}
 			}
 		}
 	}
@@ -972,6 +1022,8 @@ void GameScene::SelectionInput(sf::Event event)
 
 		if (event.mouseButton.button == sf::Mouse::Right)
 		{
+			m_worldChanged = true;
+
 			if (PhysicsUtil::WorldRayCast(m_voxelManager, ray, 1000.0f, hit, face))
 			{
 				m_voxelManager->DestroyVoxel(hit, face);
@@ -997,7 +1049,6 @@ void GameScene::HandleBuildModeInput(sf::Event event)
 
 }
 
-
 void GameScene::CreateEntity(std::string unitName)
 {
 	Entity *entity = m_next_free_entity;
@@ -1008,6 +1059,9 @@ void GameScene::CreateEntity(std::string unitName)
 	int health = def["health"];
 	int speed = def["speed"];
 	int thinkRate = def["thinkRate"];
+	int attack = def["attack"];
+	int attackRange = def["range"];
+
 	GLuint model = GetModelID(def["model"]);
 
 	Json data = def["AABBmin"];
@@ -1017,7 +1071,7 @@ void GameScene::CreateEntity(std::string unitName)
 	AABB aabb = { min, max};
 	if (m_castle)
 	{
-		entity->Init(model, m_castle->GetPosition() + glm::vec3(0, 1, 5.0f), aabb, health, speed, thinkRate);
+		entity->Init(model, m_castle->GetPosition() + glm::vec3(0, 1, 5.0f), aabb, health, speed, thinkRate, attackRange, attack);
 		entity->m_rigidBody = m_physics->CubeRigidBody(aabb.max, entity->GetPosition(), 1);
 		entity->m_nextFree = NULL;
 	}
@@ -1044,10 +1098,47 @@ void GameScene::CreateStructure(std::string structName)
 	{
 		if (!m_castle)
 		{
+			m_castle_alive = true;
 			m_castle = entity;
 			entity->Init(m_selection_box + m_selection_face, aabb, health, speed, thinkRate, structName);
-			entity->m_rigidBody = m_physics->CubeRigidBody(aabb.max, entity->GetPosition(), 1);
+			entity->m_rigidBody = m_physics->CubeRigidBody(aabb.max, entity->GetPosition(), 9999);
 			entity->m_nextFree = NULL;
+
+			Game::instance().getEventSystem().Notify(Sound, std::string("hammer"));
 		}
+	}
+}
+
+void GameScene::CreateBoss()
+{
+	Entity *entity = m_next_free_entity;
+	m_next_free_entity = entity->m_nextFree;
+
+	Json def = GetEntityDef("boss");
+
+	int health = def["health"];
+	int speed = def["speed"];
+	int attack = def["attack"];
+	int thinkRate = def["thinkRate"];
+	float attackRange = def["range"];
+
+	GLuint model = GetModelID(def["model"]);
+
+	Json data = def["AABBmin"];
+	glm::vec3 min = glm::vec3(def["AABBmin"][0], def["AABBmin"][1], def["AABBmin"][2]);
+	glm::vec3 max = glm::vec3(def["AABBmax"][0], def["AABBmax"][1], def["AABBmax"][2]);
+
+	AABB aabb = { min, max };
+
+	if (m_castle && !m_boss)
+	{
+		m_boss_alive = true;
+
+		m_boss = entity;
+		entity->Init(model, m_castle->GetPosition() + glm::vec3(0, 10, 35.0f), aabb, health, speed, thinkRate, attackRange, attack);
+		entity->m_rigidBody = m_physics->CubeRigidBody(aabb.max - aabb.min, entity->GetPosition() + 1.5f, 1);
+		entity->m_nextFree = NULL;
+		m_boss->m_enemy = m_castle;
+		m_boss->Attack(m_castle);
 	}
 }

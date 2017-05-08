@@ -11,6 +11,8 @@ enum Event
 	ServerInput,/**<  Player input sent from server*/ 
 	BuildButton,
 	UnitButton,
+	Sound,
+	Music,
 	Chat, /**<  Player typed something in chat*/  
 	Start, /**< Player starts the game*/  
 	InitGame, /**< Server response to inform all players to initiate game*/  

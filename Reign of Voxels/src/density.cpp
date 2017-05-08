@@ -22,17 +22,18 @@ float Cuboid(const glm::vec3& worldPosition, const glm::vec3& origin, const glm:
 //axis aligned plane
 float Density_PlanarFunc(const glm::vec3 &worldPosition)
 {
-	const int PLANE = 10;
+	const int PLANE = 2;
 
 	const float terrain = Density_Func(worldPosition);
 	const float terrain_plane = worldPosition.y - PLANE;
 
-	//return  glm::min(terrain, glm::max(-terrain, terrain_plane));
+	//return  glm::min(terrain, terrain_plane);
 	return terrain_plane;
 }
 
 float Density_Func(const glm::vec3& worldPosition)
 {
+	//const plane = 2.0
 	const float heightScale = 1.0f / VoxelOctree::maxHeight;
 	float perlinMapVal = GetPerlinMapValue(worldPosition.x, worldPosition.z);
 

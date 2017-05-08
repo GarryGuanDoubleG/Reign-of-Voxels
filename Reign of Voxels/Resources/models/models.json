@@ -2,11 +2,30 @@
   "worker": {
     "path": "Resources\\models\\worker\\chr_knight.fbx",
     "anim": {
-      "hook_punch": "Resources\\models\\worker\\hook_punch.fbx",
+      "attack": "Resources\\models\\worker\\hook_punch.fbx",
       "walking": "Resources\\models\\worker\\walking.fbx",
       "jogging": "Resources\\models\\worker\\jogging.fbx"
     },
     "scale": [ 0.1, 0.1, 0.1 ]
+  },
+
+  "boss": {
+    "path": "Resources\\models\\boss\\boss.fbx",
+    "anim": {
+      "death": "Resources\\models\\boss\\boss_death.fbx",
+      "walking": "Resources\\models\\boss\\boss_idle.fbx",
+      "attack": "Resources\\models\\boss\\boss_attack.fbx"
+    },
+    "scale": [ 0.25, 0.25, 0.25 ]
+  },
+  "swordsman": {
+    "path": "Resources\\models\\swordsman\\swordsman.fbx",
+    "anim": {
+      "death": "Resources\\models\\swordsman\\swordsman_death.fbx",
+      "attack": "Resources\\models\\swordsman\\swordsman_walk.fbx",
+      "walking": "Resources\\models\\swordsman\\swordsman_attack.fbx"
+    },
+    "scale": [ 0.25, 0.25, 0.25 ]
   },
 
   "castle": {

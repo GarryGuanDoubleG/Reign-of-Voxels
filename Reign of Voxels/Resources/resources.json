@@ -5,6 +5,7 @@
   "textures": "Resources\\textures\\texture.json",
   "config": "Resources\\config.json",
   "entity": "Resources\\entity.json",
-  "structures": "Resources\\structures.json"
+  "structures": "Resources\\structures.json",
+  "sounds" : "Resources\\sound.json"
 }
 

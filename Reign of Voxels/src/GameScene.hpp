@@ -7,7 +7,7 @@
 #include "camera.hpp"
 #include "HUD.hpp"
 #include "VoxelManager.hpp"
-
+#include "audio.hpp"
 
 #define MAX_ENTITES 400
 #define MAX_STRUCTURES 100
@@ -37,6 +37,7 @@ private:
 
 	HUD * m_hud;/**<HUD handler class that managers hud inputs and rendering*/
 
+	Audio * m_audio;
 
 	Physics *m_physics;
 	BulletDebugDrawer m_physicsDrawer;
@@ -78,6 +79,9 @@ private:
 	std::string m_buildModeName;
 
 	Structure *m_castle;
+	Entity * m_boss;
+	bool m_boss_alive;
+	bool m_castle_alive;
 public:
 	/**
 	* constructor
@@ -116,6 +120,7 @@ private:
 	void Update();
 
 	void EntityRayCollision(Ray ray);
+	bool BossRayCollision(Ray ray);
 	/**
 	*@brief Handles user input
 	*@param event the user input
@@ -154,5 +159,6 @@ private:
 	*/
 	void CreateEntity(std::string unitName);
 	void CreateStructure(std::string structName);
+	void CreateBoss();
 
 };

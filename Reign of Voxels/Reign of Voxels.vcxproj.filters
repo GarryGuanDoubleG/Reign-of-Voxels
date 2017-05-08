@@ -138,6 +138,9 @@
     <ClCompile Include="src\Physics.cpp">
       <Filter>Source</Filter>
     </ClCompile>
+    <ClCompile Include="src\audio.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="src\Actor.hpp">
@@ -267,6 +270,9 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="src\Physics.hpp">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="src\audio.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
@@ -403,6 +409,9 @@
     </None>
     <None Include="shader\transparentObject_vs.glsl">
       <Filter>Shaders</Filter>
+    </None>
+    <None Include="Resources\sounds\sound.json">
+      <Filter>Json</Filter>
     </None>
   </ItemGroup>
 </Project>

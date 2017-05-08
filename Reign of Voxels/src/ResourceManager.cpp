@@ -72,6 +72,21 @@ void ResourceManager::LoadResources()
 		LoadStructureDefs(data);
 		in.close();
 	}
+
+	std::string sound_def = resources["sounds"];
+	in.open(sound_def);
+
+	if (in.is_open())
+	{
+		data.clear();
+		in >> data;
+		
+		m_music_defs = data["music"];
+		m_sound_defs = data["sound"];
+
+		in.close();
+	}
+
 }
 
 void ResourceManager::LoadConfig()
@@ -242,6 +257,8 @@ int GetConfigSetting(std::string key)
 {
 	return g_resourceManager->GetConfigSetting(key);
 }
+/*****store things as Json objects or map and use the key to get its value in the definition file ****/
+
 
 GLuint GetTextureID(std::string name)
 {
@@ -271,4 +288,22 @@ Json GetStructDef(std::string key)
 Json GetEntityDef(std::string key)
 {
 	return g_resourceManager->GetEntityDef(key);
+}
+
+std::string GetSoundDef(std::string key)
+{
+	return g_resourceManager->m_sound_defs[key];
+}
+
+std::string GetMusicDef(std::string key)
+{
+	Json data = g_resourceManager->m_music_defs;
+
+	for (Json::iterator it = data.begin(); it != data.end(); ++it)
+	{
+		std::cout << "data: " << it.key() << std::endl;
+		std::cout << "data: " << it.value() << std::endl;
+	}
+
+	return g_resourceManager->m_music_defs[key];
 }

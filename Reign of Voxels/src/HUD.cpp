@@ -65,6 +65,14 @@ void LoadHudWidget(Json &data, HUDWidget &widget)
 		widget.rect.position.y = (float)Game::screen_height - widget.rect.size.y;
 	}
 
+	if (data.find("active") != data.end())
+	{
+		widget.active = data["active"];
+	}
+	else
+	{
+		widget.active = true;
+	}
 }
 
 //load textures and fonts
@@ -168,11 +176,25 @@ void HUD::Render()
 
 	for (int i = 0; i < m_widgets.size(); i++)
 	{
+		if (!m_widgets[i].active)
+			continue;
+
 		glBindTexture(GL_TEXTURE_2D, m_widgets[i].textureID);
 
 		glBindVertexArray(m_widgets[i].vao);
 		glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_INT, 0);
 		glBindVertexArray(0);
+	}
+}
+
+void HUD::ActiveWidget(std::string name)
+{
+	for (int i = 0; i < m_widgets.size(); i++)
+	{
+		if (m_widgets[i].name == name)
+		{
+			m_widgets[i].active = true;
+		}
 	}
 }
 
@@ -184,6 +206,9 @@ void HUD::HandleInput(sf::Event event)
 
 		for (int i = 0; i < m_widgets.size(); i++)
 		{
+			if (!m_widgets[i].active)
+				continue;
+
 			if (m_widgets[i].rect.position.x <= mouse_pos.x &&
 				m_widgets[i].rect.position.y <= mouse_pos.y &&
 				mouse_pos.x < m_widgets[i].rect.position.x + m_widgets[i].rect.size.x &&
@@ -192,11 +217,13 @@ void HUD::HandleInput(sf::Event event)
 				if (m_widgets[i].type == "building")
 				{
 					Game::instance().getEventSystem().Notify(BuildButton, m_widgets[i].name);
+					Game::instance().getEventSystem().Notify(Sound, std::string("click"));
 				}
 
 				else if(m_widgets[i].type == "unit")
 				{
 					Game::instance().getEventSystem().Notify(UnitButton, m_widgets[i].name);
+					Game::instance().getEventSystem().Notify(Sound, std::string("click"));
 				}
 
 			}

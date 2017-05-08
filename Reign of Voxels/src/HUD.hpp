@@ -24,6 +24,8 @@ typedef struct HUDWidget
 
 	Vertex2D vertices[4];
 	GLuint indices[6];
+
+	bool active;
 };
 
 class HUD
@@ -37,6 +39,8 @@ public:
 	void BindWidgets();
 
 	void Render();
+
+	void ActiveWidget(std::string name);
 
 	void HandleInput(sf::Event event);
 private:

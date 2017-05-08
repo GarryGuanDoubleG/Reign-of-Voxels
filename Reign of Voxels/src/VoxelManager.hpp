@@ -26,6 +26,11 @@ private:
 	VoxelOctree *m_octreeRoot; // ptr to octree root node
 	VoxelOctree *m_nextFreeNode;//linked list of inactive nodes
 
+	std::vector<VoxelVertex> m_water_verts;
+	std::vector<GLuint> m_water_tri;
+
+	VoxelOctree *m_waterRoot;
+
 public:
 	VoxelManager(int worldSize);
 	~VoxelManager();

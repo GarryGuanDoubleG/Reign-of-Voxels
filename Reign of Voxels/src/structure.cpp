@@ -15,7 +15,11 @@ Structure::~Structure()
 void Structure::Init(glm::vec3 position, AABB aabb, int health, int speed, int thinkRate, std::string name)
 {
 	GLuint modelID = GetModelID(name + "1");
-	Entity::Init(modelID, position, aabb, health, speed, thinkRate);
+	if (modelID == 0)
+	{
+		modelID = GetModelID(name);
+	}
+	Entity::Init(modelID, position, aabb, health, speed, thinkRate, 0, 0);
 
 	m_structFlag = STRUCT_BUILDING_MODE; // start building
 
@@ -50,6 +54,11 @@ void Structure::Update()
 			std::string nextModel = m_buildInfo->name + std::to_string(buildFrame);
 			m_modelID = GetModelID(nextModel);
 		}		
+	}
+
+	if (m_health < 0)
+	{
+		Destroy();
 	}
 
 }

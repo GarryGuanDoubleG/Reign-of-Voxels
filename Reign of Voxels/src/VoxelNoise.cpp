@@ -31,10 +31,9 @@ std::string GenerateTerrainMap(int resolution)
 	baseFlatTerrain.SetOctaveCount(2.0f);
 	baseFlatTerrain.SetPersistence(2.0f);
 
-
 	module::ScaleBias flatTerrain;
 	flatTerrain.SetSourceModule(0, baseFlatTerrain);
-	flatTerrain.SetScale(0.0125);
+	flatTerrain.SetScale(0.0);
 	flatTerrain.SetBias(-1.0);
 
 	module::Perlin terrainType;
@@ -52,8 +51,6 @@ std::string GenerateTerrainMap(int resolution)
 
 	utils::NoiseMap heightMap;
 	utils::NoiseMapBuilderPlane heightMapBuilder;
-
-
 
 	heightMapBuilder.SetSourceModule(finalTerrain);
 	heightMapBuilder.SetDestNoiseMap(heightMap);
@@ -77,7 +74,7 @@ std::string GenerateTerrainMap(int resolution)
 	renderer.SetSourceNoiseMap(heightMap);
 	renderer.SetDestImage(image);
 	renderer.ClearGradient();
-	renderer.AddGradientPoint(-1.00, utils::Color(32, 160, 0, 255)); // grass
+	renderer.AddGradientPoint(-1.00, utils::Color(0, 0, 255, 255)); // grass
 	renderer.AddGradientPoint(-0.25, utils::Color(224, 224, 0, 255)); // dirt
 	renderer.AddGradientPoint(0.25, utils::Color(128, 128, 128, 255)); // rock
 	renderer.AddGradientPoint(1.00, utils::Color(255, 255, 255, 255)); // snow

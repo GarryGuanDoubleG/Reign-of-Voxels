@@ -14,6 +14,7 @@
 #define WATER 1
 #define SNOW 2
 #define DIRT 3
+#define SOIL 4
 
 enum OctreeNodeType
 {

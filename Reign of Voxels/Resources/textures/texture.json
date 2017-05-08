@@ -15,12 +15,16 @@
   "snow": {
     "path": "Resources\\textures\\snow.png"
   },
+   "soil": {
+    "path": "Resources\\textures\\soil.png"
+  },
   "billboard_grass": {
     "path": "Resources\\textures\\billboard_grass.png"
   },
   "skybox": {
     "path": "Resources\\textures\\skybox\\"
   },
+
   "skybox1": {
     "path": "Resources\\textures\\skybox\\front.jpg"
   },

@@ -84,13 +84,13 @@ void Game::Initialize()
 	GraphicsInit();
 	CompileAllShaders();
 
+	m_resourceManager->LoadResources();
+
 	m_instance.m_sceneManager = new SceneManager(new GameScene()); // first scene will be menu
 	m_instance.m_client = new Client();//managers communication with the server
 
 	m_initialized = true;
 	m_lock_mouse = false;
-
-	m_resourceManager->LoadResources();
 }
 /*
 * @brief throws a close game event to start clean up process

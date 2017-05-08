@@ -220,9 +220,7 @@ void VoxelManager::RenderGrass(Camera * player_cam)
 	GLuint shader = GetShader("billboard");
 	glUseProgram(shader);
 	
-	glDepthFunc(GL_ALWAYS);
-	/*glDisable(GL_DEPTH_FUNC);
-	glDisable(GL_DEPTH_TEST);*/
+	glDepthFunc(GL_LEQUAL);
 
 	glm::vec3 light_pos = glm::vec3(256, 512, 256);
 	glm::vec3 light_color = glm::vec3(1.0f, 1.0f, 1.0f);
@@ -231,6 +229,11 @@ void VoxelManager::RenderGrass(Camera * player_cam)
 	glm::mat4 model(1.0f);
 
 	glm::vec2 billboardSize(1.0f, 2.0f);
+
+	glDepthMask(GL_FALSE);
+	glEnable(GL_BLEND);
+	glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
+
 
 	glUniformMatrix4fv(glGetUniformLocation(shader, "view"), 1, GL_FALSE, &player_cam->GetViewMat()[0][0]);
 	glUniformMatrix4fv(glGetUniformLocation(shader, "projection"), 1, GL_FALSE, &player_cam->GetProj()[0][0]);
@@ -252,6 +255,9 @@ void VoxelManager::RenderGrass(Camera * player_cam)
 	
 	glActiveTexture(GL_TEXTURE0);
 
+	//draw transparent object ...
+	//glDisable(GL_BLEND);
+	glDepthMask(GL_TRUE);
 	glDepthFunc(GL_LESS);
 }
 
@@ -343,7 +349,7 @@ void VoxelManager::RenderWater(GLuint reflectionTex, GLuint refractionTex, Camer
 
 	int loc = glGetUniformLocation(shader, "cameraPos");
 
-	m_octreeRoot->DrawWater();
+	m_waterRoot->DrawWater();
 
 	glActiveTexture(GL_TEXTURE0);
 	//glBindTexture(GL_TEXTURE_2D, 0);
@@ -380,11 +386,11 @@ void VoxelManager::RenderVoxels(bool draw_textured, Camera * player_cam)
 	glUniform3fv(glGetUniformLocation(voxel_shader, "lightPos"), 1, &light_pos[0]);
 	glUniform3fv(glGetUniformLocation(voxel_shader, "lightColor"), 1, &light_color[0]);
 
-	//voxels
-	glUniform3fv(glGetUniformLocation(voxel_shader, "voxelColor"), 1, &voxel_color[0]);
+//voxels
+glUniform3fv(glGetUniformLocation(voxel_shader, "voxelColor"), 1, &voxel_color[0]);
 
-	VoxelOctree::Draw(voxel_shader);
-	m_octreeRoot->Draw();
+VoxelOctree::Draw(voxel_shader);
+m_octreeRoot->Draw();
 }
 
 void VoxelManager::RenderVoxelTextured(Camera *player_cam)
@@ -410,13 +416,14 @@ void VoxelManager::RenderVoxelTextured(Camera *player_cam)
 
 
 	// Now set the sampler to the correct texture unit
-	
+
 	// And finally bind the texture
 	//textures
 	GLuint grass = GetTextureID("grass");
 	GLuint water = GetTextureID("water");
 	GLuint snow = GetTextureID("snow");
 	GLuint dirt = GetTextureID("dirt");
+	GLuint soil = GetTextureID("soil");
 
 	glActiveTexture(GL_TEXTURE0);
 	glBindTexture(GL_TEXTURE_2D, grass);
@@ -430,10 +437,13 @@ void VoxelManager::RenderVoxelTextured(Camera *player_cam)
 	glActiveTexture(GL_TEXTURE0 + 3);
 	glBindTexture(GL_TEXTURE_2D, dirt);
 
+	glActiveTexture(GL_TEXTURE0 + 4);
+	glBindTexture(GL_TEXTURE_2D, soil);
+
 	glActiveTexture(GL_TEXTURE0);
 
-	GLint samplers[4] = { 0, 1, 2, 3};
-	glUniform1iv(glGetUniformLocation(voxel_shader, "voxelTexture"), 4, &samplers[0]);
+	GLint samplers[] = { 0, 1, 2, 3, 4 };
+	glUniform1iv(glGetUniformLocation(voxel_shader, "voxelTexture"), 5, &samplers[0]);
 
 	m_octreeRoot->Draw();
 }
@@ -444,9 +454,7 @@ bool VoxelManager::BlockWorldPosActive(glm::vec3 world_pos)
 
 	if (!node || ~node->m_flag & OCTREE_ACTIVE)
 		return false;
-	
-	/*VoxelChunk * chunk = m_octreeRoot->FindChunk(world_pos);
-	chunk->m_render_mode = !chunk->m_render_mode;*/
+
 
 	return true;
 }
@@ -469,37 +477,52 @@ void VoxelManager::DestroyVoxel(glm::ivec3 world_pos, glm::ivec3 face)
 	if (world_pos.x == min.x || world_pos.y == min.y || world_pos.z == min.z ||
 		world_pos.x == max.x || world_pos.y == max.y || world_pos.z == max.z)
 	{
-		glm::ivec3 neighborPos = world_pos - face;
-		VoxelChunk *neighbor = chunk->m_node->FindChunk(neighborPos);
 
-		VoxelOctree *leaf_node = NULL;
-		if (!neighbor || ~neighbor->m_node->m_flag & OCTREE_ACTIVE)
+		for (int i = 0; i < 6; i++)
 		{
-			leaf_node = InitNode(neighborPos, 1);
-			m_octreeRoot->AssignLeafNode(leaf_node);
+			VoxelChunk *neighbor = chunk->m_neighbor[i];
+			glm::ivec3 neighborPos = chunk->m_node->m_min + g_neighbors[i] * VoxelChunk::CHUNK_SIZE;
 
-			neighbor = m_octreeRoot->FindChunk(neighborPos);
-			if (neighbor)
+			if (!neighbor || ~neighbor->m_node->m_flag & OCTREE_ACTIVE)
 			{
-				neighbor->m_node->BuildTree(neighborPos);
+				VoxelOctree *leaf_node = NULL;
 
-				neighbor->m_csgOpPos.push_back(neighborPos);
+				leaf_node = InitNode(neighborPos, 1);
+				m_octreeRoot->AssignLeafNode(leaf_node);
+
+				neighbor = m_octreeRoot->FindChunk(neighborPos);
+				if (neighbor)
+				{
+					neighbor->m_node->BuildTree(neighborPos);
+					neighbor->m_csgOpPos.push_back(neighborPos);
+				}
+				chunk->m_node->AssignNeighbors();
 			}
+
+			//if (!BOUNDCONTAINS3D(neighbor->m_node->m_min.x, neighbor->m_node->m_min.y, neighbor->m_node->m_min.z, 
+			//					 neighborPos.x, neighborPos.y, neighborPos.z,
+			//					 VoxelChunk::CHUNK_SIZE, VoxelChunk::CHUNK_SIZE, VoxelChunk::CHUNK_SIZE))
+			//{
+			//	continue;
+			//}
+			else if(neighborPos.y > 3)
+			{
+				neighbor->m_csgOpPos.push_back(neighborPos);
+				neighbor->m_node->BuildTree(neighbor->m_csgOpPos);
+			}
+			if (!neighbor || neighbor->m_node->m_min.y <= 2)
+			{
+				continue;
+			}
+			neighbor->m_vertices.clear();
+			neighbor->m_tri_indices.clear();
+
+			neighbor->m_node->GenerateVertexIndices(neighbor->m_vertices);
+			neighbor->m_node->ContourCellProc(neighbor->m_tri_indices);
+
+			neighbor->GenerateSeam();
+			neighbor->BindMesh();
 		}
-		else
-		{
-			neighbor->m_csgOpPos.push_back(neighborPos);
-			neighbor->m_node->BuildTree(neighbor->m_csgOpPos);
-		}
-
-		neighbor->m_vertices.clear();
-		neighbor->m_tri_indices.clear();
-
-		neighbor->m_node->GenerateVertexIndices(neighbor->m_vertices);
-		neighbor->m_node->ContourCellProc(neighbor->m_tri_indices);
-
-		neighbor->GenerateSeam();
-		neighbor->BindMesh();
 	}
 
 	chunk->m_csgOpPos.push_back(world_pos);
@@ -539,39 +562,46 @@ bool VoxelManager::IsWaterChunk(int x, int z)
 void VoxelManager::GenerateWater()
 {
 	//find regions with water by looking at color map
-	for (int x = 0; x < m_worldSize; x += VoxelChunk::CHUNK_SIZE)
-	{
-		for (int z = 0; z < m_worldSize; z += VoxelChunk::CHUNK_SIZE)
-		{					
-			if (IsWaterChunk(x,z))
-			{
-				VoxelChunk* chunk = m_octreeRoot->FindChunk(glm::ivec3(x, WATER_HEIGHT, z));
-				if (chunk)
-				{
-					m_water_chunks.push_back(chunk);
-				}
-			}
-		}
-	}
+	//for (int x = 0; x < m_worldSize; x += VoxelChunk::CHUNK_SIZE)
+	//{
+	//	for (int z = 0; z < m_worldSize; z += VoxelChunk::CHUNK_SIZE)
+	//	{					
+	//		if (IsWaterChunk(x,z))
+	//		{
+	//			VoxelChunk* chunk = m_octreeRoot->FindChunk(glm::ivec3(x, WATER_HEIGHT, z));
+	//			if (chunk)
+	//			{
+	//				m_water_chunks.push_back(chunk);
+	//			}
+	//		}
+	//	}
+	//}
 
-	for(int i = 0; i < m_water_chunks.size(); i++)
-	{
-		VoxelChunk *chunk = m_water_chunks[i];
+	//for(int i = 0; i < m_water_chunks.size(); i++)
+	//{
+	//	VoxelChunk *chunk = m_water_chunks[i];
 
-		glm::ivec3 chunkMin = chunk->m_node->m_min;
+	//	glm::ivec3 chunkMin = chunk->m_node->m_min;
 
-		VoxelOctree *water_root = InitNode(chunkMin, VoxelChunk::CHUNK_SIZE);
-		chunk->m_water_tree = water_root;
+	//	VoxelOctree *water_root = InitNode(chunkMin, VoxelChunk::CHUNK_SIZE);
+	//	chunk->m_water_tree = water_root;
 
-		water_root->m_chunk = chunk;
-		water_root->BuildWaterTree();
+	//	water_root->m_chunk = chunk;
+	//	water_root->BuildWaterTree();
 
-		water_root->GenerateVertexIndices(chunk->m_water_vertices);
-		water_root->ContourCellProc(chunk->m_water_indices);
+	//	water_root->GenerateSeams();
+	//	water_root->GenerateVertexIndices(chunk->m_water_vertices);
+	//	water_root->ContourCellProc(chunk->m_water_indices);
 
-		chunk->BindWaterPlanes();
-	}
+	//	chunk->BindWaterPlanes();
+	//}
+	VoxelOctree *water_root = InitNode(glm::ivec3(0), m_worldSize);
 
+	water_root->BuildWaterTree();
+
+	water_root->GenerateSeams();
+	water_root->GenerateVertexIndices(m_water_verts);
+	water_root->ContourCellProc(m_water_tri);
 }
 
 void VoxelManager::GenerateRigidBody(Physics *physics)

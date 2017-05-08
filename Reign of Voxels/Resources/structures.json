@@ -7,7 +7,7 @@
     "speed": 0,
     "thinkRate": 1,
     "AABBmin": [ 0, 0, 0 ],
-    "AABBmax": [ 20, 20, 20 ],
+    "AABBmax": [ 20, 10, 20 ],
 
     "tick_rate": 0.25,
     "totalFrames": 9
